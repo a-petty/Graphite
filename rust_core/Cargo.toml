@@ -1,0 +1,82 @@
+[package]
+name = "semantic_engine"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+tree-sitter = "0.20"
+tree-sitter-python = "0.20"
+tree-sitter-rust = "0.20"
+tree-sitter-javascript = "0.20"
+tree-sitter-typescript = "0.20"
+tree-sitter-go = "0.20"
+petgraph = "0.6"           # Graph algorithms
+ignore = "0.4"             # Fast .gitignore-ignore-aware file walking
+rayon = "1.7"              # Parallel iteration
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+glob = "0.3"
+pyo3 = { version = "0.20", features = ["extension-module"] }
+walkdir = "2.5.0"          # For directory traversal
+pathdiff = "0.2.1"         # For relative path calculations
+lazy_static = "1.4.0"      # For statically allocated HashSets
+# File watching
+notify = { version = "6.1.1", default-features = false, features = ["macos_fsevent"] }
+notify-debouncer-full = "0.3.1"  # Built-in debouncing
+# Thread communication
+crossbeam-channel = "0.5.12"
+# Concurrency primitives
+parking_lot = "0.12"  # More efficient than std::sync::Mutex
+thiserror = "1.0"
+lru = "0.12"
+log = "0.4"
+env_logger = "0.11"
+
+[dev-dependencies]
+tiktoken-rs = { version = "^0.5.2", features = ["async-openai"] }
+tempfile = "3.10.1"        # For creating temporary files/dirs in tests
+criterion = { version = "0.4", features = ["html_reports"] }
+
+[[test]]
+name = "test_symbol_harvesting"
+harness = true
+
+[[test]]
+name = "test_phase2_criteria"
+harness = true
+
+[[test]]
+name = "test_graph_construction"
+harness = true
+
+[[test]]
+name = "test_repo_map"
+harness = true
+
+[[test]]
+name = "test_watcher"
+harness = true
+
+[[test]]
+name = "test_graph_updates"
+harness = true
+
+[[test]]
+name = "test_cpg"
+harness = true
+
+[[test]]
+name = "test_cfg"
+harness = true
+
+[[test]]
+name = "test_dataflow"
+harness = true
+
+[[test]]
+name = "test_callgraph"
+harness = true
+
+[[bench]]
+name = "incremental_benchmark"
+harness = false

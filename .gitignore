@@ -1,0 +1,21 @@
+# Python
+.venv/
+*.pyc
+__pycache__/
+.pytest_cache/
+*.so
+
+# Logs and test results
+repo_map.log
+senpo_watch.log
+test_results_recent.md
+*.log
+
+# Test repository
+test_repo/
+
+# Build artifacts
+dist/
+
+# Rust
+rust_core/target/
