@@ -65,8 +65,13 @@ def create_parser() -> argparse.ArgumentParser:
         help="Target repository path (default: current directory)"
     )
     query_parser.add_argument(
+        "--provider", type=str, default="ollama",
+        choices=["ollama", "mlx"],
+        help="LLM provider to use (default: ollama)."
+    )
+    query_parser.add_argument(
         "--model", type=str, default="deepseek-r2-distill-qwen-32b",
-        help="The Ollama model to use for the query."
+        help="Model name or HuggingFace model ID."
     )
 
     # --- Chat Command ---
@@ -76,8 +81,13 @@ def create_parser() -> argparse.ArgumentParser:
         help="Target repository path (default: current directory)"
     )
     chat_parser.add_argument(
+        "--provider", type=str, default="ollama",
+        choices=["ollama", "mlx"],
+        help="LLM provider to use (default: ollama)."
+    )
+    chat_parser.add_argument(
         "--model", type=str, default="deepseek-r2-distill-qwen-32b",
-        help="The Ollama model to use."
+        help="Model name or HuggingFace model ID."
     )
     chat_parser.add_argument(
         "--max-rounds", type=int, default=5,
@@ -117,13 +127,13 @@ def handle_query_command(args: argparse.Namespace):
     console.print(Panel(
         f"[bold white]Atlas Query[/bold white]\n"
         f"[dim]Target: {target_path}\n"
+        f"Provider: {args.provider}\n"
         f"Model: {args.model}[/dim]",
         border_style="cyan",
         expand=False
     ))
 
-    # Instantiate agent with the real LLM client
-    agent = AtlasAgent(project_root=target_path, use_real_llm=True, model_name=args.model)
+    agent = AtlasAgent(project_root=target_path, provider=args.provider, model_name=args.model)
     agent.initialize()
     agent.query(args.prompt)
 
@@ -136,13 +146,14 @@ def handle_chat_command(args: argparse.Namespace):
     console.print(Panel(
         f"[bold white]Atlas Chat[/bold white]\n"
         f"[dim]Target: {target_path}\n"
+        f"Provider: {args.provider}\n"
         f"Model: {args.model}\n"
         f"Max tool rounds: {args.max_rounds}[/dim]",
         border_style="green",
         expand=False
     ))
 
-    agent = AtlasAgent(project_root=target_path, use_real_llm=True, model_name=args.model)
+    agent = AtlasAgent(project_root=target_path, provider=args.provider, model_name=args.model)
     agent.initialize()
 
     console.print("[bold green]Chat session started.[/bold green] Type [bold]/reset[/bold] to clear history, [bold]exit[/bold] or [bold]quit[/bold] to end.\n")

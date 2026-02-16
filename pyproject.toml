@@ -2,7 +2,7 @@
 name = "atlas"
 version = "0.1.0"
 description = "Python orchestration shell for Project Atlas"
-authors = [{ name = "Alec Petty", email = "alecgpetty@gmail.com" }]
+authors = [{ name = "Alec Petty", email = "alexander@petty.is" }]
 dependencies = [
     "pydantic>=2.0",
     "rich>=13.0",
@@ -22,6 +22,9 @@ dev = [
     "pytest>=7.0",
     "pytest-asyncio>=0.21",
     "mypy>=1.0",
+]
+mlx = [
+    "mlx-lm>=0.20",
 ]
 
 [build-system]

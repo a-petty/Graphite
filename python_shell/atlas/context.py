@@ -28,6 +28,12 @@ MODEL_CONTEXT_WINDOWS = {
     "llama3": 8_000,
     "mistral": 32_000,
     "qwen2.5-coder": 128_000,
+    # Local models (MLX — HuggingFace model IDs)
+    "mlx-community/deepseek-coder": 128_000,
+    "mlx-community/mistral": 32_000,
+    "mlx-community/codellama": 16_000,
+    "mlx-community/llama-3": 8_000,
+    "mlx-community/qwen2.5-coder": 128_000,
 }
 
 CONTEXT_UTILIZATION = 0.60  # Use 60% of window for context (rest for system prompt + response)

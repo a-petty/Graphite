@@ -27,7 +27,7 @@ from atlas.semantic_engine import RepoGraph, FileWatcher, scan_repository, Graph
 # Local Imports
 from .embeddings import EmbeddingManager
 from .context import ContextManager
-from .llm import StubClient, OllamaClient
+from .llm import StubClient, OllamaClient, MLXClient
 from .tools import ToolExecutor
 
 # Setup Rich Console & Logging
@@ -110,19 +110,21 @@ class AtlasAgent:
     Bridges the Rust semantic engine with the Python runtime.
     """
 
-    def __init__(self, project_root: Path, use_real_llm: bool = False, model_name: str = "deepseek-coder"):
+    def __init__(self, project_root: Path, provider: str = "stub", model_name: str = "deepseek-coder"):
         self.config = AgentConfig(project_root=project_root)
         self.project_root_canonical = project_root.resolve()
         self.repo_graph = RepoGraph(str(project_root))
         self.watcher: Optional[FileWatcher] = None
         self.tools = ToolExecutor(project_root.resolve(), self.repo_graph)
         self.running = False
-        
+
         self.embedding_manager = EmbeddingManager()
         self.context_manager = ContextManager(self.repo_graph, self.embedding_manager, model=model_name)
-        
-        if use_real_llm:
+
+        if provider == "ollama":
             self.llm = OllamaClient(model=model_name)
+        elif provider == "mlx":
+            self.llm = MLXClient(model=model_name)
         else:
             self.llm = StubClient()
 
