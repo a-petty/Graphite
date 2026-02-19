@@ -1,5 +1,5 @@
 use lazy_static::lazy_static;
-use log::info;
+use log::{debug, info};
 use serde::Deserialize;
 use std::collections::{HashMap, HashSet};
 use std::fmt::Debug;
@@ -155,10 +155,13 @@ impl PythonImportResolver {
     fn detect_source_roots(&self) -> Vec<PathBuf> {
         let mut roots = Vec::new();
 
+        info!("Source root detection: scanning project root {:?}", self.project_root);
+        info!("Source root detection: ignored_dirs = {:?}", self.ignored_dirs);
+
         let read_dir = match std::fs::read_dir(&self.project_root) {
             Ok(rd) => rd,
-            Err(_) => {
-                info!("Source root detection: cannot read project root {:?}", self.project_root);
+            Err(e) => {
+                info!("Source root detection: cannot read project root {:?}: {}", self.project_root, e);
                 return roots;
             }
         };
@@ -176,20 +179,66 @@ impl PythonImportResolver {
 
             // Skip ignored directories
             if self.ignored_dirs.contains(&dir_name) {
+                debug!("Source root detection: skipping ignored dir {}", dir_name);
                 continue;
             }
 
-            // Check if this directory contains at least one Python package
+            // Check if this directory contains at least one Python package.
+            // A child dir is a Python package if:
+            //   1. It has __init__.py (traditional package), OR
+            //   2. It contains .py files (namespace/implicit package), OR
+            //   3. It has subdirectories with __init__.py (nested packages)
+            let mut found_package = false;
             if let Ok(sub_entries) = std::fs::read_dir(&path) {
                 for sub_entry in sub_entries.filter_map(Result::ok) {
                     let sub_path = sub_entry.path();
-                    if sub_path.is_dir() && sub_path.join("__init__.py").exists() {
+                    if !sub_path.is_dir() {
+                        continue;
+                    }
+                    let sub_name = sub_path.file_name()
+                        .and_then(|n| n.to_str())
+                        .unwrap_or("");
+                    if sub_name.starts_with('.') || sub_name == "__pycache__" {
+                        continue;
+                    }
+
+                    // Check 1: traditional package (has __init__.py)
+                    if sub_path.join("__init__.py").exists() {
                         let canonical = path.canonicalize().unwrap_or_else(|_| path.clone());
-                        info!("Detected source root: {}", canonical.display());
+                        info!("Detected source root: {} (found package {})",
+                              canonical.display(), sub_name);
                         roots.push(canonical);
+                        found_package = true;
                         break;
                     }
+
+                    // Check 2: namespace package (has .py files or sub-packages)
+                    if let Ok(grandchildren) = std::fs::read_dir(&sub_path) {
+                        let has_python = grandchildren.filter_map(Result::ok).any(|gc| {
+                            let gc_path = gc.path();
+                            if gc_path.is_file() {
+                                gc_path.extension().and_then(|e| e.to_str()) == Some("py")
+                            } else if gc_path.is_dir() {
+                                gc_path.join("__init__.py").exists()
+                            } else {
+                                false
+                            }
+                        });
+                        if has_python {
+                            let canonical = path.canonicalize().unwrap_or_else(|_| path.clone());
+                            info!("Detected source root: {} (found namespace package {})",
+                                  canonical.display(), sub_name);
+                            roots.push(canonical);
+                            found_package = true;
+                            break;
+                        }
+                    }
                 }
+            } else {
+                info!("Source root detection: cannot read_dir {}", path.display());
+            }
+            if !found_package {
+                debug!("Source root detection: {} has no Python package subdirs", dir_name);
             }
         }
 
@@ -1252,6 +1301,45 @@ def my_function():
         // Only backend/ should be detected, not node_modules/
         assert_eq!(resolver.source_roots.len(), 1);
         assert_eq!(resolver.source_roots[0], root_path.join("backend"));
+    }
+
+    #[test]
+    fn test_source_root_namespace_package_no_init() {
+        // Mirrors FountainOfYouth layout:
+        //   backend/app/         ← NO __init__.py (namespace package)
+        //   backend/app/main.py  ← has .py files
+        //   backend/app/models/__init__.py  ← sub-packages have __init__.py
+        let root = tempdir().unwrap();
+        let root_path = root.path().canonicalize().unwrap();
+
+        create_dummy_file(&root_path, "backend/__init__.py", "");
+        // app/ has NO __init__.py — this is the key difference
+        create_dummy_file(&root_path, "backend/app/main.py", "from app.models.enums import Foo");
+        create_dummy_file(&root_path, "backend/app/models/__init__.py", "");
+        create_dummy_file(&root_path, "backend/app/models/enums.py", "class Foo: pass");
+        create_dummy_file(&root_path, "backend/app/services/__init__.py", "");
+        create_dummy_file(&root_path, "config/settings/__init__.py", "");
+        create_dummy_file(&root_path, "config/settings/base.py", "DEBUG = True");
+
+        let resolver = PythonImportResolver::new(&root_path, &[], None);
+
+        // Both backend/ and config/ should be detected as source roots
+        let root_names: HashSet<String> = resolver.source_roots.iter()
+            .filter_map(|p| p.file_name().and_then(|n| n.to_str()).map(String::from))
+            .collect();
+        assert!(root_names.contains("backend"),
+            "backend/ should be detected as source root (namespace package with .py files). Found: {:?}",
+            root_names);
+        assert!(root_names.contains("config"),
+            "config/ should be detected as source root. Found: {:?}",
+            root_names);
+
+        // Source-root-relative module keys should exist
+        assert!(resolver.module_index.contains_key("app.main"),
+            "app.main should be in module index. Keys: {:?}",
+            resolver.module_index.keys().collect::<Vec<_>>());
+        assert!(resolver.module_index.contains_key("app.models.enums"),
+            "app.models.enums should be in module index");
     }
 
     #[test]
