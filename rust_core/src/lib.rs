@@ -483,6 +483,7 @@ impl PyRepoGraph {
             dict.set_item("parameters", params)?;
             dict.set_item("return_type", &node.return_type)?;
             dict.set_item("docstring", &node.docstring)?;
+            dict.set_item("bases", &node.bases)?;
             dict.set_item("parent_class", &node.parent_class)?;
             result.push(dict.into_py(py));
         }

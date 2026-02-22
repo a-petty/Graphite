@@ -83,9 +83,10 @@ class Dog(Animal, Serializable):
     assert!(cls.docstring.as_ref().unwrap().contains("good dog"));
 
     let funcs = cpg.get_functions_in_file(&path);
-    assert_eq!(funcs.len(), 2);
-    assert!(funcs.iter().all(|f| f.kind == CpgNodeKind::Method));
-    assert!(funcs.iter().all(|f| f.parent_class.as_deref() == Some("Dog")));
+    assert_eq!(funcs.len(), 3);  // 1 class + 2 methods
+    let methods: Vec<_> = funcs.iter().filter(|f| f.kind == CpgNodeKind::Method).collect();
+    assert_eq!(methods.len(), 2);
+    assert!(methods.iter().all(|f| f.parent_class.as_deref() == Some("Dog")));
 
     // Verify AstChild edges from class to methods
     let class_idx = cpg.file_to_nodes.get(&path).unwrap().iter().find(|idx| {
@@ -142,7 +143,7 @@ class Service:
 
     let path = PathBuf::from("/test/app.py");
     let funcs = cpg.get_functions_in_file(&path);
-    assert_eq!(funcs.len(), 3);
+    assert_eq!(funcs.len(), 4);  // 1 class + 3 functions/methods
 
     let names: Vec<&str> = funcs.iter().map(|f| f.name.as_str()).collect();
     assert!(names.contains(&"index"));
@@ -262,7 +263,7 @@ def format_name(first: str, last: str) -> str:
 
     // Check models.py
     let model_funcs = cpg.get_functions_in_file(&root_path.join("models.py"));
-    assert_eq!(model_funcs.len(), 2);
+    assert_eq!(model_funcs.len(), 3);  // 1 class + 2 methods
 
     let model_classes = cpg.get_classes_in_file(&root_path.join("models.py"));
     assert_eq!(model_classes.len(), 1);

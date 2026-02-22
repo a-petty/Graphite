@@ -486,22 +486,26 @@ async def get_file_symbols(file_path: str) -> str:
                 for sym in symbols:
                     kind = sym["kind"]
                     name = sym["name"]
-                    params = sym.get("parameters", [])
-                    param_strs = []
-                    for p in params:
-                        s = p["name"]
-                        if p.get("type_annotation"):
-                            s += f": {p['type_annotation']}"
-                        if p.get("default_value"):
-                            s += f" = {p['default_value']}"
-                        param_strs.append(s)
-                    sig = f"{kind} {name}({', '.join(param_strs)})"
-                    ret = sym.get("return_type")
-                    if ret:
-                        sig += f" -> {ret}"
-                    parent = sym.get("parent_class")
-                    if parent:
-                        sig += f"  [in class {parent}]"
+                    if kind == "class":
+                        bases = sym.get("bases", [])
+                        sig = f"class {name}({', '.join(bases)})" if bases else f"class {name}"
+                    else:
+                        params = sym.get("parameters", [])
+                        param_strs = []
+                        for p in params:
+                            s = p["name"]
+                            if p.get("type_annotation"):
+                                s += f": {p['type_annotation']}"
+                            if p.get("default_value"):
+                                s += f" = {p['default_value']}"
+                            param_strs.append(s)
+                        sig = f"{kind} {name}({', '.join(param_strs)})"
+                        ret = sym.get("return_type")
+                        if ret:
+                            sig += f" -> {ret}"
+                        parent = sym.get("parent_class")
+                        if parent:
+                            sig += f"  [in class {parent}]"
                     lines.append(f"  L{sym['start_line']}-{sym['end_line']}: {sig}")
                     doc = sym.get("docstring")
                     if doc:

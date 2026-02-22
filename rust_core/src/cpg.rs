@@ -376,11 +376,11 @@ impl CpgLayer {
             .unwrap_or_default()
     }
 
-    /// Get function and method nodes for a file.
+    /// Get function, method, and class nodes for a file.
     pub fn get_functions_in_file(&self, path: &Path) -> Vec<&CpgNode> {
         self.get_nodes_for_file(path)
             .into_iter()
-            .filter(|n| matches!(n.kind, CpgNodeKind::Function | CpgNodeKind::Method))
+            .filter(|n| matches!(n.kind, CpgNodeKind::Function | CpgNodeKind::Method | CpgNodeKind::Class))
             .collect()
     }
 
