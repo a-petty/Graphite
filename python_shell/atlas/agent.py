@@ -135,7 +135,7 @@ class AtlasAgent:
         self.tools = ToolExecutor(project_root.resolve(), self.repo_graph)
         self.running = False
 
-        self.embedding_manager = EmbeddingManager()
+        self.embedding_manager = EmbeddingManager(repo_graph=self.repo_graph)
         self.context_manager = ContextManager(self.repo_graph, self.embedding_manager, model=model_name)
 
         if provider == "ollama":

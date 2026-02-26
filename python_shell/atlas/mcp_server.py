@@ -207,7 +207,7 @@ def _ensure_embeddings() -> None:
     from atlas.embeddings import EmbeddingManager
     from atlas.context import ContextManager
 
-    _embedding_manager = EmbeddingManager()
+    _embedding_manager = EmbeddingManager(repo_graph=_graph)
     # Cap at 20K tokens (~80K chars) to stay within MCP tool result limits
     _context_manager = ContextManager(_graph, _embedding_manager, max_tokens=20_000)
     log.info("Embedding manager ready")
@@ -476,9 +476,12 @@ async def get_file_symbols(file_path: str) -> str:
                 if cpg_err:
                     return cpg_err
                 # Try incremental CPG build for just this file (fast)
+                global _cpg_enabled
                 if not _graph.ensure_cpg_for_file(normalized):
                     # Fall back to full CPG build if incremental fails
                     _ensure_cpg()
+                else:
+                    _cpg_enabled = True
                 symbols = _graph.get_functions_in_file(normalized)
                 if not symbols:
                     return f"No symbols found in {_to_relative(normalized)}"
@@ -517,6 +520,22 @@ async def get_file_symbols(file_path: str) -> str:
             return f"ERROR: {e}"
 
 
+MAX_NEIGHBOR_FILES = 200  # Safety cap for lazy call graph resolution
+
+
+def _build_cpg_for_neighbors(normalized: str, neighbor_paths: list) -> None:
+    """Build CPG for a set of neighbor files (deps or dependents), filtering to Python only."""
+    global _cpg_enabled
+    built = 0
+    for dep_path, _ in neighbor_paths:
+        if built >= MAX_NEIGHBOR_FILES:
+            break
+        if Path(dep_path).suffix in SUPPORTED_CPG_EXTENSIONS:
+            _graph.ensure_cpg_for_file(dep_path)
+            built += 1
+    _cpg_enabled = True
+
+
 @mcp.tool()
 async def get_callees(file_path: str, function_name: str) -> str:
     """Get all functions called by a given function (outgoing call graph).
@@ -533,7 +552,14 @@ async def get_callees(file_path: str, function_name: str) -> str:
                 cpg_err = _validate_cpg_file(normalized)
                 if cpg_err:
                     return cpg_err
-                _ensure_cpg()
+                # Lazy call graph: build CPG for deps first (so callees' function nodes exist),
+                # then build target (whose call sites resolve against those deps).
+                # This avoids the full-repo resolve_all() that causes hangs.
+                deps = _graph.get_dependencies(normalized)
+                _build_cpg_for_neighbors(normalized, deps)
+                global _cpg_enabled
+                _graph.ensure_cpg_for_file(normalized)
+                _cpg_enabled = True
                 callees = _graph.get_callees(normalized, function_name)
                 if not callees:
                     return f"No callees found for {function_name} in {_to_relative(normalized)}"
@@ -565,7 +591,16 @@ async def get_callers(file_path: str, function_name: str) -> str:
                 cpg_err = _validate_cpg_file(normalized)
                 if cpg_err:
                     return cpg_err
-                _ensure_cpg()
+                # Lazy call graph: build target first (so its function nodes exist),
+                # then build dependents (whose call sites resolve to target's functions),
+                # then re-resolve target to pick up all incoming CalledBy edges.
+                global _cpg_enabled
+                _graph.ensure_cpg_for_file(normalized)
+                _cpg_enabled = True
+                dependents = _graph.get_dependents(normalized)
+                _build_cpg_for_neighbors(normalized, dependents)
+                # Re-resolve target to find incoming calls from all built dependents
+                _graph.resolve_cpg_for_file(normalized)
                 callers = _graph.get_callers(normalized, function_name)
                 if not callers:
                     return f"No callers found for {function_name} in {_to_relative(normalized)}"
@@ -631,6 +666,32 @@ async def atlas_refresh() -> str:
             return await anyio.to_thread.run_sync(_run)
         except Exception as e:
             return f"ERROR: {e}"
+
+
+@mcp.tool()
+async def diag_full_cpg_build() -> str:
+    """[DIAGNOSTIC] Trigger a full CPG build to identify bottlenecks.
+
+    This runs enable_cpg_and_build() which processes ALL files.
+    Watch stderr for [DIAG] timing messages to identify the hang point.
+    Remove this tool after diagnosis is complete.
+    """
+    async with _get_lock():
+        try:
+            def _run():
+                global _cpg_enabled, _cpg_failed
+                _ensure_graph()
+                import time
+                log.info("[DIAG] Starting full CPG build via diagnostic tool...")
+                ignored = _load_ignore_dirs(_project_root) if _project_root else []
+                start = time.monotonic()
+                _graph.enable_cpg_and_build(excluded_dirs=ignored)
+                elapsed = time.monotonic() - start
+                _cpg_enabled = True
+                return f"Full CPG build completed in {elapsed:.1f}s. Check stderr for [DIAG] timing breakdown."
+            return await anyio.to_thread.run_sync(_run)
+        except Exception as e:
+            return f"ERROR during full CPG build: {e}"
 
 
 # ---------------------------------------------------------------------------
