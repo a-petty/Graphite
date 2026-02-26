@@ -2,6 +2,7 @@ use petgraph::graph::{DiGraph, NodeIndex};
 use petgraph::visit::EdgeRef;
 use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};
+use std::time::Instant;
 use tree_sitter::Tree;
 
 use crate::parser::SupportedLanguage;
@@ -193,6 +194,11 @@ impl CpgLayer {
 
         // Build CFG for each function/method (Python only)
         if language == SupportedLanguage::Python {
+            let func_count = node_indices.iter()
+                .filter(|idx| matches!(self.graph[**idx].kind, CpgNodeKind::Function | CpgNodeKind::Method))
+                .count();
+
+            let phase_start = Instant::now();
             let cfg_builder = crate::cfg::CfgBuilder::new(language);
             // Clone source to avoid borrow conflict (self.sources borrowed vs &mut self)
             let source_clone = self.sources.get(&path.to_path_buf()).unwrap().clone();
@@ -201,22 +207,38 @@ impl CpgLayer {
                     let _ = cfg_builder.build_function_cfg(self, idx, &source_clone);
                 }
             }
+            let cfg_elapsed = phase_start.elapsed();
 
             // Data flow analysis: reaching definitions for each function
+            let phase_start = Instant::now();
             let source_clone = self.sources.get(&path.to_path_buf()).unwrap().clone();
             for &idx in &node_indices {
                 if matches!(self.graph[idx].kind, CpgNodeKind::Function | CpgNodeKind::Method) {
                     crate::dataflow::DataFlowAnalyzer::analyze_function(self, idx, &source_clone);
                 }
             }
+            let dataflow_elapsed = phase_start.elapsed();
 
             // Call site extraction (Pass 1): extract raw call sites per function
+            let phase_start = Instant::now();
             let source_clone = self.sources.get(&path.to_path_buf()).unwrap().clone();
             for &idx in &node_indices {
                 if matches!(self.graph[idx].kind, CpgNodeKind::Function | CpgNodeKind::Method) {
                     let sites = crate::callgraph::CallGraphBuilder::extract_call_sites(self, idx, &source_clone);
                     self.call_sites.insert(idx, sites);
                 }
+            }
+            let callsite_elapsed = phase_start.elapsed();
+
+            // Log per-file phase timing if any phase took >1s
+            let total_ms = cfg_elapsed.as_millis() + dataflow_elapsed.as_millis() + callsite_elapsed.as_millis();
+            if total_ms > 1000 {
+                eprintln!("[DIAG] build_file slow ({} funcs): cfg={:.2}s dataflow={:.2}s callsites={:.2}s file={}",
+                    func_count,
+                    cfg_elapsed.as_secs_f64(),
+                    dataflow_elapsed.as_secs_f64(),
+                    callsite_elapsed.as_secs_f64(),
+                    path.display());
             }
 
             // Update name_to_funcs index for this file
@@ -485,24 +507,34 @@ impl CpgLayer {
 
     /// Get all functions called by a given function (follows Calls edges).
     pub fn get_callees(&self, func_idx: NodeIndex) -> Vec<(NodeIndex, &CpgNode)> {
+        let mut seen = HashSet::new();
         self.graph
             .edges_directed(func_idx, petgraph::Direction::Outgoing)
             .filter(|e| *e.weight() == CpgEdge::Calls)
             .filter_map(|e| {
                 let target = e.target();
-                self.graph.node_weight(target).map(|n| (target, n))
+                if seen.insert(target) {
+                    self.graph.node_weight(target).map(|n| (target, n))
+                } else {
+                    None
+                }
             })
             .collect()
     }
 
     /// Get all functions that call a given function (follows CalledBy edges).
     pub fn get_callers(&self, func_idx: NodeIndex) -> Vec<(NodeIndex, &CpgNode)> {
+        let mut seen = HashSet::new();
         self.graph
             .edges_directed(func_idx, petgraph::Direction::Outgoing)
             .filter(|e| *e.weight() == CpgEdge::CalledBy)
             .filter_map(|e| {
                 let target = e.target();
-                self.graph.node_weight(target).map(|n| (target, n))
+                if seen.insert(target) {
+                    self.graph.node_weight(target).map(|n| (target, n))
+                } else {
+                    None
+                }
             })
             .collect()
     }

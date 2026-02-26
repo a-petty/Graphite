@@ -62,6 +62,20 @@ fn count_edge_kind(cpg: &CpgLayer, kind_matcher: impl Fn(&CpgEdge) -> bool) -> u
         .count()
 }
 
+fn count_calls_edges(cpg: &CpgLayer, from: NodeIndex, to: NodeIndex) -> usize {
+    cpg.graph
+        .edges_connecting(from, to)
+        .filter(|e| *e.weight() == CpgEdge::Calls)
+        .count()
+}
+
+fn count_called_by_edges(cpg: &CpgLayer, from: NodeIndex, to: NodeIndex) -> usize {
+    cpg.graph
+        .edges_connecting(from, to)
+        .filter(|e| *e.weight() == CpgEdge::CalledBy)
+        .count()
+}
+
 fn get_dataflow_arg_edges(cpg: &CpgLayer) -> Vec<(NodeIndex, NodeIndex, usize)> {
     cpg.graph.edge_indices()
         .filter_map(|e| {
@@ -522,4 +536,113 @@ fn test_self_param_skip() {
     // Position 0 should be present (42 maps to x, which is position 0 after self skip)
     let positions: HashSet<usize> = arg_edges.iter().map(|(_, _, pos)| *pos).collect();
     assert!(positions.contains(&0), "Arg 42 should map to position 0 (after self skip)");
+}
+
+// ============================================================
+// Duplicate Edge Regression Tests (22-23)
+// ============================================================
+
+// Test 22: Same-file resolve_file produces no duplicate edges, even after re-resolve
+#[test]
+fn test_resolve_file_no_duplicate_edges_same_file() {
+    let mut cpg = CpgLayer::new();
+    // Function F is called by 3 different functions in the same file
+    let source = "\
+def target():
+    pass
+
+def caller_a():
+    target()
+
+def caller_b():
+    target()
+
+def caller_c():
+    target()
+";
+    let path = PathBuf::from("/test/dup1.py");
+    build_cpg_for_source(&mut cpg, "/test/dup1.py", source);
+
+    let symbol_index = SymbolIndex::new();
+    CallGraphBuilder::resolve_file(&mut cpg, &path, &symbol_index);
+
+    let target_idx = find_function(&cpg, "/test/dup1.py", "target").unwrap();
+    let caller_a_idx = find_function(&cpg, "/test/dup1.py", "caller_a").unwrap();
+    let caller_b_idx = find_function(&cpg, "/test/dup1.py", "caller_b").unwrap();
+    let caller_c_idx = find_function(&cpg, "/test/dup1.py", "caller_c").unwrap();
+
+    // Each caller should have exactly 1 Calls edge to target
+    assert_eq!(count_calls_edges(&cpg, caller_a_idx, target_idx), 1, "caller_a→target should have 1 Calls edge");
+    assert_eq!(count_calls_edges(&cpg, caller_b_idx, target_idx), 1, "caller_b→target should have 1 Calls edge");
+    assert_eq!(count_calls_edges(&cpg, caller_c_idx, target_idx), 1, "caller_c→target should have 1 Calls edge");
+
+    // target should have exactly 3 unique callers
+    let callers = cpg.get_callers(target_idx);
+    assert_eq!(callers.len(), 3, "target should have exactly 3 callers, got {}", callers.len());
+
+    // Each caller should see exactly 1 callee
+    let callees_a = cpg.get_callees(caller_a_idx);
+    assert_eq!(callees_a.len(), 1, "caller_a should have exactly 1 callee, got {}", callees_a.len());
+
+    // Re-resolve and verify no accumulation
+    CallGraphBuilder::resolve_file(&mut cpg, &path, &symbol_index);
+
+    let callers_after = cpg.get_callers(target_idx);
+    assert_eq!(callers_after.len(), 3, "After re-resolve, target should still have 3 callers, got {}", callers_after.len());
+
+    assert_eq!(count_calls_edges(&cpg, caller_a_idx, target_idx), 1, "After re-resolve: caller_a→target should still have 1 Calls edge");
+    assert_eq!(count_calls_edges(&cpg, caller_b_idx, target_idx), 1, "After re-resolve: caller_b→target should still have 1 Calls edge");
+    assert_eq!(count_calls_edges(&cpg, caller_c_idx, target_idx), 1, "After re-resolve: caller_c→target should still have 1 Calls edge");
+}
+
+// Test 23: Cross-file resolve_file produces no duplicate edges
+#[test]
+fn test_resolve_file_no_duplicate_edges_cross_file() {
+    let mut cpg = CpgLayer::new();
+    let source_a = "\
+def helper():
+    pass
+";
+    let source_b = "\
+def use1():
+    helper()
+
+def use2():
+    helper()
+";
+    let path_a = PathBuf::from("/test/a.py");
+    let path_b = PathBuf::from("/test/b.py");
+
+    build_cpg_for_source(&mut cpg, "/test/a.py", source_a);
+    build_cpg_for_source(&mut cpg, "/test/b.py", source_b);
+
+    // Symbol index tells us helper is defined in a.py
+    let mut symbol_index = SymbolIndex::new();
+    symbol_index.definitions.insert(
+        "helper".to_string(),
+        vec![path_a.clone()],
+    );
+
+    // Resolve file A then file B
+    CallGraphBuilder::resolve_file(&mut cpg, &path_a, &symbol_index);
+    CallGraphBuilder::resolve_file(&mut cpg, &path_b, &symbol_index);
+
+    let helper_idx = find_function(&cpg, "/test/a.py", "helper").unwrap();
+    let use1_idx = find_function(&cpg, "/test/b.py", "use1").unwrap();
+    let use2_idx = find_function(&cpg, "/test/b.py", "use2").unwrap();
+
+    assert_eq!(count_calls_edges(&cpg, use1_idx, helper_idx), 1, "use1→helper should have 1 Calls edge");
+    assert_eq!(count_calls_edges(&cpg, use2_idx, helper_idx), 1, "use2→helper should have 1 Calls edge");
+
+    let callers = cpg.get_callers(helper_idx);
+    assert_eq!(callers.len(), 2, "helper should have exactly 2 callers, got {}", callers.len());
+
+    // Re-resolve file A (simulating MCP's resolve_cpg_for_file pattern)
+    CallGraphBuilder::resolve_file(&mut cpg, &path_a, &symbol_index);
+
+    let callers_after = cpg.get_callers(helper_idx);
+    assert_eq!(callers_after.len(), 2, "After re-resolve of A, helper should still have 2 callers, got {}", callers_after.len());
+
+    assert_eq!(count_calls_edges(&cpg, use1_idx, helper_idx), 1, "After re-resolve: use1→helper should still have 1 Calls edge");
+    assert_eq!(count_calls_edges(&cpg, use2_idx, helper_idx), 1, "After re-resolve: use2→helper should still have 1 Calls edge");
 }

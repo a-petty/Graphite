@@ -2,6 +2,7 @@ use petgraph::graph::NodeIndex;
 use petgraph::visit::EdgeRef;
 use std::collections::HashSet;
 use std::path::Path;
+use std::time::Instant;
 
 use crate::cpg::{CpgEdge, CpgLayer, CpgNodeKind, StatementKind};
 use crate::symbol_table::SymbolIndex;
@@ -104,9 +105,11 @@ impl CallGraphBuilder {
     /// Resolve all call sites after all files have been built.
     /// Creates Calls/CalledBy edges and DataFlowArgument/DataFlowReturn edges.
     pub fn resolve_all(cpg: &mut CpgLayer, symbol_index: &SymbolIndex) {
+        let resolve_start = Instant::now();
         let builtins = python_builtins();
 
         // Collect all call sites with their caller file paths
+        let collect_start = Instant::now();
         let all_sites: Vec<(CallSite, std::path::PathBuf)> = cpg
             .call_sites
             .values()
@@ -117,22 +120,46 @@ impl CallGraphBuilder {
                     .map(|n| (site.clone(), n.file_path.clone()))
             })
             .collect();
+        eprintln!("[DIAG] resolve_all: collected {} call sites from {} functions in {:.2}s",
+            all_sites.len(), cpg.call_sites.len(), collect_start.elapsed().as_secs_f64());
 
         // Resolve each call site
         let mut edges_to_add: Vec<EdgeToAdd> = Vec::new();
+        let mut resolved_count = 0usize;
 
-        for (site, caller_file) in &all_sites {
+        let resolve_loop_start = Instant::now();
+        for (i, (site, caller_file)) in all_sites.iter().enumerate() {
+            let site_start = Instant::now();
             if let CallResolution::Resolved(callee_idx) =
                 Self::resolve_callee(cpg, site, caller_file, symbol_index, &builtins)
             {
                 collect_edges_for_resolved_call(cpg, site, callee_idx, &mut edges_to_add);
+                resolved_count += 1;
+            }
+            let site_elapsed = site_start.elapsed();
+            if site_elapsed.as_millis() > 100 {
+                eprintln!("[DIAG] resolve_all: slow call site #{} ({:.2}s): {} -> {} in {}",
+                    i, site_elapsed.as_secs_f64(),
+                    site.callee_name,
+                    cpg.graph.node_weight(site.caller_func_idx)
+                        .map(|n| n.name.as_str()).unwrap_or("?"),
+                    caller_file.display());
+            }
+            if (i + 1) % 1000 == 0 {
+                eprintln!("[DIAG] resolve_all: progress {}/{} sites ({} resolved, {:.2}s elapsed)",
+                    i + 1, all_sites.len(), resolved_count, resolve_loop_start.elapsed().as_secs_f64());
             }
         }
+        eprintln!("[DIAG] resolve_all: resolution loop completed in {:.2}s ({}/{} resolved)",
+            resolve_loop_start.elapsed().as_secs_f64(), resolved_count, all_sites.len());
 
         // Apply all edges
+        let apply_start = Instant::now();
         for edge in edges_to_add {
             cpg.graph.add_edge(edge.source, edge.target, edge.weight);
         }
+        eprintln!("[DIAG] resolve_all: edge application completed in {:.2}s", apply_start.elapsed().as_secs_f64());
+        eprintln!("[DIAG] resolve_all: total time {:.2}s", resolve_start.elapsed().as_secs_f64());
     }
 
     // -----------------------------------------------------------------------
@@ -216,7 +243,12 @@ impl CallGraphBuilder {
         }
 
         for edge in edges_to_add {
-            cpg.graph.add_edge(edge.source, edge.target, edge.weight);
+            let already_exists = cpg.graph
+                .edges_connecting(edge.source, edge.target)
+                .any(|e| *e.weight() == edge.weight);
+            if !already_exists {
+                cpg.graph.add_edge(edge.source, edge.target, edge.weight);
+            }
         }
     }
 
