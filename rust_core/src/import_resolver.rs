@@ -4,6 +4,7 @@ use serde::Deserialize;
 use std::collections::{HashMap, HashSet};
 use std::fmt::Debug;
 use std::path::{Path, PathBuf};
+use std::sync::atomic::{AtomicUsize, Ordering};
 use tree_sitter::{Query, QueryCursor, Tree};
 use walkdir::WalkDir;
 use crate::parser::SupportedLanguage;
@@ -102,10 +103,282 @@ pub trait ImportResolver: Debug + Send + Sync {
 
     /// Get module index size (for diagnostics). Default: 0.
     fn module_index_size(&self) -> usize { 0 }
+
+    /// Get unique top-level module names visible in the module index. Default: empty.
+    fn get_known_root_modules(&self) -> Vec<String> { Vec::new() }
+
+    /// Get the number of import resolution attempts. Default: 0.
+    fn get_attempted_imports(&self) -> usize { 0 }
+
+    /// Get the number of failed import resolutions. Default: 0.
+    fn get_failed_imports(&self) -> usize { 0 }
+}
+
+// ---------------------------------------------------------------------------
+// pyproject.toml parsing structs
+// ---------------------------------------------------------------------------
+
+/// Top-level pyproject.toml structure.
+#[derive(Debug, Deserialize)]
+#[allow(dead_code)]
+struct PyProjectToml {
+    tool: Option<ToolSection>,
+    project: Option<ProjectSection>,
+}
+
+#[derive(Debug, Deserialize)]
+#[allow(dead_code)]
+struct ProjectSection {
+    name: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+struct ToolSection {
+    hatch: Option<HatchConfig>,
+    setuptools: Option<SetuptoolsConfig>,
+    poetry: Option<PoetryConfig>,
+    uv: Option<UvConfig>,
+}
+
+// --- Hatch ---
+#[derive(Debug, Deserialize)]
+struct HatchConfig {
+    build: Option<HatchBuildConfig>,
+}
+
+#[derive(Debug, Deserialize)]
+struct HatchBuildConfig {
+    targets: Option<HatchTargets>,
+}
+
+#[derive(Debug, Deserialize)]
+struct HatchTargets {
+    wheel: Option<HatchWheel>,
+}
+
+#[derive(Debug, Deserialize)]
+struct HatchWheel {
+    packages: Option<Vec<String>>,
+}
+
+// --- Setuptools ---
+#[derive(Debug, Deserialize)]
+struct SetuptoolsConfig {
+    #[serde(rename = "package-dir")]
+    package_dir: Option<HashMap<String, String>>,
+    packages: Option<SetuptoolsPackages>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(untagged)]
+#[allow(dead_code)]
+enum SetuptoolsPackages {
+    List(Vec<String>),
+    Find(SetuptoolsFind),
+}
+
+#[derive(Debug, Deserialize)]
+struct SetuptoolsFind {
+    #[serde(rename = "where")]
+    where_dirs: Option<Vec<String>>,
+}
+
+// --- Poetry ---
+#[derive(Debug, Deserialize)]
+struct PoetryConfig {
+    packages: Option<Vec<PoetryPackage>>,
+}
+
+#[derive(Debug, Deserialize)]
+#[allow(dead_code)]
+struct PoetryPackage {
+    include: Option<String>,
+    from: Option<String>,
+}
+
+// --- UV ---
+#[derive(Debug, Deserialize)]
+struct UvConfig {
+    workspace: Option<UvWorkspace>,
+}
+
+#[derive(Debug, Deserialize)]
+struct UvWorkspace {
+    members: Option<Vec<String>>,
+}
+
+// ---------------------------------------------------------------------------
+// pyproject.toml helper functions
+// ---------------------------------------------------------------------------
+
+/// Parse a pyproject.toml file, returning None on any failure.
+fn parse_pyproject_toml(path: &Path) -> Option<PyProjectToml> {
+    let content = match std::fs::read_to_string(path) {
+        Ok(c) => c,
+        Err(e) => {
+            debug!("Cannot read {}: {}", path.display(), e);
+            return None;
+        }
+    };
+    match toml::from_str::<PyProjectToml>(&content) {
+        Ok(parsed) => Some(parsed),
+        Err(e) => {
+            debug!("Cannot parse {}: {}", path.display(), e);
+            None
+        }
+    }
+}
+
+/// Expand workspace member glob patterns (e.g., "providers/*") to directories
+/// that contain a pyproject.toml.
+fn expand_workspace_members(project_root: &Path, patterns: &[String]) -> Vec<PathBuf> {
+    let mut members = Vec::new();
+    for pattern in patterns {
+        let full_pattern = project_root.join(pattern).to_string_lossy().to_string();
+        match glob::glob(&full_pattern) {
+            Ok(paths) => {
+                for entry in paths.filter_map(Result::ok) {
+                    if entry.is_dir() && entry.join("pyproject.toml").exists() {
+                        let canonical = entry.canonicalize().unwrap_or(entry);
+                        members.push(canonical);
+                    }
+                }
+            }
+            Err(e) => {
+                debug!("Invalid glob pattern '{}': {}", pattern, e);
+            }
+        }
+    }
+    members
+}
+
+/// Given a package path like "src/airflow", find the source root directory.
+/// The source root is the directory that should be on sys.path — i.e., the parent
+/// of the first component that is an actual Python package.
+///
+/// Examples:
+///   "src/airflow" with src/airflow/__init__.py → returns src/
+///   "airflow" with airflow/__init__.py → returns base_dir
+///   "src/airflow" with no __init__.py anywhere → returns None
+fn derive_source_dir_from_package_path(base_dir: &Path, pkg_path: &str) -> Option<PathBuf> {
+    let components: Vec<&str> = pkg_path.split('/').filter(|s| !s.is_empty()).collect();
+    if components.is_empty() {
+        return None;
+    }
+
+    // Walk the components from the start. The first component that is a Python package
+    // (has __init__.py) tells us the source root is its parent.
+    let mut current = base_dir.to_path_buf();
+    for (i, component) in components.iter().enumerate() {
+        current = current.join(component);
+        if current.join("__init__.py").exists() {
+            // This component is a package — source root is everything before it
+            let mut source_root = base_dir.to_path_buf();
+            for c in &components[..i] {
+                source_root = source_root.join(c);
+            }
+            return Some(source_root.canonicalize().unwrap_or(source_root));
+        }
+    }
+
+    // No __init__.py found anywhere — check if the full path has .py files (namespace package)
+    let full_path = base_dir.join(pkg_path);
+    if full_path.is_dir() {
+        let has_py = std::fs::read_dir(&full_path)
+            .map(|entries| entries.filter_map(Result::ok).any(|e| {
+                e.path().extension().and_then(|ext| ext.to_str()) == Some("py")
+            }))
+            .unwrap_or(false);
+        if has_py {
+            // Namespace package — source root is its parent
+            let mut source_root = base_dir.to_path_buf();
+            for c in &components[..components.len() - 1] {
+                source_root = source_root.join(c);
+            }
+            return Some(source_root.canonicalize().unwrap_or(source_root));
+        }
+    }
+
+    None
+}
+
+/// Extract source root from a single pyproject.toml file.
+/// Tries: Hatch packages → Setuptools package-dir/find.where → Poetry packages.from
+fn extract_source_root(member_dir: &Path) -> Option<PathBuf> {
+    let pyproject_path = member_dir.join("pyproject.toml");
+    let pyproject = parse_pyproject_toml(&pyproject_path)?;
+    let tool = pyproject.tool?;
+
+    // Priority 1: Hatch packages
+    if let Some(hatch) = &tool.hatch {
+        if let Some(build) = &hatch.build {
+            if let Some(targets) = &build.targets {
+                if let Some(wheel) = &targets.wheel {
+                    if let Some(packages) = &wheel.packages {
+                        for pkg_path in packages {
+                            if let Some(root) = derive_source_dir_from_package_path(member_dir, pkg_path) {
+                                info!("pyproject.toml (Hatch): packages='{}' → source root: {}",
+                                      pkg_path, root.display());
+                                return Some(root);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Priority 2: Setuptools package-dir or find.where
+    if let Some(setuptools) = &tool.setuptools {
+        // [tool.setuptools.package-dir] "" = "src"
+        if let Some(package_dir) = &setuptools.package_dir {
+            if let Some(src_dir) = package_dir.get("") {
+                let root = member_dir.join(src_dir);
+                if root.is_dir() {
+                    let canonical = root.canonicalize().unwrap_or(root);
+                    info!("pyproject.toml (Setuptools package-dir): '' = '{}' → source root: {}",
+                          src_dir, canonical.display());
+                    return Some(canonical);
+                }
+            }
+        }
+        // [tool.setuptools.packages.find] where = ["src"]
+        if let Some(SetuptoolsPackages::Find(find)) = &setuptools.packages {
+            if let Some(where_dirs) = &find.where_dirs {
+                for dir in where_dirs {
+                    let root = member_dir.join(dir);
+                    if root.is_dir() {
+                        let canonical = root.canonicalize().unwrap_or(root);
+                        info!("pyproject.toml (Setuptools find.where): '{}' → source root: {}",
+                              dir, canonical.display());
+                        return Some(canonical);
+                    }
+                }
+            }
+        }
+    }
+
+    // Priority 3: Poetry packages.from
+    if let Some(poetry) = &tool.poetry {
+        if let Some(packages) = &poetry.packages {
+            for pkg in packages {
+                if let Some(from_dir) = &pkg.from {
+                    let root = member_dir.join(from_dir);
+                    if root.is_dir() {
+                        let canonical = root.canonicalize().unwrap_or(root);
+                        info!("pyproject.toml (Poetry packages.from): '{}' → source root: {}",
+                              from_dir, canonical.display());
+                        return Some(canonical);
+                    }
+                }
+            }
+        }
+    }
+
+    None
 }
 
 /// Resolves Python import statements to absolute file paths.
-#[derive(Debug)]
 pub struct PythonImportResolver {
     pub project_root: PathBuf,
     /// A map of module names (e.g., `my_package.utils`) to their file paths.
@@ -117,6 +390,22 @@ pub struct PythonImportResolver {
     /// Detected source roots (directories containing Python packages).
     /// Modules are also indexed relative to each source root.
     source_roots: Vec<PathBuf>,
+    /// Number of import resolution attempts (atomic for thread-safe counting).
+    attempted_imports: AtomicUsize,
+    /// Number of failed import resolutions (atomic for thread-safe counting).
+    failed_imports: AtomicUsize,
+}
+
+impl std::fmt::Debug for PythonImportResolver {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("PythonImportResolver")
+            .field("project_root", &self.project_root)
+            .field("module_index_size", &self.module_index.len())
+            .field("source_roots", &self.source_roots)
+            .field("attempted_imports", &self.attempted_imports.load(Ordering::Relaxed))
+            .field("failed_imports", &self.failed_imports.load(Ordering::Relaxed))
+            .finish()
+    }
 }
 
 impl PythonImportResolver {
@@ -132,6 +421,8 @@ impl PythonImportResolver {
             module_index: HashMap::new(),
             ignored_dirs: ignored_set,
             source_roots: Vec::new(),
+            attempted_imports: AtomicUsize::new(0),
+            failed_imports: AtomicUsize::new(0),
             // Pre-compile the query for performance
             // Pattern 0: absolute import (e.g., `import app.models`)
             // Pattern 1: entire from-import statement for programmatic AST walking
@@ -171,10 +462,157 @@ impl PythonImportResolver {
         resolver
     }
 
-    /// Detect source roots: depth-1 directories that contain Python packages.
+    /// Main source root detection pipeline.
+    /// Priority: pyproject.toml → src/ heuristic → legacy depth-1 scan.
+    fn detect_source_roots(&self) -> Vec<PathBuf> {
+        // Priority 1: pyproject.toml-driven discovery
+        let pyproject_roots = self.discover_source_roots_from_pyproject();
+        if !pyproject_roots.is_empty() {
+            return pyproject_roots;
+        }
+
+        // Priority 2: src/ layout heuristic
+        let src_roots = self.detect_src_layout_heuristic();
+        if !src_roots.is_empty() {
+            return src_roots;
+        }
+
+        // Priority 3: Legacy depth-1 scan
+        self.detect_source_roots_legacy()
+    }
+
+    /// Detect source roots for src/ layout projects.
+    /// Checks for src/ (or lib/, source/) directories that are NOT Python packages
+    /// themselves (no __init__.py) but contain Python packages or modules.
+    fn detect_src_layout_heuristic(&self) -> Vec<PathBuf> {
+        let candidate_names = ["src", "lib", "source"];
+        let mut roots = Vec::new();
+
+        for name in &candidate_names {
+            let candidate = self.project_root.join(name);
+            if !candidate.is_dir() {
+                continue;
+            }
+
+            // Guard: if src/__init__.py exists, it's a package, not a source root
+            if candidate.join("__init__.py").exists() {
+                debug!("src/ heuristic: {}/{} has __init__.py, skipping (it's a package)",
+                       self.project_root.display(), name);
+                continue;
+            }
+
+            // Check: src/ must contain at least one Python package or module
+            let has_python_content = if let Ok(entries) = std::fs::read_dir(&candidate) {
+                entries.filter_map(Result::ok).any(|entry| {
+                    let path = entry.path();
+                    if path.is_dir() {
+                        let dir_name = path.file_name()
+                            .and_then(|n| n.to_str())
+                            .unwrap_or("");
+                        if dir_name.starts_with('.') || dir_name == "__pycache__" {
+                            return false;
+                        }
+                        // Has __init__.py (traditional package) or contains .py files (namespace)
+                        if path.join("__init__.py").exists() {
+                            return true;
+                        }
+                        // Check for .py files in the directory
+                        std::fs::read_dir(&path)
+                            .map(|entries| entries.filter_map(Result::ok).any(|e| {
+                                e.path().extension().and_then(|ext| ext.to_str()) == Some("py")
+                            }))
+                            .unwrap_or(false)
+                    } else {
+                        // Direct .py file in src/
+                        path.extension().and_then(|ext| ext.to_str()) == Some("py")
+                    }
+                })
+            } else {
+                false
+            };
+
+            if has_python_content {
+                let canonical = candidate.canonicalize().unwrap_or(candidate);
+                info!("src/ heuristic: detected source root: {}", canonical.display());
+                roots.push(canonical);
+                break; // Only one src/ dir per project
+            }
+        }
+
+        roots
+    }
+
+    /// Discover source roots by reading pyproject.toml files.
+    /// Handles UV workspaces (multi-member) and single projects.
+    fn discover_source_roots_from_pyproject(&self) -> Vec<PathBuf> {
+        let pyproject_path = self.project_root.join("pyproject.toml");
+        let pyproject = match parse_pyproject_toml(&pyproject_path) {
+            Some(p) => p,
+            None => return Vec::new(),
+        };
+
+        let mut roots = Vec::new();
+
+        // Check for UV workspace
+        if let Some(tool) = &pyproject.tool {
+            if let Some(uv) = &tool.uv {
+                if let Some(workspace) = &uv.workspace {
+                    if let Some(members) = &workspace.members {
+                        info!("pyproject.toml: UV workspace with members: {:?}", members);
+                        let member_dirs = expand_workspace_members(&self.project_root, members);
+                        for member_dir in &member_dirs {
+                            if let Some(root) = extract_source_root(member_dir) {
+                                if !roots.contains(&root) {
+                                    roots.push(root);
+                                }
+                            } else {
+                                // Fallback: try src/ heuristic on member dir
+                                let src_dir = member_dir.join("src");
+                                if src_dir.is_dir() && !src_dir.join("__init__.py").exists() {
+                                    let has_python = std::fs::read_dir(&src_dir)
+                                        .map(|entries| entries.filter_map(Result::ok).any(|e| {
+                                            let p = e.path();
+                                            (p.is_dir() && (p.join("__init__.py").exists() ||
+                                                std::fs::read_dir(&p)
+                                                    .map(|es| es.filter_map(Result::ok).any(|f| {
+                                                        f.path().extension().and_then(|ext| ext.to_str()) == Some("py")
+                                                    }))
+                                                    .unwrap_or(false)))
+                                            || (p.is_file() && p.extension().and_then(|ext| ext.to_str()) == Some("py"))
+                                        }))
+                                        .unwrap_or(false);
+                                    if has_python {
+                                        let canonical = src_dir.canonicalize().unwrap_or(src_dir);
+                                        if !roots.contains(&canonical) {
+                                            info!("UV workspace member {}: src/ heuristic → {}",
+                                                  member_dir.display(), canonical.display());
+                                            roots.push(canonical);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        if !roots.is_empty() {
+                            return roots;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Single project: try to extract source root
+        if let Some(root) = extract_source_root(&self.project_root) {
+            roots.push(root);
+        }
+
+        roots
+    }
+
+    /// Legacy source root detection: depth-1 directories that contain Python packages.
     /// A directory is a source root if it has at least one child directory with `__init__.py`.
     /// Falls back to namespace package detection if no `__init__.py` roots found.
-    fn detect_source_roots(&self) -> Vec<PathBuf> {
+    fn detect_source_roots_legacy(&self) -> Vec<PathBuf> {
         let mut roots = Vec::new();
 
         info!("Source root detection: scanning project root {:?}", self.project_root);
@@ -442,10 +880,15 @@ impl PythonImportResolver {
             base_path = base_path.parent()?.to_path_buf();
         }
 
-        // Convert base_path to a module string from project root.
-        let rel_path = match base_path.strip_prefix(&self.project_root) {
-            Ok(p) => p,
-            Err(_) => return None,
+        // Convert base_path to a module string.
+        // Try source roots first (for src/ layout), then fall back to project root.
+        let rel_path = self.source_roots.iter()
+            .filter_map(|sr| base_path.strip_prefix(sr).ok())
+            .next()
+            .or_else(|| base_path.strip_prefix(&self.project_root).ok());
+        let rel_path = match rel_path {
+            Some(p) => p,
+            None => return None,
         };
 
         let mut components: Vec<String> = rel_path
@@ -745,19 +1188,27 @@ impl ImportResolver for PythonImportResolver {
                         if !PYTHON_STDLIB_MODULES.contains(root_module)
                             && !COMMON_THIRD_PARTY_MODULES.contains(root_module)
                         {
+                            self.attempted_imports.fetch_add(1, Ordering::Relaxed);
                             if let Some(path) = self.resolve_absolute(text) {
                                 imports.insert(path);
+                            } else {
+                                self.failed_imports.fetch_add(1, Ordering::Relaxed);
                             }
                         }
                     }
                     "from_import" => {
                         // Pattern 1: entire `from ... import ...` statement
+                        self.attempted_imports.fetch_add(1, Ordering::Relaxed);
+                        let before = imports.len();
                         self.resolve_from_import(
                             capture.node,
                             current_file,
                             source,
                             &mut imports,
                         );
+                        if imports.len() == before {
+                            self.failed_imports.fetch_add(1, Ordering::Relaxed);
+                        }
                     }
                     _ => (),
                 }
@@ -824,6 +1275,26 @@ impl ImportResolver for PythonImportResolver {
 
     fn module_index_size(&self) -> usize {
         self.module_index.len()
+    }
+
+    fn get_known_root_modules(&self) -> Vec<String> {
+        let mut roots: HashSet<String> = HashSet::new();
+        for key in self.module_index.keys() {
+            if let Some(first) = key.split('.').next() {
+                roots.insert(first.to_string());
+            }
+        }
+        let mut sorted: Vec<String> = roots.into_iter().collect();
+        sorted.sort();
+        sorted
+    }
+
+    fn get_attempted_imports(&self) -> usize {
+        self.attempted_imports.load(Ordering::Relaxed)
+    }
+
+    fn get_failed_imports(&self) -> usize {
+        self.failed_imports.load(Ordering::Relaxed)
     }
 }
 
@@ -1572,5 +2043,292 @@ def my_function():
         // So src/ IS detected as a source root
         assert_eq!(repo.resolver.source_roots.len(), 1);
         assert_eq!(repo.resolver.source_roots[0], repo.root_path.join("src"));
+    }
+
+    // -----------------------------------------------------------------------
+    // Test Case F: src/ layout without __init__.py → detected as source root
+    // -----------------------------------------------------------------------
+    #[test]
+    fn test_src_layout_without_init() {
+        let root = tempdir().unwrap();
+        let root_path = root.path().canonicalize().unwrap();
+
+        // src/mypackage/ is a real package, src/ itself has no __init__.py
+        create_dummy_file(&root_path, "src/mypackage/__init__.py", "");
+        create_dummy_file(&root_path, "src/mypackage/core.py", "x = 1");
+
+        let resolver = PythonImportResolver::new(&root_path, &[], None);
+
+        // src/ should be detected as a source root (by the heuristic)
+        assert_eq!(resolver.source_roots.len(), 1, "Should detect src/ as source root");
+        assert_eq!(resolver.source_roots[0], root_path.join("src"));
+
+        // Module index should have source-root-relative keys: mypackage, mypackage.core
+        assert!(
+            resolver.module_index.contains_key("mypackage"),
+            "Should index 'mypackage' relative to src/. Keys: {:?}",
+            resolver.module_index.keys().collect::<Vec<_>>()
+        );
+        assert!(
+            resolver.module_index.contains_key("mypackage.core"),
+            "Should index 'mypackage.core' relative to src/. Keys: {:?}",
+            resolver.module_index.keys().collect::<Vec<_>>()
+        );
+    }
+
+    // -----------------------------------------------------------------------
+    // Test Case G: src/__init__.py exists → NOT a source root (it's a package)
+    // -----------------------------------------------------------------------
+    #[test]
+    fn test_src_as_package_not_source_root() {
+        let root = tempdir().unwrap();
+        let root_path = root.path().canonicalize().unwrap();
+
+        // src/ IS a package (has __init__.py)
+        create_dummy_file(&root_path, "src/__init__.py", "");
+        create_dummy_file(&root_path, "src/utils.py", "x = 1");
+
+        let resolver = PythonImportResolver::new(&root_path, &[], None);
+
+        // src/ heuristic should skip it. Legacy should detect project root
+        // as having src/ as a depth-1 dir with __init__.py → no additional source root
+        // because src/ is a package itself, not a root containing packages.
+        // The module key should be "src.utils", NOT "utils"
+        assert!(
+            resolver.module_index.contains_key("src.utils"),
+            "Should index 'src.utils' (src/ is a package). Keys: {:?}",
+            resolver.module_index.keys().collect::<Vec<_>>()
+        );
+    }
+
+    // -----------------------------------------------------------------------
+    // Test Case A: Hatch packages in pyproject.toml
+    // -----------------------------------------------------------------------
+    #[test]
+    fn test_src_layout_with_pyproject_hatch() {
+        let root = tempdir().unwrap();
+        let root_path = root.path().canonicalize().unwrap();
+
+        create_dummy_file(&root_path, "src/mypackage/__init__.py", "");
+        create_dummy_file(&root_path, "src/mypackage/core.py", "x = 1");
+        create_dummy_file(&root_path, "pyproject.toml", r#"
+[tool.hatch.build.targets.wheel]
+packages = ["src/mypackage"]
+"#);
+
+        let resolver = PythonImportResolver::new(&root_path, &[], None);
+
+        assert_eq!(resolver.source_roots.len(), 1, "Should detect src/ as source root via Hatch");
+        assert_eq!(resolver.source_roots[0], root_path.join("src"));
+        assert!(
+            resolver.module_index.contains_key("mypackage.core"),
+            "Should index 'mypackage.core' relative to src/. Keys: {:?}",
+            resolver.module_index.keys().collect::<Vec<_>>()
+        );
+    }
+
+    // -----------------------------------------------------------------------
+    // Test Case B: UV workspace with member dirs
+    // -----------------------------------------------------------------------
+    #[test]
+    fn test_uv_workspace_members() {
+        let root = tempdir().unwrap();
+        let root_path = root.path().canonicalize().unwrap();
+
+        // Root pyproject.toml with UV workspace
+        create_dummy_file(&root_path, "pyproject.toml", r#"
+[tool.uv.workspace]
+members = ["packages/*"]
+"#);
+
+        // Member 1: packages/core with src/ layout
+        create_dummy_file(&root_path, "packages/core/pyproject.toml", r#"
+[tool.hatch.build.targets.wheel]
+packages = ["src/core_lib"]
+"#);
+        create_dummy_file(&root_path, "packages/core/src/core_lib/__init__.py", "");
+        create_dummy_file(&root_path, "packages/core/src/core_lib/utils.py", "x = 1");
+
+        // Member 2: packages/api with src/ layout (no tool config, relies on heuristic)
+        create_dummy_file(&root_path, "packages/api/pyproject.toml", r#"
+[project]
+name = "api"
+"#);
+        create_dummy_file(&root_path, "packages/api/src/api_lib/__init__.py", "");
+        create_dummy_file(&root_path, "packages/api/src/api_lib/routes.py", "x = 1");
+
+        let resolver = PythonImportResolver::new(&root_path, &[], None);
+
+        // Should detect two source roots
+        assert_eq!(
+            resolver.source_roots.len(), 2,
+            "Should detect 2 source roots (one per workspace member). Got: {:?}",
+            resolver.source_roots
+        );
+
+        // Module keys should be relative to source roots
+        assert!(
+            resolver.module_index.contains_key("core_lib.utils"),
+            "Should index 'core_lib.utils'. Keys: {:?}",
+            resolver.module_index.keys().collect::<Vec<_>>()
+        );
+        assert!(
+            resolver.module_index.contains_key("api_lib.routes"),
+            "Should index 'api_lib.routes'. Keys: {:?}",
+            resolver.module_index.keys().collect::<Vec<_>>()
+        );
+    }
+
+    // -----------------------------------------------------------------------
+    // Test Case H: Setuptools package-dir
+    // -----------------------------------------------------------------------
+    #[test]
+    fn test_setuptools_package_dir() {
+        let root = tempdir().unwrap();
+        let root_path = root.path().canonicalize().unwrap();
+
+        create_dummy_file(&root_path, "src/mylib/__init__.py", "");
+        create_dummy_file(&root_path, "src/mylib/core.py", "x = 1");
+        create_dummy_file(&root_path, "pyproject.toml", r#"
+[tool.setuptools.package-dir]
+"" = "src"
+"#);
+
+        let resolver = PythonImportResolver::new(&root_path, &[], None);
+
+        assert_eq!(resolver.source_roots.len(), 1, "Should detect src/ via setuptools");
+        assert_eq!(resolver.source_roots[0], root_path.join("src"));
+        assert!(
+            resolver.module_index.contains_key("mylib.core"),
+            "Should index 'mylib.core'. Keys: {:?}",
+            resolver.module_index.keys().collect::<Vec<_>>()
+        );
+    }
+
+    // -----------------------------------------------------------------------
+    // Test Case I: Poetry packages.from
+    // -----------------------------------------------------------------------
+    #[test]
+    fn test_poetry_packages_from() {
+        let root = tempdir().unwrap();
+        let root_path = root.path().canonicalize().unwrap();
+
+        create_dummy_file(&root_path, "src/mylib/__init__.py", "");
+        create_dummy_file(&root_path, "src/mylib/core.py", "x = 1");
+        create_dummy_file(&root_path, "pyproject.toml", r#"
+[tool.poetry]
+name = "mylib"
+
+[[tool.poetry.packages]]
+include = "mylib"
+from = "src"
+"#);
+
+        let resolver = PythonImportResolver::new(&root_path, &[], None);
+
+        assert_eq!(resolver.source_roots.len(), 1, "Should detect src/ via Poetry");
+        assert_eq!(resolver.source_roots[0], root_path.join("src"));
+        assert!(
+            resolver.module_index.contains_key("mylib.core"),
+            "Should index 'mylib.core'. Keys: {:?}",
+            resolver.module_index.keys().collect::<Vec<_>>()
+        );
+    }
+
+    // -----------------------------------------------------------------------
+    // Test: Relative import in src/ layout
+    // -----------------------------------------------------------------------
+    #[test]
+    fn test_relative_import_in_src_layout() {
+        let root = tempdir().unwrap();
+        let root_path = root.path().canonicalize().unwrap();
+
+        create_dummy_file(&root_path, "src/mypackage/__init__.py", "");
+        create_dummy_file(&root_path, "src/mypackage/utils.py", "def helper(): pass");
+        create_dummy_file(&root_path, "src/mypackage/core.py", "from . import utils");
+
+        let mut parser = Parser::new();
+        parser.set_language(tree_sitter_python::language()).unwrap();
+
+        let resolver = PythonImportResolver::new(&root_path, &[], None);
+
+        let source = "from . import utils";
+        let tree = parser.parse(source, None).unwrap();
+        let core_path = root_path.join("src/mypackage/core.py");
+        let imports = resolver.find_imports(&tree, &core_path, source.as_bytes());
+
+        let utils_path = root_path.join("src/mypackage/utils.py");
+        assert!(
+            imports.contains(&utils_path),
+            "Relative import 'from . import utils' in src/ layout should resolve.\n\
+             Expected: {:?}\n\
+             Got: {:?}\n\
+             Source roots: {:?}",
+            utils_path,
+            imports,
+            resolver.source_roots,
+        );
+    }
+
+    // -----------------------------------------------------------------------
+    // Test: Double-dot relative import in src/ layout
+    // -----------------------------------------------------------------------
+    #[test]
+    fn test_relative_import_double_dot_in_src_layout() {
+        let root = tempdir().unwrap();
+        let root_path = root.path().canonicalize().unwrap();
+
+        create_dummy_file(&root_path, "src/mypackage/__init__.py", "");
+        create_dummy_file(&root_path, "src/mypackage/sub/__init__.py", "");
+        create_dummy_file(&root_path, "src/mypackage/sub/deep.py", "from .. import utils");
+        create_dummy_file(&root_path, "src/mypackage/utils.py", "def helper(): pass");
+
+        let mut parser = Parser::new();
+        parser.set_language(tree_sitter_python::language()).unwrap();
+
+        let resolver = PythonImportResolver::new(&root_path, &[], None);
+
+        let source = "from .. import utils";
+        let tree = parser.parse(source, None).unwrap();
+        let deep_path = root_path.join("src/mypackage/sub/deep.py");
+        let imports = resolver.find_imports(&tree, &deep_path, source.as_bytes());
+
+        let utils_path = root_path.join("src/mypackage/utils.py");
+        assert!(
+            imports.contains(&utils_path),
+            "Relative import 'from .. import utils' in src/ layout should resolve.\n\
+             Expected: {:?}\n\
+             Got: {:?}\n\
+             Source roots: {:?}",
+            utils_path,
+            imports,
+            resolver.source_roots,
+        );
+    }
+
+    // -----------------------------------------------------------------------
+    // Test: Setuptools find.where
+    // -----------------------------------------------------------------------
+    #[test]
+    fn test_setuptools_find_where() {
+        let root = tempdir().unwrap();
+        let root_path = root.path().canonicalize().unwrap();
+
+        create_dummy_file(&root_path, "src/mylib/__init__.py", "");
+        create_dummy_file(&root_path, "src/mylib/core.py", "x = 1");
+        create_dummy_file(&root_path, "pyproject.toml", r#"
+[tool.setuptools.packages.find]
+where = ["src"]
+"#);
+
+        let resolver = PythonImportResolver::new(&root_path, &[], None);
+
+        assert_eq!(resolver.source_roots.len(), 1, "Should detect src/ via setuptools find.where");
+        assert_eq!(resolver.source_roots[0], root_path.join("src"));
+        assert!(
+            resolver.module_index.contains_key("mylib.core"),
+            "Should index 'mylib.core'. Keys: {:?}",
+            resolver.module_index.keys().collect::<Vec<_>>()
+        );
     }
 }

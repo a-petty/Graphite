@@ -178,3 +178,168 @@ fn test_source_roots_detected_in_statistics() {
         "Module index should have entries"
     );
 }
+
+// ---------------------------------------------------------------------------
+// Test Case C: Full graph build with src/ layout
+// ---------------------------------------------------------------------------
+#[test]
+fn test_src_layout_integration() {
+    let root = tempdir().unwrap();
+    let non_canonical_root = root.path().to_path_buf();
+
+    // src/ layout project: src/mypackage/ is the package
+    create_file(&non_canonical_root, "src/mypackage/__init__.py", "");
+    create_file(&non_canonical_root, "src/mypackage/utils.py", "def helper(): pass");
+    create_file(
+        &non_canonical_root,
+        "src/mypackage/core.py",
+        "from mypackage.utils import helper",
+    );
+
+    let canonical_files = scan_and_canonicalize(&non_canonical_root);
+    let mut graph = RepoGraph::new(&non_canonical_root, "python", &[], None);
+    graph.build_complete(&canonical_files, &non_canonical_root);
+
+    let canonical_root = non_canonical_root.canonicalize().unwrap();
+    let core_path = canonical_root.join("src/mypackage/core.py");
+    let utils_path = canonical_root.join("src/mypackage/utils.py");
+
+    assert!(
+        graph.has_file(&core_path),
+        "core.py should be in graph"
+    );
+    assert!(
+        graph.has_file(&utils_path),
+        "utils.py should be in graph"
+    );
+
+    // KEY: absolute import "from mypackage.utils import helper" should resolve
+    let deps = graph.get_outgoing_dependencies(&core_path);
+    let dep_paths: HashSet<PathBuf> = deps.iter().map(|(p, _)| p.clone()).collect();
+
+    assert!(
+        dep_paths.contains(&utils_path),
+        "core.py should have import edge to utils.py via 'from mypackage.utils import helper'.\n\
+         Dependencies found: {:?}\n\
+         Expected: {:?}\n\
+         Stats: source_roots={:?}, module_index_size={}, known_root_modules={:?}",
+        dep_paths,
+        utils_path,
+        graph.get_statistics().source_roots,
+        graph.get_statistics().module_index_size,
+        graph.get_statistics().known_root_modules,
+    );
+}
+
+// ---------------------------------------------------------------------------
+// Test Case E: Airflow-like UV workspace structure
+// ---------------------------------------------------------------------------
+#[test]
+fn test_airflow_like_structure() {
+    let root = tempdir().unwrap();
+    let non_canonical_root = root.path().to_path_buf();
+
+    // Root pyproject.toml with UV workspace
+    create_file(&non_canonical_root, "pyproject.toml", r#"
+[tool.uv.workspace]
+members = ["airflow-core"]
+"#);
+
+    // Airflow-core member with Hatch config
+    create_file(&non_canonical_root, "airflow-core/pyproject.toml", r#"
+[tool.hatch.build.targets.wheel]
+packages = ["src/airflow"]
+"#);
+    create_file(&non_canonical_root, "airflow-core/src/airflow/__init__.py", "");
+    create_file(&non_canonical_root, "airflow-core/src/airflow/models/__init__.py", "");
+    create_file(
+        &non_canonical_root,
+        "airflow-core/src/airflow/models/dag.py",
+        "from airflow.utils.helpers import some_func",
+    );
+    create_file(&non_canonical_root, "airflow-core/src/airflow/utils/__init__.py", "");
+    create_file(
+        &non_canonical_root,
+        "airflow-core/src/airflow/utils/helpers.py",
+        "def some_func(): pass",
+    );
+
+    let canonical_files = scan_and_canonicalize(&non_canonical_root);
+    let mut graph = RepoGraph::new(&non_canonical_root, "python", &[], None);
+    graph.build_complete(&canonical_files, &non_canonical_root);
+
+    let canonical_root = non_canonical_root.canonicalize().unwrap();
+    let dag_path = canonical_root.join("airflow-core/src/airflow/models/dag.py");
+    let helpers_path = canonical_root.join("airflow-core/src/airflow/utils/helpers.py");
+
+    let stats = graph.get_statistics();
+
+    // Verify source root detection
+    assert!(
+        stats.source_roots.iter().any(|sr|
+            sr == &canonical_root.join("airflow-core/src")
+        ),
+        "Should detect airflow-core/src/ as a source root.\n\
+         Source roots: {:?}",
+        stats.source_roots,
+    );
+
+    // Verify "airflow" is a known root module
+    assert!(
+        stats.known_root_modules.contains(&"airflow".to_string()),
+        "Should have 'airflow' as a known root module.\n\
+         Known root modules: {:?}",
+        stats.known_root_modules,
+    );
+
+    // KEY: import edge dag.py → helpers.py should resolve
+    let deps = graph.get_outgoing_dependencies(&dag_path);
+    let dep_paths: HashSet<PathBuf> = deps.iter().map(|(p, _)| p.clone()).collect();
+
+    assert!(
+        dep_paths.contains(&helpers_path),
+        "dag.py should have import edge to helpers.py via 'from airflow.utils.helpers import some_func'.\n\
+         Dependencies found: {:?}\n\
+         Expected: {:?}\n\
+         Import stats: attempted={}, failed={}",
+        dep_paths,
+        helpers_path,
+        stats.attempted_imports,
+        stats.failed_imports,
+    );
+}
+
+// ---------------------------------------------------------------------------
+// Test: src/ layout with relative imports through full graph build
+// ---------------------------------------------------------------------------
+#[test]
+fn test_src_layout_relative_import_integration() {
+    let root = tempdir().unwrap();
+    let non_canonical_root = root.path().to_path_buf();
+
+    create_file(&non_canonical_root, "src/mypackage/__init__.py", "");
+    create_file(&non_canonical_root, "src/mypackage/utils.py", "def helper(): pass");
+    create_file(
+        &non_canonical_root,
+        "src/mypackage/core.py",
+        "from . import utils",
+    );
+
+    let canonical_files = scan_and_canonicalize(&non_canonical_root);
+    let mut graph = RepoGraph::new(&non_canonical_root, "python", &[], None);
+    graph.build_complete(&canonical_files, &non_canonical_root);
+
+    let canonical_root = non_canonical_root.canonicalize().unwrap();
+    let core_path = canonical_root.join("src/mypackage/core.py");
+    let utils_path = canonical_root.join("src/mypackage/utils.py");
+
+    let deps = graph.get_outgoing_dependencies(&core_path);
+    let dep_paths: HashSet<PathBuf> = deps.iter().map(|(p, _)| p.clone()).collect();
+
+    assert!(
+        dep_paths.contains(&utils_path),
+        "core.py should have import edge to utils.py via 'from . import utils' in src/ layout.\n\
+         Dependencies found: {:?}",
+        dep_paths,
+    );
+}
