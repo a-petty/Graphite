@@ -10,6 +10,10 @@ from .embeddings import EmbeddingManager # Assuming EmbeddingManager is in embed
 
 logger = logging.getLogger(__name__)
 
+# Re-ranking weights for combining embedding similarity with PageRank.
+SIMILARITY_WEIGHT = 0.80
+PAGERANK_WEIGHT = 0.20
+
 # Known context window sizes (tokens). Used to set max_tokens automatically.
 # Conservative utilization: use 60% of window (leave room for system prompt + response).
 MODEL_CONTEXT_WINDOWS = {
@@ -176,7 +180,8 @@ class ContextManager:
             # Supplement with query-relevant file ranking when embeddings available
             if self.embedding_manager is not None and user_query:
                 try:
-                    all_graph_files = [Path(p) for p, _ in self.repo_graph.get_top_ranked_files(200)]
+                    stats = self.repo_graph.get_statistics()
+                    all_graph_files = [Path(p) for p, _ in self.repo_graph.get_top_ranked_files(stats.node_count)]
                     relevant = self.embedding_manager.find_relevant_files(
                         user_query, all_graph_files, top_n=15
                     )
@@ -216,13 +221,26 @@ class ContextManager:
             processed_files.update(explicit_processed)
             neighborhood_budget -= self.count_tokens(explicit_content)
 
-        # 2b. Vector search anchors
-        all_graph_files = [Path(p) for p, _ in self.repo_graph.get_top_ranked_files(1000)]
-        anchor_files = self.embedding_manager.find_relevant_files(
+        # 2b. Vector search anchors (with similarity + PageRank re-ranking)
+        stats = self.repo_graph.get_statistics()
+        all_graph_files = [Path(p) for p, _ in self.repo_graph.get_top_ranked_files(stats.node_count)]
+        # Fetch extra candidates for re-ranking
+        scored = self.embedding_manager.find_relevant_files_scored(
             user_query,
             all_graph_files,
-            top_n=params.anchor_count
+            top_n=params.anchor_count * 3,
         )
+        # Re-rank: combine embedding similarity with PageRank
+        pagerank_map = dict(self.repo_graph.get_top_ranked_files(stats.node_count))
+        max_pr = max(pagerank_map.values()) if pagerank_map else 1.0
+        reranked = []
+        for path, similarity in scored:
+            pr = pagerank_map.get(str(path), 0.0)
+            normalized_pr = pr / max_pr if max_pr > 0 else 0.0
+            combined = SIMILARITY_WEIGHT * similarity + PAGERANK_WEIGHT * normalized_pr
+            reranked.append((path, combined))
+        reranked.sort(key=lambda x: x[1], reverse=True)
+        anchor_files = [path for path, _ in reranked[:params.anchor_count]]
 
         anchor_content, anchor_processed = self._fill_with_content(
             anchor_files,
@@ -273,7 +291,7 @@ class ContextManager:
             seen = set(skeleton_candidates)
             if self.embedding_manager is not None:
                 try:
-                    all_graph_files = [Path(p) for p, _ in self.repo_graph.get_top_ranked_files(1000)]
+                    all_graph_files = [Path(p) for p, _ in self.repo_graph.get_top_ranked_files(stats.node_count)]
                     embedding_candidates = self.embedding_manager.find_relevant_files(
                         user_query, all_graph_files, top_n=50
                     )

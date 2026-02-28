@@ -258,6 +258,78 @@ class TestGetEmbeddingText:
 
 
 # ---------------------------------------------------------------------------
+# Module prefix tests
+# ---------------------------------------------------------------------------
+
+class TestFilePathToModulePrefix:
+    """Tests for _file_path_to_module_prefix method."""
+
+    def _make_manager(self, project_root):
+        with patch("atlas.embeddings.TextEmbedding"):
+            return EmbeddingManager(project_root=project_root)
+
+    def test_basic_python_file(self, tmp_path):
+        mgr = self._make_manager(tmp_path)
+        result = mgr._file_path_to_module_prefix(tmp_path / "mypackage" / "models" / "user.py")
+        assert result == "mypackage.models.user"
+
+    def test_strips_src_prefix(self, tmp_path):
+        mgr = self._make_manager(tmp_path)
+        result = mgr._file_path_to_module_prefix(tmp_path / "src" / "airflow" / "models" / "pool.py")
+        assert result == "airflow.models.pool"
+
+    def test_strips_lib_prefix(self, tmp_path):
+        mgr = self._make_manager(tmp_path)
+        result = mgr._file_path_to_module_prefix(tmp_path / "lib" / "utils" / "helpers.py")
+        assert result == "utils.helpers"
+
+    def test_init_file_stripped(self, tmp_path):
+        mgr = self._make_manager(tmp_path)
+        result = mgr._file_path_to_module_prefix(tmp_path / "mypackage" / "__init__.py")
+        assert result == "mypackage"
+
+    def test_top_level_file(self, tmp_path):
+        mgr = self._make_manager(tmp_path)
+        result = mgr._file_path_to_module_prefix(tmp_path / "setup.py")
+        assert result == "setup"
+
+    def test_no_project_root_returns_empty(self):
+        with patch("atlas.embeddings.TextEmbedding"):
+            mgr = EmbeddingManager(project_root=None)
+        result = mgr._file_path_to_module_prefix(Path("/some/file.py"))
+        assert result == ""
+
+    def test_file_outside_project_returns_empty(self, tmp_path):
+        mgr = self._make_manager(tmp_path)
+        result = mgr._file_path_to_module_prefix(Path("/completely/different/path.py"))
+        assert result == ""
+
+    def test_nested_src_dir(self, tmp_path):
+        """Handles project structures like airflow-core/src/airflow/...
+
+        The src/ directory is stripped, but the workspace package name
+        (airflow-core) is preserved — it's not a source directory.
+        """
+        mgr = self._make_manager(tmp_path)
+        result = mgr._file_path_to_module_prefix(
+            tmp_path / "airflow-core" / "src" / "airflow" / "models" / "pool.py"
+        )
+        assert result == "airflow-core.airflow.models.pool"
+
+    def test_prefix_prepended_to_embedding_text(self, tmp_path):
+        """_get_embedding_text should prepend the module prefix."""
+        with patch("atlas.embeddings.TextEmbedding"):
+            mgr = EmbeddingManager(project_root=tmp_path)
+        test_file = tmp_path / "mypackage" / "core.py"
+        test_file.parent.mkdir(parents=True, exist_ok=True)
+        test_file.write_text("def hello(): pass")
+
+        result = mgr._get_embedding_text(test_file)
+        assert result.startswith("mypackage.core\n")
+        assert "def hello(): pass" in result
+
+
+# ---------------------------------------------------------------------------
 # Integration: find_relevant_files with chunk pipeline
 # ---------------------------------------------------------------------------
 
@@ -310,3 +382,61 @@ class TestFindRelevantFilesChunked:
             result = mgr.find_relevant_files("test query", files, top_n=3)
             assert len(result) == 3
             assert all(isinstance(p, Path) for p in result)
+
+    def test_scored_returns_tuples_with_scores(self, tmp_path):
+        """find_relevant_files_scored should return (Path, float) tuples."""
+        with patch("atlas.embeddings.TextEmbedding") as MockModel:
+            mock_instance = MagicMock()
+            dim = 384
+            mock_instance.embed.side_effect = lambda texts: [
+                np.random.randn(dim) for _ in texts
+            ]
+            MockModel.return_value = mock_instance
+
+            mgr = EmbeddingManager()
+            files = []
+            for i in range(5):
+                f = tmp_path / f"file_{i}.py"
+                f.write_text(f"def func_{i}(): pass")
+                files.append(f)
+
+            result = mgr.find_relevant_files_scored("test query", files, top_n=3)
+            assert len(result) == 3
+            for path, score in result:
+                assert isinstance(path, Path)
+                assert isinstance(score, float)
+            # Scores should be sorted descending
+            scores = [s for _, s in result]
+            assert scores == sorted(scores, reverse=True)
+
+    def test_scored_consistent_with_unscored(self, tmp_path):
+        """find_relevant_files and find_relevant_files_scored should return same ordering."""
+        with patch("atlas.embeddings.TextEmbedding") as MockModel:
+            mock_instance = MagicMock()
+            dim = 384
+            # Use deterministic embeddings
+            np.random.seed(42)
+            mock_instance.embed.side_effect = lambda texts: [
+                np.random.randn(dim) for _ in texts
+            ]
+            MockModel.return_value = mock_instance
+
+            mgr = EmbeddingManager()
+            files = []
+            for i in range(5):
+                f = tmp_path / f"file_{i}.py"
+                f.write_text(f"def func_{i}(): pass")
+                files.append(f)
+
+            scored = mgr.find_relevant_files_scored("test", files, top_n=3)
+            scored_paths = [p for p, _ in scored]
+
+            # Reset seed and create a fresh manager for consistent comparison
+            np.random.seed(42)
+            mock_instance.embed.side_effect = lambda texts: [
+                np.random.randn(dim) for _ in texts
+            ]
+            mgr2 = EmbeddingManager()
+            unscored = mgr2.find_relevant_files("test", files, top_n=3)
+
+            assert scored_paths == unscored

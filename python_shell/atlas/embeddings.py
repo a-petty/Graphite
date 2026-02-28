@@ -42,27 +42,82 @@ class EmbeddingManager:
     - Allowing individual functions to match queries independently
     """
 
-    def __init__(self, model_name: str = "BAAI/bge-small-en-v1.5", repo_graph=None):
+    # Common source directory names that should be stripped from module paths
+    _SOURCE_DIR_NAMES = {"src", "lib", "source", "sources"}
+
+    def __init__(self, model_name: str = "BAAI/bge-small-en-v1.5", repo_graph=None, project_root: Optional[Path] = None):
         logger.info(f"Initializing EmbeddingManager with model: {model_name}")
         try:
             self.model = TextEmbedding(model_name=model_name)
             self.embeddings_cache: Dict[Path, FileEmbedding] = {}
             self.repo_graph = repo_graph
+            self.project_root = project_root
             logger.info("FastEmbed model initialized and ready.")
         except Exception as e:
             logger.error(f"Failed to initialize fastembed model {model_name}: {e}")
             raise
 
+    def _file_path_to_module_prefix(self, file_path: Path) -> str:
+        """Convert a file path to a dotted module prefix for embedding.
+
+        Examples:
+            /repo/airflow-core/src/airflow/models/pool.py → airflow.models.pool
+            /repo/src/utils/helpers.py → utils.helpers
+            /repo/mypackage/__init__.py → mypackage
+        """
+        if self.project_root is None:
+            return ""
+        try:
+            rel = file_path.resolve().relative_to(self.project_root.resolve())
+        except ValueError:
+            return ""
+
+        parts = list(rel.parts)
+        if not parts:
+            return ""
+
+        # Strip common source directory names wherever they appear (e.g., src/, lib/)
+        # This handles both top-level (src/airflow/...) and nested
+        # monorepo layouts (airflow-core/src/airflow/...)
+        parts = [p for p in parts if p.lower() not in self._SOURCE_DIR_NAMES]
+
+        if not parts:
+            return ""
+
+        # Remove file extension from last part
+        last = parts[-1]
+        stem = Path(last).stem
+        if stem == "__init__":
+            parts = parts[:-1]
+        else:
+            parts[-1] = stem
+
+        return ".".join(parts)
+
     def _get_embedding_text(self, file_path: Path) -> str:
-        """Get text to embed for a file. Uses skeleton if repo_graph is available."""
+        """Get text to embed for a file.
+
+        Uses skeleton if repo_graph is available, and prepends the dotted
+        module path (e.g., 'airflow.models.pool') so that file identity
+        is captured in the embedding.
+        """
+        text = None
         if self.repo_graph is not None:
             try:
                 skeleton = self.repo_graph.get_skeleton(str(file_path))
                 if skeleton and skeleton.strip():
-                    return skeleton
+                    text = skeleton
             except Exception:
                 pass
-        return file_path.read_text()
+        if text is None:
+            text = file_path.read_text()
+
+        # Prepend module path prefix for semantic signal
+        prefix = self._file_path_to_module_prefix(file_path)
+        if prefix:
+            text = f"{prefix}\n{text}"
+
+        return text
 
     def _split_into_chunks(self, text: str) -> List[str]:
         """Split text into chunks at function/class definition boundaries.
@@ -145,9 +200,9 @@ class EmbeddingManager:
             return 0.0
         return float(np.dot(vec1, vec2) / (norm1 * norm2))
 
-    def find_relevant_files(self, query: str, file_paths: List[Path], top_n: int = 5) -> List[Path]:
+    def find_relevant_files_scored(self, query: str, file_paths: List[Path], top_n: int = 5) -> List[Tuple[Path, float]]:
         """
-        Finds files most relevant to a given query using cosine similarity.
+        Finds files most relevant to a query, returning (path, similarity) tuples.
 
         Files are embedded using their skeleton representation (if repo_graph
         is available) split into function-level chunks. Similarity is computed
@@ -160,7 +215,8 @@ class EmbeddingManager:
             top_n: Number of top relevant files to return.
 
         Returns:
-            The top_n most relevant file paths, ordered by relevance.
+            The top_n most relevant (file_path, similarity_score) tuples,
+            ordered by descending similarity.
         """
         if not file_paths:
             return []
@@ -190,7 +246,13 @@ class EmbeddingManager:
 
         # Batch-embed all new chunks at once
         if all_new_chunks:
-            logger.debug(f"Generating embeddings for {len(all_new_chunks)} chunks from {len(chunk_file_map)} new files.")
+            if len(chunk_file_map) > 100:
+                logger.info(
+                    f"Embedding {len(all_new_chunks)} chunks from {len(chunk_file_map)} files "
+                    f"(first search — this may take 20-30s on CPU, cached after that)..."
+                )
+            else:
+                logger.debug(f"Generating embeddings for {len(all_new_chunks)} chunks from {len(chunk_file_map)} new files.")
             new_embeddings = self.generate_embedding(all_new_chunks)
 
             embed_idx = 0
@@ -206,6 +268,14 @@ class EmbeddingManager:
 
         similarities.sort(key=lambda x: x[1], reverse=True)
 
-        relevant_files = [path for path, _ in similarities[:top_n]]
-        logger.debug(f"Found {len(relevant_files)} relevant files.")
-        return relevant_files
+        logger.debug(f"Found {min(top_n, len(similarities))} relevant files.")
+        return similarities[:top_n]
+
+    def find_relevant_files(self, query: str, file_paths: List[Path], top_n: int = 5) -> List[Path]:
+        """
+        Finds files most relevant to a given query using cosine similarity.
+
+        Convenience wrapper around find_relevant_files_scored() that returns
+        just the file paths without scores.
+        """
+        return [path for path, _ in self.find_relevant_files_scored(query, file_paths, top_n)]

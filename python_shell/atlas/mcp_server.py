@@ -82,6 +82,12 @@ MAX_RESULT_CHARS = 60_000  # Safety cap for MCP tool results (Claude Code limit 
 SUPPORTED_CPG_EXTENSIONS = {".py", ".pyi"}
 CPG_TOOL_TIMEOUT_SECONDS = 120  # Safety timeout for CPG-dependent tools (call graph queries)
 
+# Re-ranking weights for combining embedding similarity with PageRank.
+# Similarity dominates so truly relevant files always win; PageRank
+# breaks ties by boosting architecturally central files.
+SIMILARITY_WEIGHT = 0.80
+PAGERANK_WEIGHT = 0.20
+
 _cpg_lock = threading.Lock()
 
 
@@ -207,7 +213,7 @@ def _ensure_embeddings() -> None:
     from atlas.embeddings import EmbeddingManager
     from atlas.context import ContextManager
 
-    _embedding_manager = EmbeddingManager(repo_graph=_graph)
+    _embedding_manager = EmbeddingManager(repo_graph=_graph, project_root=_project_root)
     # Cap at 20K tokens (~80K chars) to stay within MCP tool result limits
     _context_manager = ContextManager(_graph, _embedding_manager, max_tokens=20_000)
     log.info("Embedding manager ready")
@@ -417,16 +423,29 @@ async def find_relevant_files(query: str, top_n: int = 10) -> str:
             def _run():
                 _ensure_graph()
                 _ensure_embeddings()
-                all_files = [Path(p) for p, _ in _graph.get_top_ranked_files(1000)]
-                # Request extra results to compensate for filtering
-                results = _embedding_manager.find_relevant_files(query, all_files, top_n=top_n + 10)
+                stats = _graph.get_statistics()
+                all_files = [Path(p) for p, _ in _graph.get_top_ranked_files(stats.node_count)]
+                # Fetch extra candidates for re-ranking and filtering
+                scored = _embedding_manager.find_relevant_files_scored(query, all_files, top_n=top_n * 3 + 10)
                 # Filter out trivial __init__.py files
-                filtered = [p for p in results if not _is_trivial_init(p)]
-                filtered = filtered[:top_n]
-                if not filtered:
+                scored = [(p, sim) for p, sim in scored if not _is_trivial_init(p)]
+                if not scored:
                     return f"No relevant files found for: {query}"
+
+                # Re-rank: combine embedding similarity (80%) with PageRank (20%)
+                pagerank_map = dict(_graph.get_top_ranked_files(stats.node_count))
+                max_pr = max(pagerank_map.values()) if pagerank_map else 1.0
+                reranked = []
+                for path, similarity in scored:
+                    pr = pagerank_map.get(str(path), 0.0)
+                    normalized_pr = pr / max_pr if max_pr > 0 else 0.0
+                    combined = SIMILARITY_WEIGHT * similarity + PAGERANK_WEIGHT * normalized_pr
+                    reranked.append((path, combined))
+                reranked.sort(key=lambda x: x[1], reverse=True)
+                reranked = reranked[:top_n]
+
                 lines = [f"Files relevant to '{query}':"]
-                for i, path in enumerate(filtered, 1):
+                for i, (path, _score) in enumerate(reranked, 1):
                     lines.append(f"  {i}. {_to_relative(str(path))}")
                 return "\n".join(lines)
             return await anyio.to_thread.run_sync(_run)
