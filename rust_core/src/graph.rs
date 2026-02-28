@@ -193,6 +193,9 @@ pub struct GraphStatistics {
     pub unresolved_import_count: usize,
     pub source_roots: Vec<PathBuf>,
     pub module_index_size: usize,
+    pub known_root_modules: Vec<String>,
+    pub attempted_imports: usize,
+    pub failed_imports: usize,
 }
 
 /// A temporary, lightweight container for the results of parsing a single file.
@@ -1521,6 +1524,9 @@ impl RepoGraph {
             unresolved_import_count: self.unresolved_imports.values().map(|s| s.len()).sum(),
             source_roots: self.import_resolver.get_source_roots(),
             module_index_size: self.import_resolver.module_index_size(),
+            known_root_modules: self.import_resolver.get_known_root_modules(),
+            attempted_imports: self.import_resolver.get_attempted_imports(),
+            failed_imports: self.import_resolver.get_failed_imports(),
         }
     }
 
@@ -1566,26 +1572,38 @@ impl RepoGraph {
         let node_count = self.graph.node_count();
         if node_count == 0 { return; }
 
-        // --- OPTIMIZATION: Pre-compute out-degrees ---
-        let out_degrees: Vec<f64> = self.graph.node_indices()
-            .map(|idx| self.graph.edges_directed(idx, petgraph::Direction::Outgoing).count() as f64)
+        // Pre-compute the WEIGHTED out-degree for each node: the sum of edge
+        // weights across all outgoing edges.  Dividing each edge's weight by
+        // this total keeps the transition matrix row-stochastic (outgoing
+        // probabilities sum to 1.0).  The previous code used unweighted
+        // out-degree and then multiplied by edge weight, which caused the
+        // probabilities to sum to > 1.0 and inflated rank in tight cycles.
+        let weighted_out_degrees: Vec<f64> = self.graph.node_indices()
+            .map(|idx| {
+                self.graph.edges_directed(idx, petgraph::Direction::Outgoing)
+                    .map(|e| e.weight().strength())
+                    .sum()
+            })
             .collect();
 
         let mut ranks: Vec<f64> = vec![1.0 / node_count as f64; node_count];
-        
+
         for _ in 0..iterations {
             let mut new_ranks = vec![0.0; node_count];
             for node_idx in self.graph.node_indices() {
                 let mut rank_sum = 0.0;
                 for edge in self.graph.edges_directed(node_idx, petgraph::Direction::Incoming) {
                     let source_idx = edge.source();
-                    // Use the pre-computed out-degree
-                    let source_out_degree = out_degrees[source_idx.index()];
-                    if source_out_degree > 0.0 {
-                        rank_sum += (ranks[source_idx.index()] / source_out_degree) * edge.weight().strength();
+                    let w_out = weighted_out_degrees[source_idx.index()];
+                    if w_out > 0.0 {
+                        // Transition probability = this edge's weight / total outgoing weight.
+                        // Import edges (2.0) get twice the share of SymbolUsage edges (1.0),
+                        // but the total across all outgoing edges sums to exactly 1.0.
+                        rank_sum += ranks[source_idx.index()] * (edge.weight().strength() / w_out);
                     }
                 }
-                new_ranks[node_idx.index()] = (1.0 - damping_factor) / node_count as f64 + damping_factor * rank_sum;
+                new_ranks[node_idx.index()] = (1.0 - damping_factor) / node_count as f64
+                    + damping_factor * rank_sum;
             }
             ranks = new_ranks;
         }

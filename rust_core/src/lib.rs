@@ -272,6 +272,12 @@ pub struct PyGraphStatistics {
     pub source_roots: Vec<String>,
     #[pyo3(get)]
     pub module_index_size: usize,
+    #[pyo3(get)]
+    pub known_root_modules: Vec<String>,
+    #[pyo3(get)]
+    pub attempted_imports: usize,
+    #[pyo3(get)]
+    pub failed_imports: usize,
 }
 
 impl From<GraphStatistics> for PyGraphStatistics {
@@ -288,6 +294,9 @@ impl From<GraphStatistics> for PyGraphStatistics {
                 .map(|p| p.to_string_lossy().into_owned())
                 .collect(),
             module_index_size: stats.module_index_size,
+            known_root_modules: stats.known_root_modules,
+            attempted_imports: stats.attempted_imports,
+            failed_imports: stats.failed_imports,
         }
     }
 }
@@ -449,6 +458,23 @@ impl PyRepoGraph {
         let path = PathBuf::from(file_path);
         let canonical = path.canonicalize().unwrap_or(path);
         self.graph.ensure_cpg_for_file(&canonical)
+    }
+
+    /// Re-resolve call graph edges for a single file without rebuilding its CPG.
+    /// Call this after building CPG for a file's dependents, so that cross-file
+    /// CalledBy edges are discovered. The file must already have CPG data
+    /// (via ensure_cpg_for_file); if not, this returns false and does nothing.
+    fn resolve_cpg_for_file(&mut self, file_path: &str) -> PyResult<bool> {
+        let cpg = self.graph.cpg.as_mut().ok_or_else(|| {
+            PyRuntimeError::new_err("CPG not enabled. Call enable_cpg() or ensure_cpg_for_file() first.")
+        })?;
+        let path = PathBuf::from(file_path);
+        let canonical = path.canonicalize().unwrap_or(path);
+        if !cpg.has_file(&canonical) {
+            return Ok(false);
+        }
+        crate::callgraph::CallGraphBuilder::resolve_file(cpg, &canonical, &self.graph.symbol_index);
+        Ok(true)
     }
 
     /// Get all functions/methods in a file as a list of dicts.
