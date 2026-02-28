@@ -542,15 +542,16 @@ async def get_file_symbols(file_path: str) -> str:
             return f"ERROR: {e}"
 
 
-MAX_NEIGHBOR_FILES = 200  # Safety cap for lazy call graph resolution
+MAX_NEIGHBOR_FILES = 200  # Safety cap for lazy call graph resolution (deps / callees)
+MAX_CALLER_NEIGHBOR_FILES = 50  # Tighter cap for dependents (callers) — dependents sets are often 5-10x larger
 
 
-def _build_cpg_for_neighbors(normalized: str, neighbor_paths: list) -> None:
+def _build_cpg_for_neighbors(normalized: str, neighbor_paths: list, *, max_files: int = MAX_NEIGHBOR_FILES) -> None:
     """Build CPG for a set of neighbor files (deps or dependents), filtering to Python only."""
     global _cpg_enabled
     built = 0
     for dep_path, _ in neighbor_paths:
-        if built >= MAX_NEIGHBOR_FILES:
+        if built >= max_files:
             break
         if Path(dep_path).suffix in SUPPORTED_CPG_EXTENSIONS:
             _graph.ensure_cpg_for_file(dep_path)
@@ -590,7 +591,7 @@ async def get_callees(file_path: str, function_name: str) -> str:
                     lines.append(f"  {callee['name']} ({_to_relative(callee['file'])}:{callee['line']})")
                 return "\n".join(lines)
             with anyio.fail_after(CPG_TOOL_TIMEOUT_SECONDS):
-                return await anyio.to_thread.run_sync(_run)
+                return await anyio.to_thread.run_sync(_run, abandon_on_cancel=True)
         except TimeoutError:
             return f"ERROR: Call graph query timed out after {CPG_TOOL_TIMEOUT_SECONDS}s. The repository may be too large for full call graph analysis."
         except Exception as e:
@@ -620,7 +621,7 @@ async def get_callers(file_path: str, function_name: str) -> str:
                 _graph.ensure_cpg_for_file(normalized)
                 _cpg_enabled = True
                 dependents = _graph.get_dependents(normalized)
-                _build_cpg_for_neighbors(normalized, dependents)
+                _build_cpg_for_neighbors(normalized, dependents, max_files=MAX_CALLER_NEIGHBOR_FILES)
                 # Re-resolve target to find incoming calls from all built dependents
                 _graph.resolve_cpg_for_file(normalized)
                 callers = _graph.get_callers(normalized, function_name)
@@ -631,7 +632,7 @@ async def get_callers(file_path: str, function_name: str) -> str:
                     lines.append(f"  {caller['name']} ({_to_relative(caller['file'])}:{caller['line']})")
                 return "\n".join(lines)
             with anyio.fail_after(CPG_TOOL_TIMEOUT_SECONDS):
-                return await anyio.to_thread.run_sync(_run)
+                return await anyio.to_thread.run_sync(_run, abandon_on_cancel=True)
         except TimeoutError:
             return f"ERROR: Call graph query timed out after {CPG_TOOL_TIMEOUT_SECONDS}s. The repository may be too large for full call graph analysis."
         except Exception as e:
