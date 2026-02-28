@@ -274,6 +274,7 @@ async def atlas_status() -> str:
             def _run():
                 _ensure_graph()
                 stats = _graph.get_statistics()
+                root_modules = stats.known_root_modules[:20]
                 lines = [
                     "Atlas Semantic Graph Status",
                     f"  Project root: {_project_root}",
@@ -284,6 +285,8 @@ async def atlas_status() -> str:
                     f"  Symbol definitions: {stats.total_definitions}",
                     f"  Module index size: {stats.module_index_size}",
                     f"  Source roots: {stats.source_roots}",
+                    f"  Known root modules: {root_modules}",
+                    f"  Import resolution: {stats.attempted_imports} attempted, {stats.failed_imports} failed",
                     f"  Unresolved imports: {stats.unresolved_import_count}",
                     f"  CPG enabled: {_cpg_enabled}",
                     f"  Embeddings loaded: {_embedding_manager is not None}",

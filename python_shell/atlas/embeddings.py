@@ -112,11 +112,26 @@ class EmbeddingManager:
         )
 
     def generate_embedding(self, texts: List[str]) -> List[np.ndarray]:
-        """Generates embeddings for a list of text inputs."""
+        """Generates embeddings for a list of text inputs.
+
+        Sorts inputs by length before batching to minimize ONNX padding overhead.
+        ONNX pads all inputs in a batch to the longest sequence; without sorting,
+        a single long text forces every item in that batch to process at max length.
+        """
         if not texts:
             return []
         try:
-            embeddings: List[np.ndarray] = list(self.model.embed(texts))
+            # Sort by length so similarly-sized texts batch together
+            indexed = sorted(enumerate(texts), key=lambda x: len(x[1]))
+            sorted_texts = [t for _, t in indexed]
+
+            sorted_embeddings = list(self.model.embed(sorted_texts))
+
+            # Restore original order
+            embeddings = [None] * len(texts)
+            for i, (orig_idx, _) in enumerate(indexed):
+                embeddings[orig_idx] = sorted_embeddings[i]
+
             return embeddings
         except Exception as e:
             logger.error(f"Failed to generate embeddings for texts: {e}")
