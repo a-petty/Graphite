@@ -558,6 +558,24 @@ def _build_cpg_for_neighbors(normalized: str, neighbor_paths: list, *, max_files
     _cpg_enabled = True
 
 
+def _filter_dependents_by_function_name(dependents: list, function_name: str) -> list:
+    """Filter dependent files to only those whose source contains the function name.
+
+    This dramatically reduces the CPG budget for popular files (e.g. 110 dependents
+    down to the ~3-5 that actually call a specific function).
+    """
+    filtered = []
+    for dep_path, label in dependents:
+        try:
+            with open(dep_path, "r", errors="replace") as f:
+                content = f.read()
+            if function_name in content:
+                filtered.append((dep_path, label))
+        except (OSError, IOError):
+            pass
+    return filtered
+
+
 @mcp.tool()
 async def get_callees(file_path: str, function_name: str) -> str:
     """Get all functions called by a given function (outgoing call graph).
@@ -615,7 +633,7 @@ async def get_callers(file_path: str, function_name: str) -> str:
                     return cpg_err
                 # Lazy call graph: build target first (so its function nodes exist),
                 # then build dependents (whose call sites resolve to target's functions),
-                # then re-resolve target to pick up all incoming CalledBy edges.
+                # then additively resolve to pick up all incoming CalledBy edges.
                 global _cpg_enabled
                 _graph.ensure_cpg_for_file(normalized)
                 _cpg_enabled = True
@@ -629,9 +647,12 @@ async def get_callers(file_path: str, function_name: str) -> str:
                     if dep_path.endswith("__init__.py"):
                         init_dependents.extend(_graph.get_dependents(dep_path))
                 all_dependents = dependents + init_dependents
-                _build_cpg_for_neighbors(normalized, all_dependents, max_files=MAX_CALLER_NEIGHBOR_FILES)
-                # Re-resolve target to find incoming calls from all built dependents
-                _graph.resolve_cpg_for_file(normalized)
+                # Pre-filter to dependents that actually reference the function name
+                relevant_dependents = _filter_dependents_by_function_name(all_dependents, function_name)
+                _build_cpg_for_neighbors(normalized, relevant_dependents, max_files=MAX_CALLER_NEIGHBOR_FILES)
+                # Additively resolve — adds new CalledBy edges without destroying
+                # edges from prior tool calls
+                _graph.resolve_new_callers(normalized)
                 callers = _graph.get_callers(normalized, function_name)
                 if not callers:
                     return f"No callers found for {function_name} in {_to_relative(normalized)}"

@@ -1089,3 +1089,206 @@ class DagModel:
     assert!(kinds.contains(&&CpgNodeKind::Function), "Should include a Function node");
     assert!(kinds.contains(&&CpgNodeKind::Method), "Should include a Method node");
 }
+
+// ============================================================
+// Overloaded Method Tests (28-30)
+// ============================================================
+
+// Test 28: self.method() resolves when @overload creates multiple CPG nodes
+#[test]
+fn test_overloaded_self_method_resolves() {
+    let mut cpg = CpgLayer::new();
+    // Simulate @overload: three method definitions with same name+class,
+    // two short stubs and one large implementation body.
+    let source = r#"
+class TaskCreator:
+    def _get_task_creator(self, x: int) -> int:
+        pass
+
+    def _get_task_creator(self, x: str) -> str:
+        pass
+
+    def _get_task_creator(self, x):
+        # This is the real implementation with a much larger body
+        result = self.process(x)
+        validated = self.validate(result)
+        logged = self.log(validated)
+        return logged
+
+    def run(self):
+        self._get_task_creator(42)
+"#;
+    build_cpg_for_source(&mut cpg, "/test/overload.py", source);
+
+    let symbol_index = SymbolIndex::new();
+    CallGraphBuilder::resolve_all(&mut cpg, &symbol_index);
+
+    let run_idx = find_function(&cpg, "/test/overload.py", "run").unwrap();
+
+    // run() should have a Calls edge to the largest _get_task_creator variant
+    let callees = cpg.get_callees(run_idx);
+    let callee_names: Vec<&str> = callees.iter().map(|(_, n)| n.name.as_str()).collect();
+    assert!(
+        callee_names.contains(&"_get_task_creator"),
+        "run() should resolve self._get_task_creator() despite @overload variants. Got callees: {:?}",
+        callee_names
+    );
+}
+
+// Test 29: Cross-file overloaded method resolves via class-qualified import
+#[test]
+fn test_cross_file_overloaded_method_resolves() {
+    let root = tempdir().unwrap();
+    let root_path = root.path().canonicalize().unwrap();
+
+    create_test_file(&root_path, "models.py", r#"
+class User:
+    def save(self, data: dict) -> bool:
+        pass
+
+    def save(self, data: list) -> bool:
+        pass
+
+    def save(self, data):
+        # Real implementation — larger body
+        validated = self.validate(data)
+        stored = self.store(validated)
+        self.notify(stored)
+        return True
+"#);
+    create_test_file(&root_path, "views.py", r#"from models import User
+
+def create_user():
+    User.save(instance)
+"#);
+
+    let mut graph = RepoGraph::new(&root_path, "python", &[], None);
+    graph.enable_cpg();
+    let paths = vec![root_path.join("models.py"), root_path.join("views.py")];
+    graph.build_complete(&paths, &root_path);
+
+    let cpg = graph.cpg.as_ref().unwrap();
+
+    let create_user_idx = find_function(cpg, &root_path.join("views.py").to_string_lossy(), "create_user").unwrap();
+
+    // Should resolve despite multiple overloaded save() methods
+    let callees = cpg.get_callees(create_user_idx);
+    let callee_names: Vec<&str> = callees.iter().map(|(_, n)| n.name.as_str()).collect();
+    assert!(
+        callee_names.contains(&"save"),
+        "create_user() should resolve User.save() despite @overload. Got callees: {:?}",
+        callee_names
+    );
+}
+
+// ============================================================
+// resolve_new_callers Tests (31-32)
+// ============================================================
+
+// Test 30: resolve_new_callers adds edges without removing existing ones
+#[test]
+fn test_resolve_new_callers_additive() {
+    let root = tempdir().unwrap();
+    let root_path = root.path().canonicalize().unwrap();
+
+    // target.py defines target() and also calls helper()
+    create_test_file(&root_path, "target.py", r#"from helper_mod import helper
+
+def target():
+    helper()
+"#);
+    create_test_file(&root_path, "helper_mod.py", r#"def helper():
+    pass
+"#);
+    // caller_a.py calls target()
+    create_test_file(&root_path, "caller_a.py", r#"from target import target
+
+def use_a():
+    target()
+"#);
+    // caller_b.py also calls target()
+    create_test_file(&root_path, "caller_b.py", r#"from target import target
+
+def use_b():
+    target()
+"#);
+
+    let mut graph = RepoGraph::new(&root_path, "python", &[], None);
+    let paths = vec![
+        root_path.join("target.py"),
+        root_path.join("helper_mod.py"),
+        root_path.join("caller_a.py"),
+        root_path.join("caller_b.py"),
+    ];
+    graph.build_complete(&paths, &root_path);
+
+    // Build CPG for all files without resolve
+    assert!(graph.build_cpg_for_file(&root_path.join("target.py")));
+    assert!(graph.build_cpg_for_file(&root_path.join("helper_mod.py")));
+    assert!(graph.build_cpg_for_file(&root_path.join("caller_a.py")));
+
+    // First, use resolve_file for target.py (establishes target→helper + caller_a→target edges)
+    let cpg = graph.cpg.as_mut().unwrap();
+    CallGraphBuilder::resolve_file(cpg, &root_path.join("target.py"), &graph.symbol_index);
+
+    let target_idx = find_function(cpg, &root_path.join("target.py").to_string_lossy(), "target").unwrap();
+    let helper_idx = find_function(cpg, &root_path.join("helper_mod.py").to_string_lossy(), "helper").unwrap();
+    let use_a_idx = find_function(cpg, &root_path.join("caller_a.py").to_string_lossy(), "use_a").unwrap();
+
+    // Verify target→helper exists
+    assert!(has_calls_edge(cpg, target_idx, helper_idx),
+        "target should call helper after resolve_file");
+    // Verify caller_a→target exists
+    assert!(has_calls_edge(cpg, use_a_idx, target_idx),
+        "use_a should call target after resolve_file");
+
+    // Now build CPG for caller_b and use resolve_new_callers
+    assert!(graph.build_cpg_for_file(&root_path.join("caller_b.py")));
+    let cpg = graph.cpg.as_mut().unwrap();
+    CallGraphBuilder::resolve_new_callers(cpg, &root_path.join("target.py"), &graph.symbol_index);
+
+    let use_b_idx = find_function(cpg, &root_path.join("caller_b.py").to_string_lossy(), "use_b").unwrap();
+
+    // caller_b→target should now exist
+    assert!(has_calls_edge(cpg, use_b_idx, target_idx),
+        "use_b should call target after resolve_new_callers");
+
+    // CRITICAL: existing edges should NOT be destroyed
+    assert!(has_calls_edge(cpg, target_idx, helper_idx),
+        "target→helper should still exist after resolve_new_callers (non-destructive)");
+    assert!(has_calls_edge(cpg, use_a_idx, target_idx),
+        "use_a→target should still exist after resolve_new_callers (non-destructive)");
+
+    // Verify no duplicates
+    assert_eq!(count_calls_edges(cpg, use_a_idx, target_idx), 1, "No duplicate use_a→target");
+    assert_eq!(count_calls_edges(cpg, use_b_idx, target_idx), 1, "No duplicate use_b→target");
+    assert_eq!(count_calls_edges(cpg, target_idx, helper_idx), 1, "No duplicate target→helper");
+}
+
+// Test 31: resolve_new_callers is idempotent (calling twice doesn't duplicate edges)
+#[test]
+fn test_resolve_new_callers_idempotent() {
+    let mut cpg = CpgLayer::new();
+    let source_a = "def helper():\n    pass\n";
+    let source_b = "def use1():\n    helper()\n";
+    build_cpg_for_source(&mut cpg, "/test/a.py", source_a);
+    build_cpg_for_source(&mut cpg, "/test/b.py", source_b);
+
+    let mut symbol_index = SymbolIndex::new();
+    symbol_index.definitions.insert(
+        "helper".to_string(),
+        vec![PathBuf::from("/test/a.py")],
+    );
+
+    let path_a = PathBuf::from("/test/a.py");
+    CallGraphBuilder::resolve_new_callers(&mut cpg, &path_a, &symbol_index);
+
+    let helper_idx = find_function(&cpg, "/test/a.py", "helper").unwrap();
+    let use1_idx = find_function(&cpg, "/test/b.py", "use1").unwrap();
+
+    assert_eq!(count_calls_edges(&cpg, use1_idx, helper_idx), 1, "First resolve: 1 edge");
+
+    // Call again — should not duplicate
+    CallGraphBuilder::resolve_new_callers(&mut cpg, &path_a, &symbol_index);
+    assert_eq!(count_calls_edges(&cpg, use1_idx, helper_idx), 1, "Second resolve: still 1 edge");
+}

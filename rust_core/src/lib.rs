@@ -486,6 +486,22 @@ impl PyRepoGraph {
         Ok(true)
     }
 
+    /// Resolve cross-file call sites targeting a file additively (without removing
+    /// existing edges). Used by get_callers to add new CalledBy edges after building
+    /// more dependent files, without destroying edges from prior tool calls.
+    fn resolve_new_callers(&mut self, file_path: &str) -> PyResult<bool> {
+        let cpg = self.graph.cpg.as_mut().ok_or_else(|| {
+            PyRuntimeError::new_err("CPG not enabled. Call enable_cpg() or ensure_cpg_for_file() first.")
+        })?;
+        let path = PathBuf::from(file_path);
+        let canonical = path.canonicalize().unwrap_or(path);
+        if !cpg.has_file(&canonical) {
+            return Ok(false);
+        }
+        crate::callgraph::CallGraphBuilder::resolve_new_callers(cpg, &canonical, &self.graph.symbol_index);
+        Ok(true)
+    }
+
     /// Get all functions/methods in a file as a list of dicts.
     fn get_functions_in_file(&self, py: Python, file_path: &str) -> PyResult<Vec<PyObject>> {
         let cpg = self.graph.cpg.as_ref().ok_or_else(|| {

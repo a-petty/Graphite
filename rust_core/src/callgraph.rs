@@ -274,6 +274,16 @@ impl CallGraphBuilder {
                                 matches[0],
                                 &mut edges_to_add,
                             );
+                        } else if matches.len() > 1 {
+                            // @overload variants — pick implementation (largest span)
+                            if let Some(best) = pick_largest_span(cpg, &matches) {
+                                collect_edges_for_resolved_call(
+                                    cpg,
+                                    site,
+                                    best,
+                                    &mut edges_to_add,
+                                );
+                            }
                         }
                     }
                 }
@@ -475,6 +485,12 @@ impl CallGraphBuilder {
                             if matches.len() == 1 {
                                 return CallResolution::Resolved(matches[0]);
                             }
+                            if matches.len() > 1 {
+                                // @overload variants — pick implementation (largest span)
+                                if let Some(best) = pick_largest_span(cpg, &matches) {
+                                    return CallResolution::Resolved(best);
+                                }
+                            }
                         }
                     }
                 }
@@ -502,6 +518,12 @@ impl CallGraphBuilder {
                             .collect();
                         if matches.len() == 1 {
                             return CallResolution::Resolved(matches[0]);
+                        }
+                        if matches.len() > 1 {
+                            // @overload variants — pick implementation (largest span)
+                            if let Some(best) = pick_largest_span(cpg, &matches) {
+                                return CallResolution::Resolved(best);
+                            }
                         }
                     }
                 }
@@ -545,9 +567,143 @@ impl CallGraphBuilder {
             if matches.len() == 1 {
                 return CallResolution::Resolved(matches[0]);
             }
+            if matches.len() > 1 {
+                // Multiple matches in same class → @overload variants.
+                // Pick the implementation (largest code span).
+                if let Some(best) = pick_largest_span(cpg, &matches) {
+                    return CallResolution::Resolved(best);
+                }
+            }
         }
 
         CallResolution::Unresolved("method_not_found".to_string())
+    }
+
+    // -----------------------------------------------------------------------
+    // Non-destructive caller resolution (for MCP get_callers)
+    // -----------------------------------------------------------------------
+
+    /// Resolve cross-file call sites targeting a file, without removing existing edges.
+    /// Used by the MCP get_callers tool to add new CalledBy edges after building
+    /// more dependent files, without destroying edges from prior tool calls.
+    pub fn resolve_new_callers(cpg: &mut CpgLayer, file_path: &Path, symbol_index: &SymbolIndex) {
+        let builtins = python_builtins();
+
+        // Collect function names defined in this file
+        let file_func_names: HashSet<String> = cpg
+            .file_to_nodes
+            .get(file_path)
+            .map(|indices| {
+                indices
+                    .iter()
+                    .filter_map(|idx| {
+                        cpg.graph.node_weight(*idx).and_then(|n| {
+                            if matches!(n.kind, CpgNodeKind::Function | CpgNodeKind::Method) {
+                                Some(n.name.clone())
+                            } else {
+                                None
+                            }
+                        })
+                    })
+                    .collect()
+            })
+            .unwrap_or_default();
+
+        if file_func_names.is_empty() {
+            return;
+        }
+
+        // Collect call sites from OTHER files that reference our function names
+        let func_names_ref = &file_func_names;
+        let cross_file_sites: Vec<(CallSite, std::path::PathBuf)> = cpg
+            .call_sites
+            .iter()
+            .flat_map(|(func_idx, sites)| {
+                let node = cpg.graph.node_weight(*func_idx);
+                sites.iter().filter_map(move |site| {
+                    node.and_then(|n| {
+                        if n.file_path != file_path && func_names_ref.contains(&site.callee_name) {
+                            Some((site.clone(), n.file_path.clone()))
+                        } else {
+                            None
+                        }
+                    })
+                })
+            })
+            .collect();
+
+        // Resolve and collect edges — NO removal of existing edges
+        let mut edges_to_add: Vec<EdgeToAdd> = Vec::new();
+
+        for (site, caller_file) in cross_file_sites.iter() {
+            match Self::resolve_callee(cpg, site, caller_file, symbol_index, &builtins) {
+                CallResolution::Resolved(callee_idx) => {
+                    collect_edges_for_resolved_call(cpg, site, callee_idx, &mut edges_to_add);
+                }
+                CallResolution::Unresolved(_) if site.receiver.is_some() => {
+                    // Instance-method fallback (same as resolve_file)
+                    if let Some(func_indices) = cpg.file_to_nodes.get(file_path) {
+                        let matches: Vec<NodeIndex> = func_indices
+                            .iter()
+                            .filter(|idx| {
+                                cpg.graph
+                                    .node_weight(**idx)
+                                    .map(|n| {
+                                        n.kind == CpgNodeKind::Method
+                                            && n.name == site.callee_name
+                                    })
+                                    .unwrap_or(false)
+                            })
+                            .copied()
+                            .collect();
+                        if matches.len() == 1 {
+                            collect_edges_for_resolved_call(
+                                cpg, site, matches[0], &mut edges_to_add,
+                            );
+                        } else if matches.len() > 1 {
+                            if let Some(best) = pick_largest_span(cpg, &matches) {
+                                collect_edges_for_resolved_call(
+                                    cpg, site, best, &mut edges_to_add,
+                                );
+                            }
+                        }
+                    }
+                }
+                _ => {}
+            }
+        }
+
+        // Also resolve LOCAL call sites (same-file calls) that may not have been resolved yet
+        let local_sites: Vec<(CallSite, std::path::PathBuf)> = cpg
+            .file_to_nodes
+            .get(file_path)
+            .map(|indices| {
+                indices
+                    .iter()
+                    .filter_map(|idx| cpg.call_sites.get(idx))
+                    .flat_map(|sites| sites.iter())
+                    .map(|site| (site.clone(), file_path.to_path_buf()))
+                    .collect()
+            })
+            .unwrap_or_default();
+
+        for (site, caller_file) in local_sites.iter() {
+            if let CallResolution::Resolved(callee_idx) =
+                Self::resolve_callee(cpg, site, caller_file, symbol_index, &builtins)
+            {
+                collect_edges_for_resolved_call(cpg, site, callee_idx, &mut edges_to_add);
+            }
+        }
+
+        // Add edges with dedup — no removal
+        for edge in edges_to_add {
+            let already_exists = cpg.graph
+                .edges_connecting(edge.source, edge.target)
+                .any(|e| *e.weight() == edge.weight);
+            if !already_exists {
+                cpg.graph.add_edge(edge.source, edge.target, edge.weight);
+            }
+        }
     }
 
     // -----------------------------------------------------------------------
@@ -614,6 +770,20 @@ impl CallGraphBuilder {
 // ---------------------------------------------------------------------------
 // Internal helpers
 // ---------------------------------------------------------------------------
+
+/// When multiple CPG nodes match (e.g. @overload variants), pick the one with the
+/// largest code span — this is the implementation body, not the stub.
+fn pick_largest_span(cpg: &CpgLayer, matches: &[NodeIndex]) -> Option<NodeIndex> {
+    matches
+        .iter()
+        .max_by_key(|idx| {
+            cpg.graph
+                .node_weight(**idx)
+                .map(|n| n.end_byte.saturating_sub(n.start_byte))
+                .unwrap_or(0)
+        })
+        .copied()
+}
 
 fn is_interprocedural_edge(edge: &CpgEdge) -> bool {
     matches!(
