@@ -14,7 +14,7 @@ Atlas combines a high-performance **Rust core** (Tree-sitter parsing, graph algo
 
 - **MCP server** — Exposes 12 tools over the [Model Context Protocol](https://modelcontextprotocol.io/) for integration with Claude Code, VS Code, and other MCP-compatible clients.
 
-- **Multi-language support** — Tree-sitter parsing for Python, Rust, JavaScript, TypeScript, Go, and Java. Import resolution for Python and JS/TS. CPG analysis for Python.
+- **Multi-language support** — Tree-sitter parsing for Python, Rust, JavaScript (+ JSX), TypeScript (+ TSX), and Go. Import resolution for Python and JS/TS. CPG analysis for Python.
 
 - **Incremental updates** — 4-tier change classification (Local/FileScope/GraphScope/FullRebuild) avoids unnecessary recomputation when files change. File watching keeps the graph in sync as you edit.
 
@@ -68,7 +68,7 @@ Atlas combines a high-performance **Rust core** (Tree-sitter parsing, graph algo
 │                                                                                 │
 │  ┌────────────────────────────────┐  ┌───────────────────────────────────────┐  │
 │  │  Parser (parser.rs)            │  │  Watcher (watcher.rs)                 │  │
-│  │  Tree-sitter: 6 languages      │  │  FSEvents (macOS) + notify crate      │  │
+│  │  Tree-sitter: 5 languages      │  │  FSEvents (macOS) + notify crate      │  │
 │  │  SymbolHarvester + queries/    │  │  100ms debouncing, .gitignore-aware   │  │
 │  │  Skeleton generation           │  │  crossbeam-channel to main thread     │  │
 │  │  Syntax checking               │  │                                       │  │
@@ -80,7 +80,7 @@ Atlas combines a high-performance **Rust core** (Tree-sitter parsing, graph algo
 
 Atlas maintains two graph layers with different granularity:
 
-**File-Level Graph** (`graph.rs` → `RepoGraph`): A `DiGraph<FileNode, EdgeKind>` where nodes are source files and edges are `Import` (structurally confirmed via AST) or `SymbolUsage` (name-matched, import-gated) relationships. Parallel parsing with rayon, weighted PageRank where SymbolUsage edges carry 2x weight (files that are actually *used* rank higher than those merely imported).
+**File-Level Graph** (`graph.rs` → `RepoGraph`): A `DiGraph<FileNode, EdgeKind>` where nodes are source files and edges are `Import` (structurally confirmed via AST) or `SymbolUsage` (name-matched, import-gated) relationships. Parallel parsing with rayon, weighted PageRank where Import edges carry 2x weight over SymbolUsage edges (structurally confirmed dependencies rank higher than heuristic name matches).
 
 **CPG Overlay** (`cpg.rs` → `CpgLayer`): Fine-grained `DiGraph<CpgNode, CpgEdge>` operating at sub-file granularity. Nodes are functions, methods, classes, variables, statements, and CFG sentinels. Edges include control flow (if/else, loops, exceptions), reaching definitions dataflow, and cross-file call/calledBy relationships with argument and return value flow. Built in four phases:
 
@@ -313,9 +313,9 @@ cd rust_core && cargo bench
 
 ### Test Suites
 
-**Rust** (`rust_core/tests/`): 11 test files covering graph construction, incremental updates, CPG node extraction, CFG construction, reaching definitions dataflow, call graph extraction and resolution, symbol harvesting, import canonicalization, JS/TS import resolution, PageRank, and file watching.
+**Rust** (`rust_core/tests/`): 14 test files covering graph construction, incremental updates and parsing, CPG node extraction, CFG construction, reaching definitions dataflow, call graph extraction and resolution, symbol harvesting, import canonicalization, JS/TS import resolution, PageRank, repo map generation, and file watching.
 
-**Python** (`python_shell/tests/`): 7 test files covering context assembly (multi-hop BFS, adaptive parameters, token budgeting, model context windows), graph updates, chat/agent loop, LLM client abstraction, response parsing, tool execution with syntax checking, and error handling.
+**Python** (`python_shell/tests/`): 8 test files covering context assembly (multi-hop BFS, adaptive parameters, token budgeting, model context windows), graph updates, embeddings, chat/agent loop, LLM client abstraction, parser integration, response parsing, tool execution with syntax checking, and error handling.
 
 ### Project Structure
 
@@ -338,7 +338,7 @@ Atlas/
 │   │   ├── rust/
 │   │   ├── javascript/
 │   │   └── typescript/
-│   └── tests/                  # 11 integration test files
+│   └── tests/                  # 14 integration test files
 ├── python_shell/
 │   └── atlas/
 │       ├── mcp_server.py       # MCP server: 12 tools, lazy init, stdio transport
@@ -368,7 +368,7 @@ Atlas/
 
 | Crate | Purpose |
 |-------|---------|
-| `tree-sitter` + language grammars | Parsing for Python, Rust, JS, TS, Go, Java |
+| `tree-sitter` + language grammars | Parsing for Python, Rust, JS/JSX, TS/TSX, Go |
 | `petgraph` | Directed graph implementation for file-level and CPG graphs |
 | `pyo3` | Python ↔ Rust FFI bindings |
 | `rayon` | Parallel file parsing |
