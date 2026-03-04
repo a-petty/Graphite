@@ -1,4 +1,10 @@
-use semantic_engine::graph::{RepoGraph, EdgeKind};
+// rust_core/tests/test_graph_construction.rs
+//
+// Tests graph construction without tree-sitter.
+// With parsing removed, build_complete creates nodes but no edges.
+// Edge creation will return in Phase 1 (LLM extraction pipeline).
+
+use semantic_engine::graph::RepoGraph;
 use std::fs;
 use tempfile::tempdir;
 
@@ -9,185 +15,97 @@ fn create_test_file(root: &std::path::Path, path: &str, content: &str) {
 }
 
 #[test]
-fn test_import_edge_creation() {
+fn test_node_creation() {
     let root = tempdir().unwrap();
     let root_path = root.path().canonicalize().unwrap();
-    
-    // Create a simple project
-    create_test_file(&root_path, "utils.py", r#"
-def helper():
-    pass
-"#);
-    
-    create_test_file(&root_path, "main.py", r#"
-import utils
 
-utils.helper()
-"#);
-    
-    // Build graph
+    create_test_file(&root_path, "utils.py", "def helper():\n    pass\n");
+    create_test_file(&root_path, "main.py", "import utils\nutils.helper()\n");
+
     let mut graph = RepoGraph::new(&root_path, "python", &[], None);
     let paths = vec![
         root_path.join("utils.py"),
         root_path.join("main.py"),
     ];
-    
+
     graph.build_complete(&paths, &root_path);
-    
-    // Verify import edge exists
+
     assert_eq!(graph.graph.node_count(), 2, "Should have 2 nodes");
-    assert!(graph.graph.edge_count() >= 1, "Should have at least 1 edge");
-    
-    // Check that main.py imports utils.py
-    let main_idx = graph.path_to_idx.get(&root_path.join("main.py")).unwrap();
-    let utils_idx = graph.path_to_idx.get(&root_path.join("utils.py")).unwrap();
-    
-    let edge = graph.graph.find_edge(*main_idx, *utils_idx);
-    assert!(edge.is_some(), "Should have edge from main to utils");
-}
-
-#[test]
-fn test_symbol_usage_edge_creation() {
-    let root = tempdir().unwrap();
-    let root_path = root.path().canonicalize().unwrap();
-    
-    // Create files with symbol usage
-    create_test_file(&root_path, "models.py", r#"
-class User:
-    pass
-"#);
-    
-    create_test_file(&root_path, "app.py", r#"
-from models import User
-
-user = User()
-"#);
-    
-    let mut graph = RepoGraph::new(&root_path, "python", &[], None);
-    let paths = vec![
-        root_path.join("models.py"),
-        root_path.join("app.py"),
-    ];
-    
-    graph.build_complete(&paths, &root_path);
-    
-    // Verify both import and symbol edges
-    assert_eq!(graph.graph.node_count(), 2);
-    assert!(graph.graph.edge_count() >= 1);
-    
-    // When both Import and SymbolUsage edges exist for the same pair,
-    // Import wins because it's structurally confirmed via AST analysis
-    let app_idx = graph.path_to_idx.get(&root_path.join("app.py")).unwrap();
-    let models_idx = graph.path_to_idx.get(&root_path.join("models.py")).unwrap();
-
-    let edge_idx = graph.graph.find_edge(*app_idx, *models_idx).unwrap();
-    let edge_kind = &graph.graph[edge_idx];
-
-    assert_eq!(edge_kind, &EdgeKind::Import, "Import should take priority over SymbolUsage");
+    assert!(graph.path_to_idx.contains_key(&root_path.join("utils.py")));
+    assert!(graph.path_to_idx.contains_key(&root_path.join("main.py")));
 }
 
 #[test]
 fn test_no_self_edges() {
     let root = tempdir().unwrap();
     let root_path = root.path().canonicalize().unwrap();
-    
-    create_test_file(&root_path, "self_import.py", r#"
-class MyClass:
-    pass
 
-obj = MyClass()
-"#);
-    
+    create_test_file(&root_path, "self_import.py", "class MyClass:\n    pass\nobj = MyClass()\n");
+
     let mut graph = RepoGraph::new(&root_path, "python", &[], None);
     let paths = vec![root_path.join("self_import.py")];
-    
+
     graph.build_complete(&paths, &root_path);
-    
+
     assert_eq!(graph.graph.node_count(), 1);
-    assert_eq!(graph.graph.edge_count(), 0, "Should have no self-edges");
-}
-
-#[test]
-fn test_multiple_symbol_definitions() {
-    let root = tempdir().unwrap();
-    let root_path = root.path().canonicalize().unwrap();
-    
-    // Same symbol defined in two files
-    create_test_file(&root_path, "util1.py", r#"
-def process():
-    pass
-"#);
-    
-    create_test_file(&root_path, "util2.py", r#"
-def process():
-    pass
-"#);
-    
-    create_test_file(&root_path, "main.py", r#"
-from util1 import process
-
-process()
-"#);
-    
-    let mut graph = RepoGraph::new(&root_path, "python", &[], None);
-    let paths = vec![
-        root_path.join("util1.py"),
-        root_path.join("util2.py"),
-        root_path.join("main.py"),
-    ];
-    
-    graph.build_complete(&paths, &root_path);
-    
-    // Should have 3 nodes
-    assert_eq!(graph.graph.node_count(), 3);
-    
-    // Should have edges to util1 (not util2, since we import from util1)
-    let main_idx = graph.path_to_idx.get(&root_path.join("main.py")).unwrap();
-    let util1_idx = graph.path_to_idx.get(&root_path.join("util1.py")).unwrap();
-    
-    assert!(graph.graph.find_edge(*main_idx, *util1_idx).is_some());
+    assert_eq!(graph.graph.edge_count(), 0, "Should have no edges");
 }
 
 #[test]
 fn test_graph_statistics() {
     let root = tempdir().unwrap();
     let root_path = root.path().canonicalize().unwrap();
-    
-    // Create a small project
-    create_test_file(&root_path, "core.py", r#"
-class Database:
-    pass
-"#);
-    
-    create_test_file(&root_path, "models.py", r#"
-from core import Database
 
-class User:
-    def __init__(self):
-        self.db = Database()
-"#);
-    
-    create_test_file(&root_path, "api.py", r#"
-from models import User
+    create_test_file(&root_path, "core.py", "class Database:\n    pass\n");
+    create_test_file(&root_path, "models.py", "from core import Database\n");
+    create_test_file(&root_path, "api.py", "from models import User\n");
 
-user = User()
-"#);
-    
     let mut graph = RepoGraph::new(&root_path, "python", &[], None);
     let paths = vec![
         root_path.join("core.py"),
         root_path.join("models.py"),
         root_path.join("api.py"),
     ];
-    
+
     graph.build_complete(&paths, &root_path);
-    
-    println!("Nodes: {}", graph.graph.node_count());
-    println!("Edges: {}", graph.graph.edge_count());
-    
-    // Should have 3 nodes
+
     assert_eq!(graph.graph.node_count(), 3);
-    
-    // Should have at least 2 edges (models->core, api->models)
-    assert!(graph.graph.edge_count() >= 2);
+    // No edges without tree-sitter parsing
+    assert_eq!(graph.graph.edge_count(), 0);
+}
+
+#[test]
+fn test_unsupported_language_skipped() {
+    let root = tempdir().unwrap();
+    let root_path = root.path().canonicalize().unwrap();
+
+    create_test_file(&root_path, "readme.md", "# Readme");
+    create_test_file(&root_path, "main.py", "print('hello')");
+
+    let mut graph = RepoGraph::new(&root_path, "python", &[], None);
+    let paths = vec![
+        root_path.join("readme.md"),
+        root_path.join("main.py"),
+    ];
+
+    graph.build_complete(&paths, &root_path);
+
+    // .md files are unsupported, only .py should be in graph
+    assert_eq!(graph.graph.node_count(), 1);
+}
+
+#[test]
+fn test_consistency_after_build() {
+    let root = tempdir().unwrap();
+    let root_path = root.path().canonicalize().unwrap();
+
+    for i in 0..10 {
+        create_test_file(&root_path, &format!("module_{}.py", i), &format!("def func_{}():\n    pass", i));
+    }
+
+    let mut graph = RepoGraph::new(&root_path, "python", &[], None);
+    let paths: Vec<_> = (0..10).map(|i| root_path.join(format!("module_{}.py", i))).collect();
+
+    graph.build_complete(&paths, &root_path);
+    graph.validate_consistency().expect("Graph should be consistent after build");
 }

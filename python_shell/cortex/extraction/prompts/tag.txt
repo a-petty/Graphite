@@ -1,0 +1,12 @@
+List every person, project, technology, organization, location, decision,
+and concept mentioned in the following text.
+
+For each entity, provide:
+- name: the most complete form of the name used in the text
+- type: person, project, technology, organization, location, decision, or concept
+
+Return JSON array: [{"name": "...", "type": "..."}]
+Return ONLY the JSON array, no other text.
+
+Text:
+{chunk_text}

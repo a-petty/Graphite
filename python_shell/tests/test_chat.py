@@ -1,17 +1,17 @@
-"""Tests for AtlasAgent multi-turn chat functionality."""
+"""Tests for CortexAgent multi-turn chat functionality."""
 
 import pytest
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-from atlas.llm import StubClient
+from cortex.llm import StubClient
 
 
 def _make_agent(tmp_path, stub_client=None):
-    """Create an AtlasAgent with mocked dependencies for chat testing."""
-    with patch("atlas.agent.RepoGraph") as MockRepoGraph, \
-         patch("atlas.agent.EmbeddingManager"), \
-         patch("atlas.agent.ContextManager") as MockContextManager:
+    """Create a CortexAgent with mocked dependencies for chat testing."""
+    with patch("cortex.agent.RepoGraph") as MockRepoGraph, \
+         patch("cortex.agent.EmbeddingManager"), \
+         patch("cortex.agent.ContextManager") as MockContextManager:
 
         mock_graph = MockRepoGraph.return_value
         mock_graph.get_top_ranked_files.return_value = []
@@ -20,9 +20,9 @@ def _make_agent(tmp_path, stub_client=None):
         mock_cm = MockContextManager.return_value
         mock_cm.assemble_context.return_value = ""
 
-        from atlas.agent import AtlasAgent
+        from cortex.agent import CortexAgent
 
-        agent = AtlasAgent(project_root=tmp_path)
+        agent = CortexAgent(project_root=tmp_path)
         if stub_client:
             agent.llm = stub_client
         return agent

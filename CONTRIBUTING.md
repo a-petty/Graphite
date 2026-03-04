@@ -1,6 +1,6 @@
-# Contributing to Atlas
+# Contributing to Cortex
 
-Thanks for your interest in contributing to Atlas! This guide will help you get started.
+Thanks for your interest in contributing to Cortex! This guide will help you get started.
 
 ## Getting Started
 
@@ -13,8 +13,8 @@ Thanks for your interest in contributing to Atlas! This guide will help you get 
 ### Development Setup
 
 ```bash
-git clone https://github.com/a-petty/Atlas.git
-cd Atlas
+git clone https://github.com/a-petty/Cortex.git
+cd Cortex
 
 # Create and activate a virtual environment
 python -m venv .venv
@@ -50,7 +50,7 @@ Open an issue with:
 - A clear title and description
 - Steps to reproduce
 - Expected vs. actual behavior
-- Atlas version, OS, Python version, Rust version
+- Cortex version, OS, Python version, Rust version
 
 ### Suggesting Features
 
@@ -82,10 +82,10 @@ Open an issue tagged `enhancement` with:
 
 If you're new to the codebase, start with:
 
-1. [`How_Atlas_Works.md`](How_Atlas_Works.md) — Detailed walkthrough of the system
+1. [`How_Atlas_Works.md`](How_Atlas_Works.md) — Detailed walkthrough of the legacy system
 2. [`rust_core/src/graph.rs`](rust_core/src/graph.rs) — The core `RepoGraph` struct
-3. [`python_shell/atlas/context.py`](python_shell/atlas/context.py) — The `ContextManager` and Anchor & Expand logic
-4. [`python_shell/atlas/mcp_server.py`](python_shell/atlas/mcp_server.py) — MCP tool definitions
+3. [`python_shell/cortex/context.py`](python_shell/cortex/context.py) — The `ContextManager` and Anchor & Expand logic
+4. [`python_shell/cortex/mcp_server.py`](python_shell/cortex/mcp_server.py) — MCP tool definitions
 
 ### Key Design Principles
 
@@ -100,4 +100,4 @@ Be respectful. We're building something useful together, and everyone's contribu
 
 ## License
 
-By contributing to Atlas, you agree that your contributions will be licensed under the [MIT License](LICENSE).
+By contributing to Cortex, you agree that your contributions will be licensed under the [MIT License](LICENSE).

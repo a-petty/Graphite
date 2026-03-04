@@ -5,7 +5,7 @@ import pytest
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-from atlas.embeddings import EmbeddingManager, FileEmbedding, _DEFINITION_PREFIXES
+from cortex.embeddings import EmbeddingManager, FileEmbedding, _DEFINITION_PREFIXES
 
 
 # ---------------------------------------------------------------------------
@@ -17,7 +17,7 @@ class TestSplitIntoChunks:
 
     def _make_manager(self):
         """Create an EmbeddingManager with mocked FastEmbed model."""
-        with patch("atlas.embeddings.TextEmbedding"):
+        with patch("cortex.embeddings.TextEmbedding"):
             return EmbeddingManager()
 
     def test_small_text_single_chunk(self):
@@ -137,7 +137,7 @@ class TestFileSimilarity:
     """Tests for _file_similarity max-chunk scoring."""
 
     def _make_manager(self):
-        with patch("atlas.embeddings.TextEmbedding"):
+        with patch("cortex.embeddings.TextEmbedding"):
             return EmbeddingManager()
 
     def test_max_chunk_used(self):
@@ -183,7 +183,7 @@ class TestCosineSimilarity:
     """Edge cases for _cosine_similarity."""
 
     def _make_manager(self):
-        with patch("atlas.embeddings.TextEmbedding"):
+        with patch("cortex.embeddings.TextEmbedding"):
             return EmbeddingManager()
 
     def test_zero_vector_returns_zero(self):
@@ -207,7 +207,7 @@ class TestGetEmbeddingText:
 
     def _make_manager_with_graph(self, skeleton_return="def foo(): ..."):
         """Create an EmbeddingManager with a mock repo_graph."""
-        with patch("atlas.embeddings.TextEmbedding"):
+        with patch("cortex.embeddings.TextEmbedding"):
             mock_graph = MagicMock()
             mock_graph.get_skeleton.return_value = skeleton_return
             mgr = EmbeddingManager(repo_graph=mock_graph)
@@ -234,7 +234,7 @@ class TestGetEmbeddingText:
 
     def test_falls_back_to_raw_when_skeleton_raises(self, tmp_path):
         """Should fall back to raw content when get_skeleton raises."""
-        with patch("atlas.embeddings.TextEmbedding"):
+        with patch("cortex.embeddings.TextEmbedding"):
             mock_graph = MagicMock()
             mock_graph.get_skeleton.side_effect = RuntimeError("not found")
             mgr = EmbeddingManager(repo_graph=mock_graph)
@@ -247,7 +247,7 @@ class TestGetEmbeddingText:
 
     def test_falls_back_when_no_repo_graph(self, tmp_path):
         """Should read raw file when repo_graph is None."""
-        with patch("atlas.embeddings.TextEmbedding"):
+        with patch("cortex.embeddings.TextEmbedding"):
             mgr = EmbeddingManager(repo_graph=None)
 
         test_file = tmp_path / "test.py"
@@ -265,7 +265,7 @@ class TestFilePathToModulePrefix:
     """Tests for _file_path_to_module_prefix method."""
 
     def _make_manager(self, project_root):
-        with patch("atlas.embeddings.TextEmbedding"):
+        with patch("cortex.embeddings.TextEmbedding"):
             return EmbeddingManager(project_root=project_root)
 
     def test_basic_python_file(self, tmp_path):
@@ -294,7 +294,7 @@ class TestFilePathToModulePrefix:
         assert result == "setup"
 
     def test_no_project_root_returns_empty(self):
-        with patch("atlas.embeddings.TextEmbedding"):
+        with patch("cortex.embeddings.TextEmbedding"):
             mgr = EmbeddingManager(project_root=None)
         result = mgr._file_path_to_module_prefix(Path("/some/file.py"))
         assert result == ""
@@ -318,7 +318,7 @@ class TestFilePathToModulePrefix:
 
     def test_prefix_prepended_to_embedding_text(self, tmp_path):
         """_get_embedding_text should prepend the module prefix."""
-        with patch("atlas.embeddings.TextEmbedding"):
+        with patch("cortex.embeddings.TextEmbedding"):
             mgr = EmbeddingManager(project_root=tmp_path)
         test_file = tmp_path / "mypackage" / "core.py"
         test_file.parent.mkdir(parents=True, exist_ok=True)
@@ -338,7 +338,7 @@ class TestFindRelevantFilesChunked:
 
     def test_caches_file_embeddings(self, tmp_path):
         """Files should be cached after first embedding and reused on second call."""
-        with patch("atlas.embeddings.TextEmbedding") as MockModel:
+        with patch("cortex.embeddings.TextEmbedding") as MockModel:
             mock_instance = MagicMock()
             # Return 384-dim embeddings
             dim = 384
@@ -364,7 +364,7 @@ class TestFindRelevantFilesChunked:
 
     def test_returns_correct_number_of_results(self, tmp_path):
         """Should return at most top_n results."""
-        with patch("atlas.embeddings.TextEmbedding") as MockModel:
+        with patch("cortex.embeddings.TextEmbedding") as MockModel:
             mock_instance = MagicMock()
             dim = 384
             mock_instance.embed.side_effect = lambda texts: [
@@ -385,7 +385,7 @@ class TestFindRelevantFilesChunked:
 
     def test_scored_returns_tuples_with_scores(self, tmp_path):
         """find_relevant_files_scored should return (Path, float) tuples."""
-        with patch("atlas.embeddings.TextEmbedding") as MockModel:
+        with patch("cortex.embeddings.TextEmbedding") as MockModel:
             mock_instance = MagicMock()
             dim = 384
             mock_instance.embed.side_effect = lambda texts: [
@@ -411,7 +411,7 @@ class TestFindRelevantFilesChunked:
 
     def test_scored_consistent_with_unscored(self, tmp_path):
         """find_relevant_files and find_relevant_files_scored should return same ordering."""
-        with patch("atlas.embeddings.TextEmbedding") as MockModel:
+        with patch("cortex.embeddings.TextEmbedding") as MockModel:
             mock_instance = MagicMock()
             dim = 384
             # Use deterministic embeddings

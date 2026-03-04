@@ -6,7 +6,7 @@ import os
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from atlas.agent import AtlasAgent
+from cortex.agent import CortexAgent
 
 def main():
     """
@@ -22,7 +22,7 @@ def main():
     print(f"Initializing agent on repository: {test_repo_path}...")
     
     # Create and initialize agent
-    agent = AtlasAgent(test_repo_path)
+    agent = CortexAgent(test_repo_path)
     agent.initialize()
 
     # --- Test Query ---

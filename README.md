@@ -1,8 +1,8 @@
-# Atlas
+# Cortex
 
 A local-first semantic code intelligence engine that builds symbol-aware dependency graphs of repositories and provides optimized context to LLMs and AI coding tools.
 
-Atlas combines a high-performance **Rust core** (Tree-sitter parsing, graph algorithms, incremental updates) with a **Python orchestration layer** (context assembly, LLM interaction, MCP server) to understand codebases at both the file and sub-file level. It powers smarter AI-assisted development by giving models the right code context automatically.
+Cortex combines a high-performance **Rust core** (Tree-sitter parsing, graph algorithms, incremental updates) with a **Python orchestration layer** (context assembly, LLM interaction, MCP server) to understand codebases at both the file and sub-file level. It powers smarter AI-assisted development by giving models the right code context automatically.
 
 ## Key Capabilities
 
@@ -30,7 +30,7 @@ Atlas combines a high-performance **Rust core** (Tree-sitter parsing, graph algo
                         └────────────────────┬────────────────────────┘
                                              │
 ┌────────────────────────────────────────────┼────────────────────────────────────┐
-│  Python Shell (python_shell/atlas/)        │                                    │
+│  Python Shell (python_shell/cortex/)       │                                    │
 │                                            │                                    │
 │  ┌───────────────┐  ┌───────────────────┐  │    ┌────────────┐  ┌────────────┐  │
 │  │    Agent      │  │ Context Manager   │  │    │  Embedding │  │    LLM     │  │
@@ -78,7 +78,7 @@ Atlas combines a high-performance **Rust core** (Tree-sitter parsing, graph algo
 
 ### Dual-Graph Model
 
-Atlas maintains two graph layers with different granularity:
+Cortex maintains two graph layers with different granularity:
 
 **File-Level Graph** (`graph.rs` → `RepoGraph`): A `DiGraph<FileNode, EdgeKind>` where nodes are source files and edges are `Import` (structurally confirmed via AST) or `SymbolUsage` (name-matched, import-gated) relationships. Parallel parsing with rayon, weighted PageRank where Import edges carry 2x weight over SymbolUsage edges (structurally confirmed dependencies rank higher than heuristic name matches).
 
@@ -97,7 +97,7 @@ resolve_all() / resolve_file():          Cross-file (after all files built)
 
 ### Incremental Updates
 
-When a file changes, Atlas classifies the change by comparing content hashes and applies the minimal update:
+When a file changes, Cortex classifies the change by comparing content hashes and applies the minimal update:
 
 | Tier | Trigger | Action |
 |------|---------|--------|
@@ -129,8 +129,8 @@ When a user asks a question, `ContextManager` assembles an optimized prompt usin
 ### Installation
 
 ```bash
-git clone https://github.com/a-petty/Atlas.git
-cd Atlas
+git clone https://github.com/a-petty/Cortex.git
+cd Cortex
 
 # Create and activate a virtual environment
 python -m venv .venv
@@ -159,22 +159,22 @@ pip install -e ".[mlx]"
 
 ### MCP Server (Claude Code, VS Code, etc.)
 
-The primary way to use Atlas is as an MCP server that provides semantic code intelligence to AI coding tools.
+The primary way to use Cortex is as an MCP server that provides semantic code intelligence to AI coding tools.
 
 ```bash
 # Start the MCP server
-atlas-mcp --project-root /path/to/repo
+cortex-mcp --project-root /path/to/repo
 
 # With debug logging
-atlas-mcp --project-root /path/to/repo --verbose
+cortex-mcp --project-root /path/to/repo --verbose
 ```
 
 **Claude Code configuration** (`.claude/settings.json` or `~/.claude/settings.json`):
 ```json
 {
   "mcpServers": {
-    "atlas": {
-      "command": "/path/to/Atlas/.venv/bin/atlas-mcp",
+    "cortex": {
+      "command": "/path/to/Cortex/.venv/bin/cortex-mcp",
       "args": ["--project-root", "/path/to/your/repo"]
     }
   }
@@ -185,8 +185,8 @@ atlas-mcp --project-root /path/to/repo --verbose
 ```json
 {
   "servers": {
-    "atlas": {
-      "command": "/path/to/Atlas/.venv/bin/atlas-mcp",
+    "cortex": {
+      "command": "/path/to/Cortex/.venv/bin/cortex-mcp",
       "args": ["--project-root", "${workspaceFolder}"]
     }
   }
@@ -197,11 +197,11 @@ The MCP server uses lazy initialization — the graph is built on first tool cal
 
 ### MCP Tools
 
-Atlas exposes 12 tools over MCP:
+Cortex exposes 12 tools over MCP:
 
 | Tool | Description |
 |------|-------------|
-| `atlas_status` | Graph statistics and readiness status. Call first to verify Atlas is ready. |
+| `cortex_status` | Graph statistics and readiness status. Call first to verify Cortex is ready. |
 | `get_repository_map` | PageRank-ordered architecture overview with directory structure and importance scores. |
 | `get_dependencies` | Outgoing dependencies for a file (what this file imports/uses). |
 | `get_dependents` | Incoming dependents for a file (blast radius — what depends on this file). |
@@ -212,34 +212,34 @@ Atlas exposes 12 tools over MCP:
 | `get_callees` | Outgoing call graph — what functions does this function call? Python only. |
 | `get_callers` | Incoming call graph — what functions call this function? Python only. |
 | `get_file_skeleton` | Function/class signatures without implementation bodies. All supported languages. |
-| `atlas_refresh` | Re-scan repository and rebuild graph from scratch (after branch switches, large merges, etc.). |
+| `cortex_refresh` | Re-scan repository and rebuild graph from scratch (after branch switches, large merges, etc.). |
 
 ### Standalone CLI
 
-Atlas also includes a standalone CLI for direct interaction with local LLMs:
+Cortex also includes a standalone CLI for direct interaction with local LLMs:
 
 ```bash
 # Watch a repository — builds the graph and keeps it updated
-atlas watch /path/to/repo
+cortex watch /path/to/repo
 
 # One-shot query against a repository
-atlas query "Explain the authentication flow" -p /path/to/repo
+cortex query "Explain the authentication flow" -p /path/to/repo
 
 # Interactive chat session with tool use
-atlas chat -p /path/to/repo
+cortex chat -p /path/to/repo
 
 # Specify a different Ollama model
-atlas query "Find all unused imports" -p /path/to/repo --model codellama
+cortex query "Find all unused imports" -p /path/to/repo --model codellama
 
 # Use MLX on Apple Silicon
-atlas chat -p /path/to/repo --provider mlx
+cortex chat -p /path/to/repo --provider mlx
 ```
 
 The CLI requires [Ollama](https://ollama.ai/) (default) or MLX for LLM inference.
 
 ## Configuration
 
-### `.atlas.toml` (optional)
+### `.cortex.toml` (optional)
 
 Place at the project root to specify explicit source roots for import resolution:
 
@@ -248,9 +248,9 @@ Place at the project root to specify explicit source roots for import resolution
 source_roots = ["src", "lib", "packages"]
 ```
 
-Without this, Atlas auto-detects source roots by looking for directories containing `__init__.py` files or namespace packages.
+Without this, Cortex auto-detects source roots by looking for directories containing `__init__.py` files or namespace packages.
 
-### `.atlasignore` (optional)
+### `.cortexignore` (optional)
 
 Place at the project root to exclude additional directories from scanning. One pattern per line; `#` for comments:
 
@@ -265,13 +265,13 @@ generated/
 
 **Default ignored directories**: `node_modules`, `target`, `.git`, `__pycache__`, `dist`, `build`, `.venv`, `venv`
 
-Atlas also respects `.gitignore` files during repository scanning.
+Cortex also respects `.gitignore` files during repository scanning.
 
 ## How It Works — A Concrete Example
 
-Scenario: You have a Django project with ~200 Python files. You ask Atlas-powered Claude Code: *"Add a new API endpoint POST /api/v2/teams/ that creates a team and assigns the authenticated user as owner."*
+Scenario: You have a Django project with ~200 Python files. You ask Cortex-powered Claude Code: *"Add a new API endpoint POST /api/v2/teams/ that creates a team and assigns the authenticated user as owner."*
 
-**1. Graph construction** (already done at startup): Atlas parsed all 200 files in parallel, harvested ~1,500 symbols, resolved ~800 import edges and ~600 symbol usage edges. PageRank identified `models/user.py`, `core/auth.py`, and `utils/db.py` as the most central files.
+**1. Graph construction** (already done at startup): Cortex parsed all 200 files in parallel, harvested ~1,500 symbols, resolved ~800 import edges and ~600 symbol usage edges. PageRank identified `models/user.py`, `core/auth.py`, and `utils/db.py` as the most central files.
 
 **2. Anchor**: Embedding search finds the 10 most query-relevant files: `views/teams.py`, `models/team.py`, `serializers/team.py`, `urls/api_v2.py`, etc.
 
@@ -281,7 +281,7 @@ Scenario: You have a Django project with ~200 Python files. You ask Atlas-powere
 
 **5. Result**: The model receives a prompt with the exact files it needs — existing team model schema, auth decorators, base serializer class, URL routing patterns, and the signatures of permission utilities. It generates code that matches the project's actual conventions.
 
-Without Atlas, you'd manually paste 3-4 files and likely miss the base serializer class or auth decorator pattern. Atlas automates context selection entirely — the developer just asks the question.
+Without Cortex, you'd manually paste 3-4 files and likely miss the base serializer class or auth decorator pattern. Cortex automates context selection entirely — the developer just asks the question.
 
 ## Development
 
@@ -320,7 +320,7 @@ cd rust_core && cargo bench
 ### Project Structure
 
 ```
-Atlas/
+Cortex/
 ├── rust_core/
 │   ├── src/
 │   │   ├── graph.rs            # RepoGraph: file-level graph, PageRank, incremental updates
@@ -340,10 +340,10 @@ Atlas/
 │   │   └── typescript/
 │   └── tests/                  # 14 integration test files
 ├── python_shell/
-│   └── atlas/
+│   └── cortex/
 │       ├── mcp_server.py       # MCP server: 12 tools, lazy init, stdio transport
 │       ├── context.py          # ContextManager: Anchor & Expand, 3-tier budgeting
-│       ├── agent.py            # AtlasAgent: orchestrator, watch loop, tool execution
+│       ├── agent.py            # CortexAgent: orchestrator, watch loop, tool execution
 │       ├── cli.py              # CLI entry point: watch, query, chat subcommands
 │       ├── tools.py            # ToolExecutor: file ops with syntax validation
 │       ├── embeddings.py       # EmbeddingManager: FastEmbed vector search

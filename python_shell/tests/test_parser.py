@@ -1,4 +1,4 @@
-"""Tests for AtlasAgent._parse_response and related parser methods."""
+"""Tests for CortexAgent._parse_response and related parser methods."""
 
 import pytest
 from pathlib import Path
@@ -7,13 +7,13 @@ import tempfile
 
 
 def _make_agent():
-    """Create an AtlasAgent with mocked dependencies for parser testing."""
+    """Create a CortexAgent with mocked dependencies for parser testing."""
     with tempfile.TemporaryDirectory() as tmp:
-        with patch("atlas.agent.RepoGraph"), \
-             patch("atlas.agent.EmbeddingManager"), \
-             patch("atlas.agent.ContextManager"):
-            from atlas.agent import AtlasAgent
-            agent = AtlasAgent(project_root=Path(tmp))
+        with patch("cortex.agent.RepoGraph"), \
+             patch("cortex.agent.EmbeddingManager"), \
+             patch("cortex.agent.ContextManager"):
+            from cortex.agent import CortexAgent
+            agent = CortexAgent(project_root=Path(tmp))
             return agent
 
 

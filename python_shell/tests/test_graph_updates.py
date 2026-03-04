@@ -2,7 +2,7 @@
 
 import pytest
 from pathlib import Path
-from atlas.semantic_engine import RepoGraph, GraphUpdateResult, scan_repository
+from cortex.semantic_engine import RepoGraph, GraphUpdateResult, scan_repository
 
 @pytest.fixture
 def dummy_repo(tmp_path):
@@ -21,52 +21,41 @@ def dummy_repo(tmp_path):
     return repo_root
 
 def test_python_update_file(dummy_repo):
-    """Tests the full flow of building a graph and then updating a single file."""
-    
+    """Tests the full flow of building a graph and then updating a single file.
+
+    With tree-sitter removed (Phase 0b), update_file only updates the content
+    hash — no edge changes or pagerank recalculation.
+    """
     # 1. Initial Scan and Build
     scanned_files = scan_repository(str(dummy_repo))
-    
+
     graph = RepoGraph(str(dummy_repo))
     graph.build_complete(scanned_files)
 
     main_path = str(dummy_repo / "src" / "main.py")
-    utils_path = str(dummy_repo / "src" / "utils.py")
-    user_path = str(dummy_repo / "src" / "models" / "user.py")
 
     # 2. Verify initial state
     initial_map = graph.generate_map(10)
     print(f"Initial Map:\n{initial_map}")
-    # A correct assertion is that the main file is part of the map
     assert "main.py" in initial_map
-    
-    # 3. Modify a file to add a new dependency
-    with open(main_path, "a") as f:
-        f.write("\nimport src.models.user")
 
-    # 4. Perform incremental update by passing content
+    # 3. Modify a file
+    with open(main_path, "a") as f:
+        f.write("\n# updated content")
+
+    # 4. Perform incremental update
     content = Path(main_path).read_text()
     update_result = graph.update_file(main_path, content)
-    
-    assert isinstance(update_result, GraphUpdateResult)
-    assert update_result.edges_added > 0
-    assert update_result.needs_pagerank_recalc is True
 
-    # 5. Verify updated state
-    # After update, main.py should have a dependency on user.py
+    assert isinstance(update_result, GraphUpdateResult)
+    # Without parsing, no edge changes occur
+    assert update_result.edges_added == 0
+    assert update_result.needs_pagerank_recalc is False
+
+    # 5. Verify graph still works after update
     updated_map = graph.generate_map(10)
     print(f"Updated Map:\n{updated_map}")
-
-    # A more robust check would be a `get_dependencies` method, but for now, we check the map
-    main_line_found = False
-    for line in updated_map.split('\n'):
-        if "main.py" in line:
-            main_line_found = True
-            break
-    
-    assert main_line_found, "main.py should be in the updated map"
-    
-    # This check is weak, but we expect the new dependency to be reflected somehow
-    assert "user.py" in updated_map
+    assert "main.py" in updated_map
 
 
 def test_python_lazy_pagerank(dummy_repo):

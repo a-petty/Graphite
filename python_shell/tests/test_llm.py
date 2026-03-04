@@ -4,7 +4,7 @@ import sys
 import pytest
 from unittest.mock import MagicMock, patch
 
-from atlas.llm import LLMClient, StubClient
+from cortex.llm import LLMClient, StubClient
 
 
 class TestMLXClientImportGuard:
@@ -14,7 +14,7 @@ class TestMLXClientImportGuard:
         """Attempting to create MLXClient without mlx-lm raises ImportError."""
         # Ensure mlx_lm is not importable
         with patch.dict("sys.modules", {"mlx_lm": None, "mlx_lm.sample_utils": None}):
-            from atlas.llm import MLXClient
+            from cortex.llm import MLXClient
             with pytest.raises(ImportError) as exc_info:
                 MLXClient()
             assert "mlx-lm is not installed" in str(exc_info.value)
@@ -22,10 +22,10 @@ class TestMLXClientImportGuard:
     def test_import_error_mentions_install_command(self):
         """Error message tells the user how to install."""
         with patch.dict("sys.modules", {"mlx_lm": None, "mlx_lm.sample_utils": None}):
-            from atlas.llm import MLXClient
+            from cortex.llm import MLXClient
             with pytest.raises(ImportError) as exc_info:
                 MLXClient()
-            assert "pip install 'atlas[mlx]'" in str(exc_info.value)
+            assert "pip install 'cortex[mlx]'" in str(exc_info.value)
 
 
 class TestMLXClientInit:
@@ -45,7 +45,7 @@ class TestMLXClientInit:
             "mlx_lm": mock_mlx_lm,
             "mlx_lm.sample_utils": mock_sample_utils,
         }):
-            from atlas.llm import MLXClient
+            from cortex.llm import MLXClient
             client = MLXClient(model="mlx-community/test-model")
 
         mock_mlx_lm.load.assert_called_once_with("mlx-community/test-model")
@@ -72,7 +72,7 @@ class TestMLXClientChat:
             "mlx_lm": mock_mlx_lm,
             "mlx_lm.sample_utils": mock_sample_utils,
         }):
-            from atlas.llm import MLXClient
+            from cortex.llm import MLXClient
             client = MLXClient()
 
         self.mock_generate = mock_mlx_lm.generate
@@ -128,7 +128,7 @@ class TestMLXClientConformsToABC:
             "mlx_lm": mock_mlx_lm,
             "mlx_lm.sample_utils": mock_sample_utils,
         }):
-            from atlas.llm import MLXClient
+            from cortex.llm import MLXClient
             client = MLXClient()
 
         assert isinstance(client, LLMClient)

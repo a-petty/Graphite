@@ -5,23 +5,24 @@ pub mod import_resolver;
 pub mod graph;
 pub mod symbol_table;
 pub mod watcher;
-pub mod incremental_parser;
-pub mod cpg;
-pub mod cfg;
-pub mod dataflow;
-pub mod callgraph;
+
+// Knowledge graph modules (Phase 1)
+pub mod entity;
+pub mod chunk;
+pub mod cooccurrence;
+pub mod knowledge_graph;
+pub mod tag_index;
+pub mod persistence;
 
 use pyo3::prelude::*;
 use pyo3::create_exception;
 use pyo3::exceptions::{PyException, PyRuntimeError};
-use pyo3::types::PyDict;
 use std::time::Duration;
 use std::path::{Path, PathBuf};
 use ignore::{WalkBuilder, DirEntry};
 use std::collections::HashSet;
-use crate::parser::{ParserPool, SupportedLanguage, create_skeleton_from_source};
+use crate::parser::create_skeleton_from_source;
 use crate::graph::GraphStatistics;
-use tree_sitter::{Node, Parser as TreeSitterParser, TreeCursor};
 
 
 // Create a Python exception type for our custom error.
@@ -31,19 +32,18 @@ create_exception!(semantic_engine, NodeNotFoundError, GraphError);
 
 
 // Implement the conversion from our internal Rust error to the Python exception.
-// This allows us to use the `?` operator in our PyO3 methods for clean error handling.
 impl From<graph::GraphError> for PyErr {
     fn from(err: graph::GraphError) -> PyErr {
         match err {
             graph::GraphError::ParseError(path) => {
                 ParseError::new_err(format!(
-                    "Syntax error in {}: unable to parse file", 
+                    "Syntax error in {}: unable to parse file",
                     path.display()
                 ))
             }
             graph::GraphError::NodeNotFound(path) => {
                 NodeNotFoundError::new_err(format!(
-                    "File not found in graph: {}", 
+                    "File not found in graph: {}",
                     path.display()
                 ))
             }
@@ -71,58 +71,26 @@ struct PySyntaxCheckResult {
     message: String,
 }
 
-/// Helper function to find the first error node in a tree-sitter tree.
-fn find_first_error_node<'a>(cursor: &mut TreeCursor<'a>) -> Option<Node<'a>> {
-    let node = cursor.node();
-    
-    // Check for both ERROR nodes and MISSING nodes
-    if node.is_error() || node.is_missing() {
-        return Some(node);
-    }
-    
-    // Additionally check for nodes with kind "ERROR"
-    if node.kind() == "ERROR" {
-        return Some(node);
-    }
-    
-    if cursor.goto_first_child() {
-        loop {
-            if let Some(error_node) = find_first_error_node(cursor) {
-                return Some(error_node);
-            }
-            if !cursor.goto_next_sibling() {
-                break;
-            }
-        }
-        cursor.goto_parent();
-    }
-    None
-}
-
+/// Stub: check_syntax now only supports Python (via native compile()).
+/// Tree-sitter validation was removed in Phase 0b.
 #[pyfunction]
 fn check_syntax(content: &str, lang_name: &str) -> PyResult<PySyntaxCheckResult> {
-    // For Python, use Python's native parser for definitive accuracy
     if lang_name == "python" || lang_name == "py" {
         return check_python_syntax_native(content);
     }
-    
-    // For other languages, use tree-sitter
-    let lang = SupportedLanguage::from_extension(lang_name);
-    if lang == SupportedLanguage::Unknown {
-        return Ok(PySyntaxCheckResult { 
-            is_valid: true, 
-            line: 0, 
-            message: "".to_string() 
-        });
-    }
 
-    check_syntax_with_treesitter(content, lang)
+    // For non-Python languages, always report valid (no tree-sitter)
+    Ok(PySyntaxCheckResult {
+        is_valid: true,
+        line: 0,
+        message: "".to_string(),
+    })
 }
 
 fn check_python_syntax_native(content: &str) -> PyResult<PySyntaxCheckResult> {
     Python::with_gil(|py| {
         let compile = py.eval("compile", None, None)?;
-        
+
         match compile.call1((content, "<string>", "exec")) {
             Ok(_) => Ok(PySyntaxCheckResult {
                 is_valid: true,
@@ -130,15 +98,14 @@ fn check_python_syntax_native(content: &str) -> PyResult<PySyntaxCheckResult> {
                 message: "".to_string(),
             }),
             Err(e) => {
-                // Extract line number and message from SyntaxError
                 let line = if let Ok(syntax_err) = e.value(py).getattr("lineno") {
                     syntax_err.extract::<usize>().unwrap_or(0)
                 } else {
                     0
                 };
-                
+
                 let message = format!("Syntax error: {}", e.value(py));
-                
+
                 Ok(PySyntaxCheckResult {
                     is_valid: false,
                     line,
@@ -147,39 +114,6 @@ fn check_python_syntax_native(content: &str) -> PyResult<PySyntaxCheckResult> {
             }
         }
     })
-}
-
-fn check_syntax_with_treesitter(content: &str, lang: SupportedLanguage) -> PyResult<PySyntaxCheckResult> {
-    let mut parser = TreeSitterParser::new();
-    let ts_lang = lang.get_parser()
-        .ok_or_else(|| PyRuntimeError::new_err("Could not get parser for language"))?;
-    parser.set_language(ts_lang)
-        .map_err(|e| PyRuntimeError::new_err(format!("Could not set language: {}", e)))?;
-    
-    let tree = parser.parse(content, None)
-        .ok_or_else(|| PyRuntimeError::new_err("Parsing failed unexpectedly"))?;
-
-    let mut cursor = tree.root_node().walk();
-    let error_node = find_first_error_node(&mut cursor);
-
-    if let Some(node) = error_node {
-        let line = node.start_position().row + 1;
-        let msg = format!(
-            "Syntax error near '{}'", 
-            node.utf8_text(content.as_bytes()).unwrap_or("[non-utf8 text]")
-        );
-        Ok(PySyntaxCheckResult {
-            is_valid: false,
-            line,
-            message: msg,
-        })
-    } else {
-        Ok(PySyntaxCheckResult { 
-            is_valid: true, 
-            line: 0, 
-            message: "".to_string() 
-        })
-    }
 }
 
 
@@ -192,8 +126,8 @@ fn scan_repository(path: &str, ignored_dirs: Option<Vec<String>>) -> PyResult<Ve
     let walker = WalkBuilder::new(path)
         .hidden(false)
         .git_ignore(true)
-        .git_global(true) // Respect global gitignore
-        .parents(true) // Respect .gitignore files in parent directories
+        .git_global(true)
+        .parents(true)
         .filter_entry(move |entry: &DirEntry| {
             if entry.file_name() == ".git" {
                 return false;
@@ -205,7 +139,7 @@ fn scan_repository(path: &str, ignored_dirs: Option<Vec<String>>) -> PyResult<Ve
                         .unwrap_or(true);
                 }
             }
-            true // Keep files
+            true
         })
         .build();
 
@@ -220,7 +154,7 @@ fn scan_repository(path: &str, ignored_dirs: Option<Vec<String>>) -> PyResult<Ve
             }
         }
     }
-    
+
     Ok(files)
 }
 
@@ -314,102 +248,58 @@ impl PyRepoGraph {
         })
     }
 
-    /// Build the entire graph from a list of file paths.
     fn build_complete(&mut self, file_paths: Vec<String>) {
         let paths: Vec<PathBuf> = file_paths.into_iter().map(PathBuf::from).collect();
         self.graph.build_complete(&paths, &self.graph.project_root.clone());
     }
 
-    /// Add or update a file in the graph.
-    ///
-    /// If the file already exists in the graph, it is first removed and then re-added
-    /// with the new content (destructive upsert). This ensures a clean state.
-    ///
-    /// Args:
-    ///     path: Project-root-relative path (must be canonical)
-    ///     content: File content as string
-    ///
-    /// Raises:
-    ///     ParseError: If file has syntax errors
-    ///     GraphError: On other graph operation failures
     fn add_file(&mut self, path: String, content: String) -> PyResult<()> {
         let path_buf = PathBuf::from(path);
         self.graph.add_file(path_buf, &content)
             .map_err(|e| e.into())
     }
 
-    /// Remove a file from the graph.
-    ///
-    /// This removes the file node and all associated edges. If other files were
-    /// importing this file, they will be downgraded to "unresolved import" status
-    /// and will automatically reconnect if this file is re-added later.
-    ///
-    /// Args:
-    ///     path: Project-root-relative path (must match stored path exactly)
-    ///
-    /// Raises:
-    ///     NodeNotFoundError: If file is not in the graph
-    ///     GraphError: On other graph operation failures
     fn remove_file(&mut self, path: String) -> PyResult<()> {
         let path_buf = PathBuf::from(path);
         self.graph.remove_file(&path_buf)
             .map_err(|e| e.into())
     }
 
-    /// Update a single file in the graph with its new content.
-    /// 
-    /// ARGS:
-    ///   file_path: The absolute path to the file.
-    ///   content: The new content of the file.
-    /// 
-    /// PERFORMANCE:
-    ///   This function does NOT read from disk. It relies on the caller (Python)
-    ///   to provide the content, enabling efficient in-memory updates from the watcher.
     fn update_file(&mut self, file_path: &str, content: &str) -> PyResult<PyGraphUpdateResult> {
         let path = PathBuf::from(file_path);
-        // Call graph logic directly with content string. The `?` will handle the error conversion.
         let result = self.graph.update_file(&path, content)?;
         Ok(result.into())
     }
 
-    /// Ensure PageRank scores are up-to-date before querying.
     fn ensure_pagerank_up_to_date(&mut self) {
         self.graph.ensure_pagerank_up_to_date();
     }
 
-    /// Generate a text map of the repository's architecture.
     fn generate_map(&mut self, max_files: usize) -> String {
         self.graph.generate_map(max_files)
     }
 
-    /// Get statistics about the graph.
     fn get_statistics(&self) -> PyGraphStatistics {
         self.graph.get_statistics().into()
     }
 
-    /// Get incoming dependencies for a file.
-    /// Returns a list of (file_path, edge_kind_str) tuples.
     fn get_dependents(&self, file_path: &str) -> PyResult<Vec<(String, String)>> {
         let path = PathBuf::from(file_path);
         let dependencies = self.graph.get_dependents(&path);
         Ok(dependencies.into_iter().map(|(p, k)| (p.to_string_lossy().into_owned(), format!("{:?}", k))).collect())
     }
 
-    /// Get outgoing dependencies for a file.
-    /// Returns a list of (file_path, edge_kind_str) tuples.
     fn get_dependencies(&self, file_path: &str) -> PyResult<Vec<(String, String)>> {
         let path = PathBuf::from(file_path);
         let dependencies = self.graph.get_dependencies(&path);
         Ok(dependencies.into_iter().map(|(p, k)| (p.to_string_lossy().into_owned(), format!("{:?}", k))).collect())
     }
 
-    /// Check if a file path exists in the graph.
     fn has_file(&self, file_path: &str) -> bool {
         let path = PathBuf::from(file_path);
         self.graph.has_file(&path)
     }
 
-    /// Get a sample of unresolved imports for diagnostics.
     fn get_unresolved_imports(&self, limit: usize) -> Vec<(String, usize)> {
         self.graph.get_unresolved_imports_sample(limit)
             .into_iter()
@@ -424,7 +314,6 @@ impl PyRepoGraph {
             .collect()
     }
 
-    /// Get skeleton for a file (Python-exposed)
     #[pyo3(name = "get_skeleton")]
     pub fn get_skeleton(&self, path: String) -> PyResult<String> {
         let skeleton_arc = self.graph.get_skeleton(Path::new(&path))
@@ -433,436 +322,6 @@ impl PyRepoGraph {
             ))?;
         Ok(skeleton_arc.as_ref().clone())
     }
-
-    /// Enable the CPG overlay layer for sub-file granularity.
-    fn enable_cpg(&mut self) {
-        self.graph.enable_cpg();
-    }
-
-    /// Enable CPG and build sub-file data for all files already in the graph.
-    /// Use this when CPG is enabled after build_complete().
-    /// `excluded_dirs` optionally filters out files under certain directories.
-    #[pyo3(signature = (excluded_dirs = None))]
-    fn enable_cpg_and_build(&mut self, excluded_dirs: Option<Vec<String>>) {
-        self.graph.enable_cpg_and_build(excluded_dirs.as_deref());
-    }
-
-    /// Check if CPG is enabled.
-    fn cpg_enabled(&self) -> bool {
-        self.graph.cpg.is_some()
-    }
-
-    /// Build CPG data for a single file on demand (incremental).
-    /// Returns true if CPG data is available for the file after this call.
-    fn ensure_cpg_for_file(&mut self, file_path: &str) -> bool {
-        let path = PathBuf::from(file_path);
-        let canonical = path.canonicalize().unwrap_or(path);
-        self.graph.ensure_cpg_for_file(&canonical)
-    }
-
-    /// Build CPG data for a single file WITHOUT running cross-file call resolution.
-    /// Use this in batch scenarios to avoid O(n²) resolve overhead.
-    /// Returns true if CPG data is available for the file after this call.
-    fn build_cpg_for_file(&mut self, file_path: &str) -> bool {
-        let path = PathBuf::from(file_path);
-        let canonical = path.canonicalize().unwrap_or(path);
-        self.graph.build_cpg_for_file(&canonical)
-    }
-
-    /// Re-resolve call graph edges for a single file without rebuilding its CPG.
-    /// Call this after building CPG for a file's dependents, so that cross-file
-    /// CalledBy edges are discovered. The file must already have CPG data
-    /// (via ensure_cpg_for_file); if not, this returns false and does nothing.
-    fn resolve_cpg_for_file(&mut self, file_path: &str) -> PyResult<bool> {
-        let cpg = self.graph.cpg.as_mut().ok_or_else(|| {
-            PyRuntimeError::new_err("CPG not enabled. Call enable_cpg() or ensure_cpg_for_file() first.")
-        })?;
-        let path = PathBuf::from(file_path);
-        let canonical = path.canonicalize().unwrap_or(path);
-        if !cpg.has_file(&canonical) {
-            return Ok(false);
-        }
-        crate::callgraph::CallGraphBuilder::resolve_file(cpg, &canonical, &self.graph.symbol_index);
-        Ok(true)
-    }
-
-    /// Resolve cross-file call sites targeting a file additively (without removing
-    /// existing edges). Used by get_callers to add new CalledBy edges after building
-    /// more dependent files, without destroying edges from prior tool calls.
-    fn resolve_new_callers(&mut self, file_path: &str) -> PyResult<bool> {
-        let cpg = self.graph.cpg.as_mut().ok_or_else(|| {
-            PyRuntimeError::new_err("CPG not enabled. Call enable_cpg() or ensure_cpg_for_file() first.")
-        })?;
-        let path = PathBuf::from(file_path);
-        let canonical = path.canonicalize().unwrap_or(path);
-        if !cpg.has_file(&canonical) {
-            return Ok(false);
-        }
-        crate::callgraph::CallGraphBuilder::resolve_new_callers(cpg, &canonical, &self.graph.symbol_index);
-        Ok(true)
-    }
-
-    /// Get all functions/methods in a file as a list of dicts.
-    fn get_functions_in_file(&self, py: Python, file_path: &str) -> PyResult<Vec<PyObject>> {
-        let cpg = self.graph.cpg.as_ref().ok_or_else(|| {
-            PyRuntimeError::new_err("CPG not enabled. Call enable_cpg() first.")
-        })?;
-        let path = canonical_path(file_path);
-        let nodes = cpg.get_functions_in_file(&path);
-        let mut result = Vec::new();
-        for node in nodes {
-            let dict = PyDict::new(py);
-            dict.set_item("name", &node.name)?;
-            dict.set_item("kind", match node.kind {
-                cpg::CpgNodeKind::Function => "function",
-                cpg::CpgNodeKind::Method => "method",
-                cpg::CpgNodeKind::Class => "class",
-                cpg::CpgNodeKind::Variable => "variable",
-                cpg::CpgNodeKind::Statement => "statement",
-                cpg::CpgNodeKind::CfgEntry => "cfg_entry",
-                cpg::CpgNodeKind::CfgExit => "cfg_exit",
-            })?;
-            dict.set_item("start_line", node.start_line)?;
-            dict.set_item("end_line", node.end_line)?;
-            let params: Vec<PyObject> = node.parameters.iter().map(|p| {
-                let pd = PyDict::new(py);
-                pd.set_item("name", &p.name).unwrap();
-                pd.set_item("type_annotation", &p.type_annotation).unwrap();
-                pd.set_item("default_value", &p.default_value).unwrap();
-                pd.into_py(py)
-            }).collect();
-            dict.set_item("parameters", params)?;
-            dict.set_item("return_type", &node.return_type)?;
-            dict.set_item("docstring", &node.docstring)?;
-            dict.set_item("bases", &node.bases)?;
-            dict.set_item("parent_class", &node.parent_class)?;
-            result.push(dict.into_py(py));
-        }
-        Ok(result)
-    }
-
-    /// Get all CPG nodes for a file as a list of dicts (with children for classes).
-    fn get_cpg_nodes(&self, py: Python, file_path: &str) -> PyResult<Vec<PyObject>> {
-        let cpg = self.graph.cpg.as_ref().ok_or_else(|| {
-            PyRuntimeError::new_err("CPG not enabled. Call enable_cpg() first.")
-        })?;
-        let path = canonical_path(file_path);
-        let indices = match cpg.file_to_nodes.get(&path) {
-            Some(indices) => indices.clone(),
-            None => return Ok(Vec::new()),
-        };
-
-        let mut result = Vec::new();
-        for idx in &indices {
-            if let Some(node) = cpg.graph.node_weight(*idx) {
-                let dict = cpg_node_to_dict(py, node)?;
-
-                // For classes, include children
-                if node.kind == cpg::CpgNodeKind::Class {
-                    let children = cpg.get_children(*idx);
-                    let child_dicts: Vec<PyObject> = children
-                        .iter()
-                        .filter_map(|(_, child_node)| {
-                            cpg_node_to_dict(py, child_node).ok().map(|d| d.into_py(py))
-                        })
-                        .collect();
-                    dict.set_item("children", child_dicts)?;
-                }
-
-                result.push(dict.into_py(py));
-            }
-        }
-        Ok(result)
-    }
-
-    /// Get the CFG for a function as a list of (source_line, target_line, edge_kind) tuples.
-    fn get_function_cfg(&self, file_path: &str, function_name: &str) -> PyResult<Vec<(usize, usize, String)>> {
-        let cpg = self.graph.cpg.as_ref().ok_or_else(|| {
-            PyRuntimeError::new_err("CPG not enabled. Call enable_cpg() first.")
-        })?;
-        let path = canonical_path(file_path);
-        let indices = match cpg.file_to_nodes.get(&path) {
-            Some(indices) => indices.clone(),
-            None => return Ok(Vec::new()),
-        };
-
-        // Find the function node
-        let func_idx = indices.iter().find(|idx| {
-            cpg.graph.node_weight(**idx)
-                .map(|n| {
-                    matches!(n.kind, cpg::CpgNodeKind::Function | cpg::CpgNodeKind::Method)
-                        && n.name == function_name
-                })
-                .unwrap_or(false)
-        });
-
-        let func_idx = match func_idx {
-            Some(idx) => *idx,
-            None => return Ok(Vec::new()),
-        };
-
-        let edges = cpg.get_cfg_edges_for_function(func_idx);
-        let result: Vec<(usize, usize, String)> = edges.iter().map(|(src, tgt, edge)| {
-            let src_line = cpg.graph.node_weight(*src).map(|n| n.start_line).unwrap_or(0);
-            let tgt_line = cpg.graph.node_weight(*tgt).map(|n| n.start_line).unwrap_or(0);
-            let kind = format!("{:?}", edge);
-            (src_line, tgt_line, kind)
-        }).collect();
-        Ok(result)
-    }
-
-    /// Get data flow edges for a function as (def_line, use_line, var_name) tuples.
-    fn get_function_dataflow(&self, file_path: &str, function_name: &str) -> PyResult<Vec<(usize, usize, String)>> {
-        let cpg = self.graph.cpg.as_ref().ok_or_else(|| {
-            PyRuntimeError::new_err("CPG not enabled. Call enable_cpg() first.")
-        })?;
-        let path = canonical_path(file_path);
-        let indices = match cpg.file_to_nodes.get(&path) {
-            Some(indices) => indices.clone(),
-            None => return Ok(Vec::new()),
-        };
-
-        // Find the function node
-        let func_idx = indices.iter().find(|idx| {
-            cpg.graph.node_weight(**idx)
-                .map(|n| {
-                    matches!(n.kind, cpg::CpgNodeKind::Function | cpg::CpgNodeKind::Method)
-                        && n.name == function_name
-                })
-                .unwrap_or(false)
-        });
-
-        let func_idx = match func_idx {
-            Some(idx) => *idx,
-            None => return Ok(Vec::new()),
-        };
-
-        let edges = cpg.get_dataflow_edges_for_function(func_idx);
-        let result: Vec<(usize, usize, String)> = edges.iter().map(|(src, tgt, var)| {
-            let src_line = cpg.graph.node_weight(*src).map(|n| n.start_line).unwrap_or(0);
-            let tgt_line = cpg.graph.node_weight(*tgt).map(|n| n.start_line).unwrap_or(0);
-            (src_line, tgt_line, var.to_string())
-        }).collect();
-        Ok(result)
-    }
-
-    /// Get defs/uses for each statement in a function.
-    fn get_statement_defs_uses(&self, py: Python, file_path: &str, function_name: &str) -> PyResult<Vec<PyObject>> {
-        let cpg = self.graph.cpg.as_ref().ok_or_else(|| {
-            PyRuntimeError::new_err("CPG not enabled. Call enable_cpg() first.")
-        })?;
-        let path = canonical_path(file_path);
-        let indices = match cpg.file_to_nodes.get(&path) {
-            Some(indices) => indices.clone(),
-            None => return Ok(Vec::new()),
-        };
-
-        // Find the function node
-        let func_idx = indices.iter().find(|idx| {
-            cpg.graph.node_weight(**idx)
-                .map(|n| {
-                    matches!(n.kind, cpg::CpgNodeKind::Function | cpg::CpgNodeKind::Method)
-                        && n.name == function_name
-                })
-                .unwrap_or(false)
-        });
-
-        let func_idx = match func_idx {
-            Some(idx) => *idx,
-            None => return Ok(Vec::new()),
-        };
-
-        let mut result = Vec::new();
-        for &idx in cpg.get_stmts_for_function(func_idx) {
-            if let Some(node) = cpg.graph.node_weight(idx) {
-                if matches!(node.kind, cpg::CpgNodeKind::Statement | cpg::CpgNodeKind::CfgEntry | cpg::CpgNodeKind::CfgExit)
-                {
-                    let dict = PyDict::new(py);
-                    dict.set_item("name", &node.name)?;
-                    dict.set_item("start_line", node.start_line)?;
-                    let defs: Vec<String> = cpg.stmt_defs.get(&idx).cloned().unwrap_or_default();
-                    let uses: Vec<String> = cpg.stmt_uses.get(&idx).cloned().unwrap_or_default();
-                    dict.set_item("defs", defs)?;
-                    dict.set_item("uses", uses)?;
-                    result.push(dict.into_py(py));
-                }
-            }
-        }
-        Ok(result)
-    }
-
-    /// Get CFG statement nodes for a function as a list of dicts.
-    fn get_cfg_statements(&self, py: Python, file_path: &str, function_name: &str) -> PyResult<Vec<PyObject>> {
-        let cpg = self.graph.cpg.as_ref().ok_or_else(|| {
-            PyRuntimeError::new_err("CPG not enabled. Call enable_cpg() first.")
-        })?;
-        let path = canonical_path(file_path);
-        let indices = match cpg.file_to_nodes.get(&path) {
-            Some(indices) => indices.clone(),
-            None => return Ok(Vec::new()),
-        };
-
-        // Find the function node
-        let func_idx = indices.iter().find(|idx| {
-            cpg.graph.node_weight(**idx)
-                .map(|n| {
-                    matches!(n.kind, cpg::CpgNodeKind::Function | cpg::CpgNodeKind::Method)
-                        && n.name == function_name
-                })
-                .unwrap_or(false)
-        });
-
-        let func_idx = match func_idx {
-            Some(idx) => *idx,
-            None => return Ok(Vec::new()),
-        };
-
-        let mut result = Vec::new();
-        for &idx in cpg.get_stmts_for_function(func_idx) {
-            if let Some(node) = cpg.graph.node_weight(idx) {
-                if matches!(node.kind, cpg::CpgNodeKind::Statement | cpg::CpgNodeKind::CfgEntry | cpg::CpgNodeKind::CfgExit)
-                {
-                    let dict = PyDict::new(py);
-                    dict.set_item("name", &node.name)?;
-                    dict.set_item("kind", match node.kind {
-                        cpg::CpgNodeKind::Statement => "statement",
-                        cpg::CpgNodeKind::CfgEntry => "cfg_entry",
-                        cpg::CpgNodeKind::CfgExit => "cfg_exit",
-                        _ => "unknown",
-                    })?;
-                    dict.set_item("start_line", node.start_line)?;
-                    dict.set_item("end_line", node.end_line)?;
-                    if let Some(ref sk) = node.statement_kind {
-                        dict.set_item("statement_kind", format!("{:?}", sk))?;
-                    }
-                    result.push(dict.into_py(py));
-                }
-            }
-        }
-        Ok(result)
-    }
-
-    /// Get all functions called by a given function.
-    /// Returns a list of dicts: {name, file, line}
-    fn get_callees(&self, py: Python, file_path: &str, function_name: &str) -> PyResult<Vec<PyObject>> {
-        let cpg = self.graph.cpg.as_ref().ok_or_else(|| {
-            PyRuntimeError::new_err("CPG not enabled. Call enable_cpg() first.")
-        })?;
-        let path = canonical_path(file_path);
-        let func_indices = find_all_func_indices(cpg, &path, function_name);
-        if func_indices.is_empty() {
-            return Ok(Vec::new());
-        }
-
-        let mut seen = HashSet::new();
-        let mut result = Vec::new();
-        for func_idx in func_indices {
-            for (_idx, node) in cpg.get_callees(func_idx) {
-                let key = (node.name.clone(), node.file_path.clone(), node.start_line);
-                if seen.insert(key) {
-                    let dict = PyDict::new(py);
-                    dict.set_item("name", &node.name)?;
-                    dict.set_item("file", node.file_path.to_string_lossy().as_ref())?;
-                    dict.set_item("line", node.start_line)?;
-                    result.push(dict.into_py(py));
-                }
-            }
-        }
-        Ok(result)
-    }
-
-    /// Get all functions that call a given function.
-    /// Returns a list of dicts: {name, file, line}
-    fn get_callers(&self, py: Python, file_path: &str, function_name: &str) -> PyResult<Vec<PyObject>> {
-        let cpg = self.graph.cpg.as_ref().ok_or_else(|| {
-            PyRuntimeError::new_err("CPG not enabled. Call enable_cpg() first.")
-        })?;
-        let path = canonical_path(file_path);
-        let func_indices = find_all_func_indices(cpg, &path, function_name);
-        if func_indices.is_empty() {
-            return Ok(Vec::new());
-        }
-
-        let mut seen = HashSet::new();
-        let mut result = Vec::new();
-        for func_idx in func_indices {
-            for (_idx, node) in cpg.get_callers(func_idx) {
-                let key = (node.name.clone(), node.file_path.clone(), node.start_line);
-                if seen.insert(key) {
-                    let dict = PyDict::new(py);
-                    dict.set_item("name", &node.name)?;
-                    dict.set_item("file", node.file_path.to_string_lossy().as_ref())?;
-                    dict.set_item("line", node.start_line)?;
-                    result.push(dict.into_py(py));
-                }
-            }
-        }
-        Ok(result)
-    }
-
-    /// Explicitly trigger call graph resolution (Pass 2).
-    fn resolve_call_graph(&mut self) -> PyResult<()> {
-        let cpg = self.graph.cpg.as_mut().ok_or_else(|| {
-            PyRuntimeError::new_err("CPG not enabled. Call enable_cpg() first.")
-        })?;
-        crate::callgraph::CallGraphBuilder::resolve_all(cpg, &self.graph.symbol_index);
-        Ok(())
-    }
-}
-
-/// Canonicalize a file path for CPG lookup (matches how build_cpg_for_file stores keys).
-fn canonical_path(file_path: &str) -> PathBuf {
-    let path = PathBuf::from(file_path);
-    path.canonicalize().unwrap_or(path)
-}
-
-/// Helper to find all function/method NodeIndices by file path and name.
-/// Returns all matches (e.g. both a module-level function and a method with the same name).
-fn find_all_func_indices(cpg: &cpg::CpgLayer, path: &Path, function_name: &str) -> Vec<petgraph::graph::NodeIndex> {
-    cpg.file_to_nodes.get(path)
-        .map(|indices| {
-            indices.iter().filter(|idx| {
-                cpg.graph.node_weight(**idx)
-                    .map(|n| {
-                        matches!(n.kind, cpg::CpgNodeKind::Function | cpg::CpgNodeKind::Method)
-                            && n.name == function_name
-                    })
-                    .unwrap_or(false)
-            }).copied().collect()
-        })
-        .unwrap_or_default()
-}
-
-/// Helper to convert a CpgNode to a Python dict.
-fn cpg_node_to_dict<'py>(py: Python<'py>, node: &cpg::CpgNode) -> PyResult<&'py PyDict> {
-    let dict = PyDict::new(py);
-    dict.set_item("name", &node.name)?;
-    dict.set_item("kind", match node.kind {
-        cpg::CpgNodeKind::Function => "function",
-        cpg::CpgNodeKind::Method => "method",
-        cpg::CpgNodeKind::Class => "class",
-        cpg::CpgNodeKind::Variable => "variable",
-        cpg::CpgNodeKind::Statement => "statement",
-        cpg::CpgNodeKind::CfgEntry => "cfg_entry",
-        cpg::CpgNodeKind::CfgExit => "cfg_exit",
-    })?;
-    dict.set_item("start_line", node.start_line)?;
-    dict.set_item("end_line", node.end_line)?;
-    dict.set_item("start_byte", node.start_byte)?;
-    dict.set_item("end_byte", node.end_byte)?;
-    let params: Vec<PyObject> = node.parameters.iter().map(|p| {
-        let pd = PyDict::new(py);
-        pd.set_item("name", &p.name).unwrap();
-        pd.set_item("type_annotation", &p.type_annotation).unwrap();
-        pd.set_item("default_value", &p.default_value).unwrap();
-        pd.into_py(py)
-    }).collect();
-    dict.set_item("parameters", params)?;
-    dict.set_item("return_type", &node.return_type)?;
-    dict.set_item("docstring", &node.docstring)?;
-    dict.set_item("bases", &node.bases)?;
-    dict.set_item("parent_class", &node.parent_class)?;
-    Ok(dict)
 }
 
 
@@ -872,7 +331,7 @@ fn cpg_node_to_dict<'py>(py: Python<'py>, node: &cpg::CpgNode) -> PyResult<&'py 
 pub struct PyFileChangeEvent {
     #[pyo3(get)]
     pub event_type: String,
-    
+
     #[pyo3(get)]
     pub path: String,
 }
@@ -882,7 +341,7 @@ impl PyFileChangeEvent {
     fn __repr__(&self) -> String {
         format!("FileChangeEvent(type='{}', path='{}')", self.event_type, self.path)
     }
-    
+
     fn __str__(&self) -> String {
         format!("{}: {}", self.event_type, self.path)
     }
@@ -917,10 +376,10 @@ impl From<watcher::FileChangeEvent> for PyFileChangeEvent {
 pub struct PyWatcherStats {
     #[pyo3(get)]
     pub events_received: usize,
-    
+
     #[pyo3(get)]
     pub events_filtered: usize,
-    
+
     #[pyo3(get)]
     pub errors_encountered: usize,
 }
@@ -961,70 +420,368 @@ impl PyFileWatcher {
         ignored_dirs: Option<Vec<String>>,
     ) -> PyResult<Self> {
         let mut filter = watcher::FileFilter::default();
-        
+
         if let Some(exts) = extensions {
             filter.extensions = exts;
         }
-        
+
         if let Some(dirs) = ignored_dirs {
             filter.ignored_dirs.extend(dirs);
         }
-        
+
         let watcher = watcher::FileWatcher::new(PathBuf::from(path), filter)
             .map_err(|e| PyRuntimeError::new_err(format!("Failed to start watcher: {}", e)))?;
-        
+
         Ok(Self {
             watcher: Some(watcher),
         })
     }
-    
-    /// Poll for new events (non-blocking)
+
     fn poll_events(&self) -> PyResult<Vec<PyFileChangeEvent>> {
         let watcher = self.watcher.as_ref()
             .ok_or_else(|| PyRuntimeError::new_err("Watcher has been stopped"))?;
-        
+
         Ok(watcher.poll_events()
             .into_iter()
             .map(PyFileChangeEvent::from)
             .collect())
     }
-    
-    /// Wait for next event with timeout (blocking)
+
     fn wait_for_event(&self, timeout_ms: u64) -> PyResult<Option<PyFileChangeEvent>> {
         let watcher = self.watcher.as_ref()
             .ok_or_else(|| PyRuntimeError::new_err("Watcher has been stopped"))?;
-        
-        // FIXED: Removed .map_err() and '?'
-        // wait_for_event returns Option<FileChangeEvent>, so we just map the inner value if it exists.
+
         Ok(watcher.wait_for_event(Duration::from_millis(timeout_ms))
             .map(PyFileChangeEvent::from))
     }
-    
-    /// Get statistics
+
     fn get_stats(&self) -> PyResult<PyWatcherStats> {
         let watcher = self.watcher.as_ref()
             .ok_or_else(|| PyRuntimeError::new_err("Watcher has been stopped"))?;
-            
+
         Ok(PyWatcherStats::from(watcher.get_stats()))
     }
-    
-        /// Stop the watcher
-    
-        fn stop(&mut self) {
-    
-            // dropping the watcher stops it
-    
-            self.watcher = None;
-    
-        }
-    
+
+    fn stop(&mut self) {
+        self.watcher = None;
     }
-    
-    
-    
-    /// Atlas Semantic Engine
-/// 
-/// A multi-language code analysis engine supporting Python, JavaScript, and TypeScript.
+}
+
+
+// ── PyKnowledgeGraph: PyO3 wrapper for KnowledgeGraph ──
+
+use crate::knowledge_graph::KnowledgeGraph;
+use crate::entity::{EntityNode, EntityType};
+use crate::chunk::{Chunk, ChunkType, MemoryCategory};
+use crate::cooccurrence::CoOccurrenceEdge;
+use crate::persistence::GraphStore;
+
+/// Helper to parse EntityType from a JSON string value.
+fn parse_entity_type(s: &str) -> EntityType {
+    match s {
+        "Person" => EntityType::Person,
+        "Project" => EntityType::Project,
+        "Technology" => EntityType::Technology,
+        "Organization" => EntityType::Organization,
+        "Location" => EntityType::Location,
+        "Decision" => EntityType::Decision,
+        "Concept" => EntityType::Concept,
+        "Document" => EntityType::Document,
+        other => EntityType::Custom(other.to_string()),
+    }
+}
+
+/// Helper to parse ChunkType from a JSON string value.
+fn parse_chunk_type(s: &str) -> ChunkType {
+    match s {
+        "Decision" => ChunkType::Decision,
+        "Discussion" => ChunkType::Discussion,
+        "ActionItem" => ChunkType::ActionItem,
+        "StatusUpdate" => ChunkType::StatusUpdate,
+        "Preference" => ChunkType::Preference,
+        "Background" => ChunkType::Background,
+        _ => ChunkType::Discussion,
+    }
+}
+
+/// Helper to parse MemoryCategory from a JSON string value.
+fn parse_memory_category(s: &str) -> MemoryCategory {
+    match s {
+        "Episodic" => MemoryCategory::Episodic,
+        "Semantic" => MemoryCategory::Semantic,
+        "Procedural" => MemoryCategory::Procedural,
+        _ => MemoryCategory::Episodic,
+    }
+}
+
+#[pyclass(name = "PyKnowledgeGraph")]
+pub struct PyKnowledgeGraph {
+    kg: KnowledgeGraph,
+}
+
+#[pymethods]
+impl PyKnowledgeGraph {
+    #[new]
+    fn new(root_path: &str) -> Self {
+        Self {
+            kg: KnowledgeGraph::new(Path::new(root_path)),
+        }
+    }
+
+    /// Add an entity from a JSON string. Returns the entity ID.
+    /// Expected JSON: {"canonical_name": "...", "entity_type": "Person", "aliases": [...]}
+    fn add_entity(&mut self, entity_json: &str) -> PyResult<String> {
+        let v: serde_json::Value = serde_json::from_str(entity_json)
+            .map_err(|e| PyRuntimeError::new_err(format!("Invalid JSON: {}", e)))?;
+
+        let canonical_name = v["canonical_name"]
+            .as_str()
+            .ok_or_else(|| PyRuntimeError::new_err("Missing canonical_name"))?
+            .to_string();
+
+        let entity_type = v["entity_type"]
+            .as_str()
+            .map(parse_entity_type)
+            .unwrap_or(EntityType::Concept);
+
+        let mut node = EntityNode::new(canonical_name, entity_type);
+
+        if let Some(aliases) = v["aliases"].as_array() {
+            node.aliases = aliases
+                .iter()
+                .filter_map(|a| a.as_str().map(String::from))
+                .collect();
+        }
+
+        if let Some(docs) = v["source_documents"].as_array() {
+            node.source_documents = docs
+                .iter()
+                .filter_map(|d| d.as_str().map(String::from))
+                .collect();
+        }
+
+        let id = node.id.clone();
+        self.kg.add_entity(node);
+        Ok(id)
+    }
+
+    /// Add a co-occurrence edge between two entities.
+    /// Expected edge_json: {"chunk_id": "...", "chunk_type": "Decision", "memory_category": "Episodic", "source_document": "..."}
+    fn add_cooccurrence(
+        &mut self,
+        entity_a_id: &str,
+        entity_b_id: &str,
+        edge_json: &str,
+    ) -> PyResult<()> {
+        let v: serde_json::Value = serde_json::from_str(edge_json)
+            .map_err(|e| PyRuntimeError::new_err(format!("Invalid JSON: {}", e)))?;
+
+        let chunk_id = v["chunk_id"]
+            .as_str()
+            .unwrap_or("")
+            .to_string();
+        let chunk_type = v["chunk_type"]
+            .as_str()
+            .map(parse_chunk_type)
+            .unwrap_or(ChunkType::Discussion);
+        let memory_category = v["memory_category"]
+            .as_str()
+            .map(parse_memory_category)
+            .unwrap_or(MemoryCategory::Episodic);
+        let timestamp = v["timestamp"].as_i64();
+        let source_document = v["source_document"]
+            .as_str()
+            .unwrap_or("")
+            .to_string();
+
+        let edge = CoOccurrenceEdge::new(
+            chunk_id,
+            chunk_type,
+            memory_category,
+            timestamp,
+            source_document,
+        );
+
+        self.kg
+            .add_cooccurrence(entity_a_id, entity_b_id, edge)
+            .map_err(|e| PyRuntimeError::new_err(e))
+    }
+
+    /// Store a chunk from JSON.
+    /// Expected: {"source_document": "...", "chunk_type": "Decision", "memory_category": "Episodic", "text": "...", ...}
+    fn store_chunk(&mut self, chunk_json: &str) -> PyResult<String> {
+        let v: serde_json::Value = serde_json::from_str(chunk_json)
+            .map_err(|e| PyRuntimeError::new_err(format!("Invalid JSON: {}", e)))?;
+
+        let source_document = v["source_document"]
+            .as_str()
+            .unwrap_or("")
+            .to_string();
+        let chunk_type = v["chunk_type"]
+            .as_str()
+            .map(parse_chunk_type)
+            .unwrap_or(ChunkType::Discussion);
+        let memory_category = v["memory_category"]
+            .as_str()
+            .map(parse_memory_category)
+            .unwrap_or(MemoryCategory::Episodic);
+        let text = v["text"]
+            .as_str()
+            .unwrap_or("")
+            .to_string();
+
+        let mut chunk = Chunk::new(source_document, chunk_type, memory_category, text);
+
+        if let Some(section) = v["section_name"].as_str() {
+            chunk.section_name = Some(section.to_string());
+        }
+        if let Some(speaker) = v["speaker"].as_str() {
+            chunk.speaker = Some(speaker.to_string());
+        }
+        if let Some(ts) = v["timestamp"].as_i64() {
+            chunk.timestamp = Some(ts);
+        }
+        if let Some(tags) = v["tags"].as_array() {
+            chunk.tags = tags
+                .iter()
+                .filter_map(|t| t.as_str().map(String::from))
+                .collect();
+        }
+
+        let id = chunk.id.clone();
+        self.kg.store_chunk(chunk);
+        Ok(id)
+    }
+
+    /// Get a chunk by ID, returned as JSON.
+    fn get_chunk(&self, chunk_id: &str) -> PyResult<Option<String>> {
+        match self.kg.get_chunk(chunk_id) {
+            Some(chunk) => {
+                let json = serde_json::to_string(chunk)
+                    .map_err(|e| PyRuntimeError::new_err(format!("Serialize error: {}", e)))?;
+                Ok(Some(json))
+            }
+            None => Ok(None),
+        }
+    }
+
+    /// Get an entity by ID, returned as JSON.
+    fn get_entity(&self, entity_id: &str) -> PyResult<Option<String>> {
+        match self.kg.get_entity(entity_id) {
+            Some(entity) => {
+                let json = serde_json::to_string(entity)
+                    .map_err(|e| PyRuntimeError::new_err(format!("Serialize error: {}", e)))?;
+                Ok(Some(json))
+            }
+            None => Ok(None),
+        }
+    }
+
+    /// Merge two entities. Returns the ID of the kept entity.
+    fn merge_entities(&mut self, keep_id: &str, merge_id: &str) -> PyResult<String> {
+        self.kg
+            .merge_entities(keep_id, merge_id)
+            .map_err(|e| PyRuntimeError::new_err(e))
+    }
+
+    /// Query the neighborhood of an entity via BFS. Returns JSON SubgraphResult.
+    #[pyo3(signature = (entity_id, hops, time_start = None, time_end = None))]
+    fn query_neighborhood(
+        &self,
+        entity_id: &str,
+        hops: usize,
+        time_start: Option<i64>,
+        time_end: Option<i64>,
+    ) -> PyResult<String> {
+        let result = self.kg.query_neighborhood(entity_id, hops, time_start, time_end);
+        serde_json::to_string(&result)
+            .map_err(|e| PyRuntimeError::new_err(format!("Serialize error: {}", e)))
+    }
+
+    /// Get all co-occurrences for an entity. Returns JSON array.
+    fn get_cooccurrences(&self, entity_id: &str) -> PyResult<String> {
+        let cooccurrences = self.kg.get_cooccurrences(entity_id);
+        serde_json::to_string(&cooccurrences)
+            .map_err(|e| PyRuntimeError::new_err(format!("Serialize error: {}", e)))
+    }
+
+    /// Search entities by name/alias substring. Returns JSON array of EntityNodes.
+    fn search_entities(&self, query: &str, limit: usize) -> PyResult<String> {
+        let results = self.kg.search_entities(query, limit);
+        serde_json::to_string(&results)
+            .map_err(|e| PyRuntimeError::new_err(format!("Serialize error: {}", e)))
+    }
+
+    /// Compute PageRank. Returns JSON array of (id, score) pairs.
+    fn compute_pagerank(&mut self) -> PyResult<String> {
+        self.kg.compute_pagerank();
+        let top = self.kg.get_top_entities(self.kg.entity_count());
+        let pairs: Vec<(&str, f64)> = top.iter().map(|e| (e.id.as_str(), e.rank)).collect();
+        serde_json::to_string(&pairs)
+            .map_err(|e| PyRuntimeError::new_err(format!("Serialize error: {}", e)))
+    }
+
+    /// Get temporal chain (chunks sorted by timestamp) for an entity. Returns JSON.
+    fn get_temporal_chain(&self, entity_id: &str) -> PyResult<String> {
+        let chain = self.kg.get_temporal_chain(entity_id);
+        serde_json::to_string(&chain)
+            .map_err(|e| PyRuntimeError::new_err(format!("Serialize error: {}", e)))
+    }
+
+    /// Get chunks for a list of entity IDs (JSON array input). Returns JSON.
+    fn get_chunks_for_entities(&self, entity_ids_json: &str) -> PyResult<String> {
+        let ids: Vec<String> = serde_json::from_str(entity_ids_json)
+            .map_err(|e| PyRuntimeError::new_err(format!("Invalid JSON: {}", e)))?;
+        let chunks = self.kg.get_chunks_for_entities(&ids);
+        serde_json::to_string(&chunks)
+            .map_err(|e| PyRuntimeError::new_err(format!("Serialize error: {}", e)))
+    }
+
+    /// Apply exponential decay to access counts.
+    fn decay_scores(&mut self, half_life_days: f64) -> PyResult<()> {
+        self.kg.decay_scores(half_life_days);
+        Ok(())
+    }
+
+    /// Export a subgraph for given entity IDs (JSON array input). Returns JSON.
+    fn export_subgraph(&self, entity_ids_json: &str) -> PyResult<String> {
+        let ids: Vec<String> = serde_json::from_str(entity_ids_json)
+            .map_err(|e| PyRuntimeError::new_err(format!("Invalid JSON: {}", e)))?;
+        let result = self.kg.export_subgraph(&ids);
+        serde_json::to_string(&result)
+            .map_err(|e| PyRuntimeError::new_err(format!("Serialize error: {}", e)))
+    }
+
+    /// Save the graph to disk at the given path.
+    fn save(&self, path: &str) -> PyResult<()> {
+        let store = GraphStore::new(Path::new(path));
+        store
+            .save_with_backup(&self.kg)
+            .map_err(|e| PyRuntimeError::new_err(e))
+    }
+
+    /// Load a graph from disk. Returns a new PyKnowledgeGraph.
+    #[staticmethod]
+    fn load(path: &str) -> PyResult<Self> {
+        let store = GraphStore::new(Path::new(path));
+        let kg = store
+            .load(Path::new(path))
+            .map_err(|e| PyRuntimeError::new_err(e))?;
+        Ok(Self { kg })
+    }
+
+    /// Get graph statistics as JSON.
+    fn get_statistics(&self) -> PyResult<String> {
+        let stats = self.kg.get_statistics();
+        serde_json::to_string(&stats)
+            .map_err(|e| PyRuntimeError::new_err(format!("Serialize error: {}", e)))
+    }
+}
+
+
+/// Cortex Semantic Engine
+///
+/// A knowledge graph engine for LLM memory (transitioning from code analysis).
 #[pymodule]
 fn semantic_engine(_py: Python, m: &PyModule) -> PyResult<()> {
 
@@ -1044,10 +801,12 @@ fn semantic_engine(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_class::<PyWatcherStats>()?;
     m.add_class::<PySyntaxCheckResult>()?;
 
+    // Knowledge graph (Phase 1)
+    m.add_class::<PyKnowledgeGraph>()?;
+
     m.add("GraphError", _py.get_type::<GraphError>())?;
     m.add("ParseError", _py.get_type::<ParseError>())?;
     m.add("NodeNotFoundError", _py.get_type::<NodeNotFoundError>())?;
 
     Ok(())
-
 }

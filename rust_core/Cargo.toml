@@ -4,12 +4,6 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-tree-sitter = "0.20"
-tree-sitter-python = "0.20"
-tree-sitter-rust = "0.20"
-tree-sitter-javascript = "0.20"
-tree-sitter-typescript = "0.20"
-tree-sitter-go = "0.20"
 petgraph = "0.6"           # Graph algorithms
 ignore = "0.4"             # Fast .gitignore-ignore-aware file walking
 rayon = "1.7"              # Parallel iteration
@@ -32,19 +26,14 @@ thiserror = "1.0"
 lru = "0.12"
 log = "0.4"
 env_logger = "0.11"
+# Knowledge graph (Phase 1)
+uuid = { version = "1", features = ["v4"] }
+chrono = "0.4"
+rmp-serde = "1"
 
 [dev-dependencies]
 tiktoken-rs = { version = "^0.5.2", features = ["async-openai"] }
 tempfile = "3.10.1"        # For creating temporary files/dirs in tests
-criterion = { version = "0.4", features = ["html_reports"] }
-
-[[test]]
-name = "test_symbol_harvesting"
-harness = true
-
-[[test]]
-name = "test_phase2_criteria"
-harness = true
 
 [[test]]
 name = "test_graph_construction"
@@ -63,25 +52,17 @@ name = "test_graph_updates"
 harness = true
 
 [[test]]
-name = "test_cpg"
+name = "test_pagerank"
 harness = true
 
 [[test]]
-name = "test_cfg"
+name = "test_knowledge_graph"
 harness = true
 
 [[test]]
-name = "test_dataflow"
+name = "test_persistence"
 harness = true
 
 [[test]]
-name = "test_callgraph"
+name = "test_tag_index"
 harness = true
-
-[[test]]
-name = "test_import_canonicalization"
-harness = true
-
-[[bench]]
-name = "incremental_benchmark"
-harness = false

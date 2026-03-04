@@ -1,7 +1,7 @@
 
 import os
 from pathlib import Path
-from atlas.semantic_engine import RepoGraph, scan_repository
+from cortex.semantic_engine import RepoGraph, scan_repository
 
 def generate_repo_map():
     """

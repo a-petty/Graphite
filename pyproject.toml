@@ -1,7 +1,7 @@
 [project]
-name = "atlas"
+name = "cortex"
 version = "0.1.0"
-description = "Python orchestration shell for Project Atlas"
+description = "Knowledge graph memory system for LLMs"
 authors = [{ name = "Alec Petty", email = "alexander@petty.is" }]
 dependencies = [
     "pydantic>=2.0",
@@ -16,8 +16,8 @@ dependencies = [
 requires-python = ">=3.10"
 
 [project.scripts]
-atlas = "atlas.cli:main"
-atlas-mcp = "atlas.mcp_server:main"
+cortex = "cortex.cli:main"
+cortex-mcp = "cortex.mcp_server:main"
 
 [project.optional-dependencies]
 dev = [
@@ -38,6 +38,6 @@ build-backend = "maturin"
 
 [tool.maturin]
 binding = "pyo3"
-module-name = "atlas.semantic_engine" # Name of the python module that maturin will create from rust_core
+module-name = "cortex.semantic_engine" # Name of the python module that maturin will create from rust_core
 manifest-path = "rust_core/Cargo.toml"
 python-source = "python_shell"

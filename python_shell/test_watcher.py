@@ -15,7 +15,7 @@ project_root = Path(__file__).parent.parent.resolve()
 sys.path.insert(0, str(project_root))
 
 try:
-    from atlas.semantic_engine import FileWatcher
+    from cortex.semantic_engine import FileWatcher
 except ImportError as e:
     print("="*80)
     print("ERROR: Could not import the `semantic_engine` module.")

@@ -48,13 +48,13 @@ class FakeRepoGraph:
 
 def _make_context_manager(graph):
     """Construct a ContextManager with mocked embedding manager and tiktoken."""
-    with patch("atlas.context.tiktoken") as mock_tiktoken:
+    with patch("cortex.context.tiktoken") as mock_tiktoken:
         mock_encoder = MagicMock()
         mock_encoder.encode.return_value = []
         mock_tiktoken.encoding_for_model.return_value = mock_encoder
 
         mock_embed = MagicMock()
-        from atlas.context import ContextManager
+        from cortex.context import ContextManager
         cm = ContextManager(graph, mock_embed, model="gpt-4", max_tokens=100000)
         return cm
 
@@ -301,7 +301,7 @@ def _make_cm_with_stats(node_count=100, edge_count=300, model="gpt-4", max_token
 
 def _make_context_manager_ext(graph, model="gpt-4", max_tokens=None):
     """Construct a ContextManager with explicit model/max_tokens and mocked tiktoken."""
-    with patch("atlas.context.tiktoken") as mock_tiktoken:
+    with patch("cortex.context.tiktoken") as mock_tiktoken:
         mock_encoder = MagicMock()
         # Simple token counting: 1 token per 4 characters
         mock_encoder.encode = lambda text: [0] * (len(text) // 4)
@@ -309,7 +309,7 @@ def _make_context_manager_ext(graph, model="gpt-4", max_tokens=None):
         mock_tiktoken.encoding_for_model.return_value = mock_encoder
 
         mock_embed = MagicMock()
-        from atlas.context import ContextManager
+        from cortex.context import ContextManager
         cm = ContextManager(graph, mock_embed, model=model, max_tokens=max_tokens)
         return cm
 
@@ -318,27 +318,27 @@ class TestModelContextWindows:
     """Tests for _resolve_max_tokens model-aware budget resolution."""
 
     def test_known_model_exact_match(self):
-        from atlas.context import ContextManager
+        from cortex.context import ContextManager
         result = ContextManager._resolve_max_tokens("deepseek-coder", None)
         assert result == int(128_000 * 0.60)
 
     def test_known_model_prefix_match(self):
-        from atlas.context import ContextManager
+        from cortex.context import ContextManager
         result = ContextManager._resolve_max_tokens("deepseek-coder:7b", None)
         assert result == int(128_000 * 0.60)
 
     def test_unknown_model_fallback(self):
-        from atlas.context import ContextManager
+        from cortex.context import ContextManager
         result = ContextManager._resolve_max_tokens("my-custom-model", None)
         assert result == int(100_000 * 0.60)
 
     def test_explicit_override(self):
-        from atlas.context import ContextManager
+        from cortex.context import ContextManager
         result = ContextManager._resolve_max_tokens("deepseek-coder", 50_000)
         assert result == 50_000
 
     def test_case_insensitive(self):
-        from atlas.context import ContextManager
+        from cortex.context import ContextManager
         result = ContextManager._resolve_max_tokens("Claude-Opus", None)
         assert result == int(200_000 * 0.60)
 

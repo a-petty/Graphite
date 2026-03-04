@@ -1,7 +1,7 @@
 import pytest
 from pathlib import Path
 import tempfile
-from atlas.agent import AtlasAgent
+from cortex.agent import CortexAgent
 
 def test_reflexive_loop_rejects_invalid_code():
     """
@@ -13,7 +13,7 @@ def test_reflexive_loop_rejects_invalid_code():
         temp_dir = Path(temp_dir_str)
         # We don't need to initialize the agent for this test, as we are
         # testing the tool executor directly.
-        agent = AtlasAgent(project_root=temp_dir)
+        agent = CortexAgent(project_root=temp_dir)
         
         # Directly access the agent's tool executor
         tools = agent.tools
