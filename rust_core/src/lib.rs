@@ -1,4 +1,5 @@
 #![allow(non_local_definitions)]
+#![allow(unsafe_op_in_unsafe_fn)]
 pub mod parser;
 pub mod test_utils;
 pub mod import_resolver;

@@ -33,8 +33,8 @@ The transformation follows 8 phases. Track current progress against this list:
 |-------|---------|--------|
 | **Phase 0** | Fork & rename (`atlas` → `cortex`), strip tree-sitter, stub modules | **Complete** |
 | **Phase 1** | Core graph schema + persistence — `EntityNode`/`CoOccurrenceEdge` replace `FileNode`/`EdgeKind`, `KnowledgeGraph` replaces `RepoGraph`, chunk storage, save/load, PyO3 bindings | **Complete** |
-| **Phase 2** | Three-pass tag-and-index pipeline — structural parse (no LLM) → classify (LLM) → tag entities (LLM), co-occurrence graph construction, test corpus | Not started |
-| **Phase 3** | Context assembly adaptation — Anchor & Expand for knowledge, evidence chunk retrieval, temporal filtering, entity summaries | Not started |
+| **Phase 2** | Three-pass tag-and-index pipeline — structural parse (no LLM) → classify (LLM) → tag entities (LLM), co-occurrence graph construction, test corpus | **Complete** |
+| **Phase 3** | Context assembly adaptation — Anchor & Expand for knowledge, evidence chunk retrieval, temporal filtering, entity summaries | **Complete** |
 | **Phase 4** | MCP server tool redesign — new knowledge-centric tool set | Not started |
 | **Phase 5** | Reflection & consolidation — entity merging, decay scoring, stale evidence detection, synthesis | Not started |
 | **Phase 6** | Incremental update handling — two-tier document change/delete model | Not started |

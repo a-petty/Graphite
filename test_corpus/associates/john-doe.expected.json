@@ -1,0 +1,32 @@
+{
+    "entities": [
+        {"name": "John Doe", "type": "person"},
+        {"name": "Sarah Chen", "type": "person"},
+        {"name": "Lisa Wang", "type": "person"},
+        {"name": "Tom Brennan", "type": "person"},
+        {"name": "TechCorp", "type": "organization"},
+        {"name": "Platform Services", "type": "organization"},
+        {"name": "Payment Gateway Refactor", "type": "project"},
+        {"name": "Observability Initiative", "type": "project"},
+        {"name": "Python", "type": "technology"},
+        {"name": "Go", "type": "technology"},
+        {"name": "PostgreSQL", "type": "technology"},
+        {"name": "Kafka", "type": "technology"},
+        {"name": "AWS", "type": "technology"},
+        {"name": "AWS EKS", "type": "technology"},
+        {"name": "Jaeger", "type": "technology"},
+        {"name": "OpenTelemetry", "type": "technology"},
+        {"name": "CockroachDB", "type": "technology"}
+    ],
+    "cooccurrences": [
+        {"entity_a": "John Doe", "entity_b": "Sarah Chen"},
+        {"entity_a": "John Doe", "entity_b": "TechCorp"},
+        {"entity_a": "John Doe", "entity_b": "Python"},
+        {"entity_a": "John Doe", "entity_b": "Payment Gateway Refactor"},
+        {"entity_a": "John Doe", "entity_b": "Lisa Wang"},
+        {"entity_a": "John Doe", "entity_b": "Tom Brennan"}
+    ],
+    "expected_chunks_min": 4,
+    "expected_chunks_max": 8,
+    "expected_filler_chunks": 0
+}

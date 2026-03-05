@@ -1,0 +1,37 @@
+{
+    "entities": [
+        {"name": "Sarah Chen", "type": "person"},
+        {"name": "Marcus Johnson", "type": "person"},
+        {"name": "Priya Patel", "type": "person"},
+        {"name": "David Kim", "type": "person"},
+        {"name": "Dashboard Redesign", "type": "project"},
+        {"name": "API Migration", "type": "project"},
+        {"name": "React", "type": "technology"},
+        {"name": "TypeScript", "type": "technology"},
+        {"name": "Vue", "type": "technology"},
+        {"name": "Shadcn UI", "type": "technology"},
+        {"name": "Django REST Framework", "type": "technology"},
+        {"name": "Django Channels", "type": "technology"},
+        {"name": "WebSocket", "type": "technology"},
+        {"name": "Kubernetes", "type": "technology"},
+        {"name": "AWS", "type": "technology"},
+        {"name": "Docker", "type": "technology"},
+        {"name": "Helm", "type": "technology"},
+        {"name": "GraphQL", "type": "technology"},
+        {"name": "Apollo Server", "type": "technology"},
+        {"name": "Acme Corp", "type": "organization"}
+    ],
+    "cooccurrences": [
+        {"entity_a": "Sarah Chen", "entity_b": "Dashboard Redesign"},
+        {"entity_a": "Marcus Johnson", "entity_b": "React"},
+        {"entity_a": "Marcus Johnson", "entity_b": "TypeScript"},
+        {"entity_a": "Priya Patel", "entity_b": "Django Channels"},
+        {"entity_a": "David Kim", "entity_b": "Kubernetes"},
+        {"entity_a": "David Kim", "entity_b": "AWS"},
+        {"entity_a": "Marcus Johnson", "entity_b": "Apollo Server"},
+        {"entity_a": "Priya Patel", "entity_b": "Acme Corp"}
+    ],
+    "expected_chunks_min": 6,
+    "expected_chunks_max": 12,
+    "expected_filler_chunks": 0
+}

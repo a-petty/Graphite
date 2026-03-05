@@ -1,6 +1,44 @@
 """Document categorization by memory type.
 
-Phase 2: Maps directory paths and document content to memory
-categories (episodic/meetings, semantic/associates, procedural/work).
-Used to select appropriate extraction prompts and graph schemas.
+Maps directory paths to memory categories:
+  meetings/  → Episodic  (event-based, temporal)
+  associates/ → Semantic  (entity-centric, stable facts)
+  work/       → Procedural (project/task-oriented)
+
+Falls back to Episodic for files outside known directories.
 """
+
+from pathlib import Path
+
+# Directory name → memory category mapping
+_CATEGORY_MAP = {
+    "meetings": "Episodic",
+    "associates": "Semantic",
+    "work": "Procedural",
+}
+
+
+def categorize_document(file_path: Path, memory_root: Path) -> str:
+    """Determine the memory category for a document based on its path.
+
+    Args:
+        file_path: Path to the document file.
+        memory_root: Root directory of the memory repository (e.g. memory/).
+
+    Returns:
+        One of "Episodic", "Semantic", or "Procedural".
+    """
+    try:
+        rel = file_path.resolve().relative_to(memory_root.resolve())
+    except ValueError:
+        # File is outside the memory root — default to Episodic
+        return "Episodic"
+
+    # Check the first path component against known directories
+    parts = rel.parts
+    if parts:
+        first_dir = parts[0].lower()
+        if first_dir in _CATEGORY_MAP:
+            return _CATEGORY_MAP[first_dir]
+
+    return "Episodic"

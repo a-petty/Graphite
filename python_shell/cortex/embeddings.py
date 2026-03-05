@@ -50,6 +50,7 @@ class EmbeddingManager:
         try:
             self.model = TextEmbedding(model_name=model_name)
             self.embeddings_cache: Dict[Path, FileEmbedding] = {}
+            self.entity_embeddings_cache: Dict[str, np.ndarray] = {}  # entity_id → embedding
             self.repo_graph = repo_graph
             self.project_root = project_root
             logger.info("FastEmbed model initialized and ready.")
@@ -279,3 +280,130 @@ class EmbeddingManager:
         just the file paths without scores.
         """
         return [path for path, _ in self.find_relevant_files_scored(query, file_paths, top_n)]
+
+    # ── Entity Embedding Support (Phase 3) ──
+
+    def build_entity_descriptor(
+        self,
+        canonical_name: str,
+        entity_type: str,
+        top_cooccurrences: List[str],
+    ) -> str:
+        """Build embedding text from entity info.
+
+        Format: 'John Doe (Person): Dashboard Redesign, React, Jane Smith'
+        The co-occurrence names encode graph structure into the embedding,
+        so semantically related entities cluster together.
+        """
+        descriptor = f"{canonical_name} ({entity_type})"
+        if top_cooccurrences:
+            descriptor += ": " + ", ".join(top_cooccurrences)
+        return descriptor
+
+    def embed_entities(
+        self,
+        entities: List[Dict],
+        knowledge_graph,
+    ) -> None:
+        """Batch-embed entities not already in the cache.
+
+        For each uncached entity: build a descriptor from the entity's name,
+        type, and its top 3 co-occurring entity names, then embed it.
+
+        Args:
+            entities: List of entity dicts with 'id', 'canonical_name', 'entity_type'.
+            knowledge_graph: PyKnowledgeGraph instance for looking up co-occurrences.
+        """
+        import json
+
+        uncached = [e for e in entities if e["id"] not in self.entity_embeddings_cache]
+        if not uncached:
+            return
+
+        descriptors: List[str] = []
+        ids: List[str] = []
+
+        for entity in uncached:
+            entity_id = entity["id"]
+            # Get co-occurrence neighbors for this entity
+            top_neighbors: List[str] = []
+            try:
+                cooc_json = knowledge_graph.get_cooccurrences(entity_id)
+                cooccurrences = json.loads(cooc_json)
+                # cooccurrences is list of [neighbor_id, {edge fields...}]
+                # Count neighbor frequency and take top 3
+                neighbor_counts: Dict[str, int] = {}
+                for item in cooccurrences:
+                    nid = item[0]
+                    neighbor_counts[nid] = neighbor_counts.get(nid, 0) + 1
+                sorted_neighbors = sorted(
+                    neighbor_counts.items(), key=lambda x: x[1], reverse=True
+                )
+                # Look up neighbor names
+                for nid, _ in sorted_neighbors[:3]:
+                    try:
+                        n_json = knowledge_graph.get_entity(nid)
+                        if n_json:
+                            n_data = json.loads(n_json)
+                            top_neighbors.append(n_data["canonical_name"])
+                    except Exception:
+                        pass
+            except Exception:
+                pass
+
+            descriptor = self.build_entity_descriptor(
+                entity["canonical_name"],
+                entity["entity_type"],
+                top_neighbors,
+            )
+            descriptors.append(descriptor)
+            ids.append(entity_id)
+
+        if descriptors:
+            logger.debug(f"Embedding {len(descriptors)} entity descriptors.")
+            embeddings = self.generate_embedding(descriptors)
+            for eid, emb in zip(ids, embeddings):
+                self.entity_embeddings_cache[eid] = emb
+
+    def find_relevant_entities_scored(
+        self,
+        query: str,
+        entity_ids: List[str],
+        top_n: int = 10,
+    ) -> List[Tuple[str, float]]:
+        """Cosine similarity search against cached entity embeddings.
+
+        Args:
+            query: The user's query string.
+            entity_ids: Entity IDs to search among (must be in cache).
+            top_n: Number of top results to return.
+
+        Returns:
+            [(entity_id, similarity_score)] sorted descending by score.
+        """
+        if not entity_ids:
+            return []
+
+        query_embedding = self.generate_embedding([query])[0]
+
+        similarities: List[Tuple[str, float]] = []
+        for eid in entity_ids:
+            if eid in self.entity_embeddings_cache:
+                score = self._cosine_similarity(
+                    query_embedding, self.entity_embeddings_cache[eid]
+                )
+                similarities.append((eid, score))
+
+        similarities.sort(key=lambda x: x[1], reverse=True)
+        return similarities[:top_n]
+
+    def invalidate_entity_cache(self, entity_id: Optional[str] = None) -> None:
+        """Clear one or all entity embeddings (e.g., after graph changes).
+
+        Args:
+            entity_id: If provided, clear only this entity. Otherwise clear all.
+        """
+        if entity_id is not None:
+            self.entity_embeddings_cache.pop(entity_id, None)
+        else:
+            self.entity_embeddings_cache.clear()
