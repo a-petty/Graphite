@@ -93,6 +93,15 @@ class CortexConfig:
     similarity_weight: float = 0.80
     pagerank_weight: float = 0.20
 
+    # ── Reflection (Phase 5) ──
+    decay_half_life_days: float = 30.0
+    decay_archival_threshold: int = 5
+    orphan_max_age_days: int = 7
+    merge_embedding_threshold: float = 0.90
+    merge_alias_overlap_threshold: float = 0.80
+    synthesis_max_chunks_per_entity: int = 20
+    lightweight_reflection_on_ingest: bool = True
+
     # ── Paths ──
     memory_root: Path = field(default_factory=lambda: Path("memory"))
     prompts_dir: Path = field(
@@ -180,6 +189,23 @@ class CortexConfig:
             kwargs["similarity_weight"] = float(context["similarity_weight"])
         if "pagerank_weight" in context:
             kwargs["pagerank_weight"] = float(context["pagerank_weight"])
+
+        # [reflection] section
+        reflection = data.get("reflection", {})
+        if "decay_half_life_days" in reflection:
+            kwargs["decay_half_life_days"] = float(reflection["decay_half_life_days"])
+        if "decay_archival_threshold" in reflection:
+            kwargs["decay_archival_threshold"] = int(reflection["decay_archival_threshold"])
+        if "orphan_max_age_days" in reflection:
+            kwargs["orphan_max_age_days"] = int(reflection["orphan_max_age_days"])
+        if "merge_embedding_threshold" in reflection:
+            kwargs["merge_embedding_threshold"] = float(reflection["merge_embedding_threshold"])
+        if "merge_alias_overlap_threshold" in reflection:
+            kwargs["merge_alias_overlap_threshold"] = float(reflection["merge_alias_overlap_threshold"])
+        if "synthesis_max_chunks_per_entity" in reflection:
+            kwargs["synthesis_max_chunks_per_entity"] = int(reflection["synthesis_max_chunks_per_entity"])
+        if "lightweight_reflection_on_ingest" in reflection:
+            kwargs["lightweight_reflection_on_ingest"] = bool(reflection["lightweight_reflection_on_ingest"])
 
         # [paths] section
         paths = data.get("paths", {})

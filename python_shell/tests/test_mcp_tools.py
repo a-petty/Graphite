@@ -502,33 +502,76 @@ class TestCortexIngest:
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# Phase 5 Stub Tests
+# Phase 5: Reflection Tool Tests
 # ═══════════════════════════════════════════════════════════════════════════════
 
 
-class TestPhase5Stubs:
-    def test_reflect_stub(self):
-        """cortex_reflect returns not-yet-implemented message."""
+class TestCortexReflect:
+    def test_reflect_returns_results(self):
+        """cortex_reflect returns formatted reflection results."""
+        _setup_populated_graph()
         from cortex.mcp_server import cortex_reflect
 
-        result = _run_async(cortex_reflect())
-        assert "not yet implemented" in result
-        assert "Phase 5" in result
+        result = _run_async(cortex_reflect(mode="light"))
+        assert "Reflection Results" in result
+        assert "Orphans removed" in result
 
-    def test_forget_stub(self):
-        """cortex_forget returns not-yet-implemented message."""
+    def test_reflect_full_mode(self):
+        """cortex_reflect in full mode runs all operations."""
+        _setup_populated_graph()
+        from cortex.mcp_server import cortex_reflect
+
+        result = _run_async(cortex_reflect(mode="full"))
+        assert "Reflection Results" in result
+        assert "Merges executed" in result
+
+
+class TestCortexForget:
+    def test_forget_removes_entity(self):
+        """cortex_forget removes an entity from the graph."""
+        kg = _setup_populated_graph()
         from cortex.mcp_server import cortex_forget
 
-        result = _run_async(cortex_forget(entity="John"))
-        assert "not yet implemented" in result
-        assert "John" in result
+        result = _run_async(cortex_forget(entity="e-john"))
+        assert "Removed entity" in result
+        assert "John Doe" in result
+        # Entity should be gone
+        assert kg.get_entity("e-john") is None
 
-    def test_review_stub(self):
-        """cortex_review returns not-yet-implemented message."""
+    def test_forget_nonexistent_returns_error(self):
+        """cortex_forget on nonexistent entity returns error."""
+        _setup_populated_graph()
+        from cortex.mcp_server import cortex_forget
+
+        result = _run_async(cortex_forget(entity="Nonexistent Person"))
+        assert "ERROR" in result
+
+
+class TestCortexReview:
+    def test_review_shows_no_candidates(self):
+        """cortex_review with clean graph shows no candidates."""
+        _setup_populated_graph()
         from cortex.mcp_server import cortex_review
 
         result = _run_async(cortex_review())
-        assert "not yet implemented" in result
+        assert "No merge candidates" in result or "candidate" in result.lower()
+
+    def test_review_shows_candidates(self):
+        """cortex_review with duplicates shows candidates."""
+        import cortex.mcp_server as srv
+        from cortex.config import CortexConfig
+        from tests.test_reflection import _build_merge_candidate_graph
+
+        _reset_mcp_globals()
+        kg = _build_merge_candidate_graph()
+        srv._kg = kg
+        srv._config = CortexConfig(merge_alias_overlap_threshold=0.30)
+        srv._graph_initialized = True
+
+        from cortex.mcp_server import cortex_review
+
+        result = _run_async(cortex_review())
+        assert "candidate" in result.lower()
 
 
 # ═══════════════════════════════════════════════════════════════════════════════

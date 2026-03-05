@@ -263,6 +263,21 @@ def _get_stats() -> dict:
     return json.loads(_kg.get_statistics())
 
 
+def _get_llm_client():
+    """Try to create an LLM client from config. Returns None on failure."""
+    _ensure_config()
+    try:
+        if _config.llm_provider == "mlx":
+            from cortex.llm import MLXClient
+            return MLXClient(model=_config.llm_model)
+        else:
+            from cortex.llm import OllamaClient
+            return OllamaClient(model=_config.llm_model)
+    except Exception as e:
+        log.info("LLM not available for reflection: %s", e)
+        return None
+
+
 # ---------------------------------------------------------------------------
 # Read-only tools (9) — require only _ensure_graph()
 # ---------------------------------------------------------------------------
@@ -936,6 +951,21 @@ async def cortex_ingest(path: str) -> str:
                 _auto_save()
                 lines.append("Graph saved.")
 
+                # Lightweight reflection post-ingest
+                if _config and _config.lightweight_reflection_on_ingest:
+                    try:
+                        from cortex.reflection.consolidator import Consolidator
+                        consolidator = Consolidator(
+                            knowledge_graph=_kg,
+                            embedding_manager=_embedding_manager,
+                            config=_config,
+                        )
+                        cleanup = consolidator.run_lightweight()
+                        if cleanup.orphans_removed > 0:
+                            lines.append(f"Post-ingest cleanup: {cleanup.orphans_removed} orphan(s) removed.")
+                    except Exception as e:
+                        log.warning("Post-ingest reflection failed: %s", e)
+
                 return "\n".join(lines)
             return await anyio.to_thread.run_sync(_run)
         except Exception as e:
@@ -1001,43 +1031,174 @@ async def cortex_reingest() -> str:
 
 
 # ---------------------------------------------------------------------------
-# Phase 5 stubs (3)
+# Phase 5: Reflection & consolidation tools (3)
 # ---------------------------------------------------------------------------
 
 @mcp.tool()
-async def cortex_reflect() -> str:
+async def cortex_reflect(mode: str = "full") -> str:
     """Run reflection and consolidation on the knowledge graph.
 
-    (Phase 5 — not yet implemented)
-    Will perform: entity merging, decay scoring, stale evidence detection,
-    and higher-order insight synthesis.
+    Performs entity merging, orphan cleanup, decay scoring, and optionally
+    LLM-powered synthesis. The graph is auto-saved after reflection.
+
+    Args:
+        mode: "full" (all operations), "light" (orphan cleanup only),
+              or "merge" (find and execute merges only).
     """
-    return "cortex_reflect is not yet implemented (Phase 5). Coming soon."
+    async with _get_lock():
+        try:
+            def _run():
+                global _graph_dirty
+                _ensure_graph()
+                _ensure_config()
+
+                from cortex.reflection.consolidator import Consolidator
+                from cortex.reflection.synthesizer import Synthesizer
+
+                llm = _get_llm_client()
+
+                consolidator = Consolidator(
+                    knowledge_graph=_kg,
+                    embedding_manager=_embedding_manager,
+                    config=_config,
+                    llm_client=llm,
+                )
+
+                lines = ["Reflection Results:"]
+
+                if mode == "light":
+                    result = consolidator.run_lightweight()
+                    lines.append(f"  Orphans removed: {result.orphans_removed}")
+                elif mode == "merge":
+                    candidates = consolidator.find_merge_candidates()
+                    confirmed = consolidator.confirm_merges(candidates)
+                    merges = consolidator.execute_merges(confirmed)
+                    lines.append(f"  Merge candidates found: {len(candidates)}")
+                    lines.append(f"  Merges executed: {merges}")
+                else:
+                    # Full mode
+                    result = consolidator.run_full()
+                    lines.append(f"  Merge candidates found: {result.merges_found}")
+                    lines.append(f"  Merges executed: {result.merges_executed}")
+                    lines.append(f"  Orphans removed: {result.orphans_removed}")
+                    lines.append(f"  Entities decayed: {result.entities_decayed}")
+                    lines.append(f"  Low-access entities: {result.entities_flagged_low}")
+
+                    # Run synthesis if LLM available
+                    if llm is not None:
+                        synthesizer = Synthesizer(
+                            knowledge_graph=_kg,
+                            llm_client=llm,
+                            embedding_manager=_embedding_manager,
+                            config=_config,
+                        )
+                        syn_result = synthesizer.run()
+                        lines.append(f"  Entities synthesized: {syn_result.entities_synthesized}")
+                        lines.append(f"  Embeddings refreshed: {syn_result.embeddings_invalidated}")
+                        lines.append(f"  Edges recalculated: {syn_result.edges_updated}")
+                        if syn_result.errors:
+                            for err in syn_result.errors:
+                                lines.append(f"  Warning: {err}")
+
+                    if result.errors:
+                        for err in result.errors:
+                            lines.append(f"  Warning: {err}")
+
+                    lines.append(f"  Duration: {result.duration_seconds:.1f}s")
+
+                _graph_dirty = True
+                _auto_save()
+                lines.append("Graph saved.")
+
+                return "\n".join(lines)
+            return await anyio.to_thread.run_sync(_run)
+        except Exception as e:
+            return f"ERROR: {e}"
 
 
 @mcp.tool()
 async def cortex_forget(entity: str) -> str:
-    """Mark an entity as decayed/archived in the knowledge graph.
+    """Permanently remove an entity from the knowledge graph.
 
-    (Phase 5 — not yet implemented)
-    Will mark the entity for decay, reducing its PageRank weight
-    and eventually archiving it from active queries.
+    Removes the entity and all its co-occurrence edges. Chunks that
+    mention it are kept (they may reference other entities). The graph
+    is auto-saved after removal.
 
     Args:
-        entity: Entity name or UUID to forget.
+        entity: Entity name or UUID to remove.
     """
-    return f"cortex_forget is not yet implemented (Phase 5). Entity '{entity}' unchanged."
+    async with _get_lock():
+        try:
+            def _run():
+                global _graph_dirty
+                _ensure_graph()
+
+                ent = _resolve_entity(entity)
+                entity_id = ent["id"]
+                name = ent["canonical_name"]
+
+                removed = _kg.remove_entity(entity_id)
+                if not removed:
+                    return f"ERROR: Failed to remove entity '{name}' ({entity_id})."
+
+                # Invalidate embedding cache
+                if _embedding_manager is not None:
+                    _embedding_manager.invalidate_entity_cache(entity_id)
+
+                _graph_dirty = True
+                _auto_save()
+
+                return f"Removed entity '{name}' ({entity_id}). Graph saved."
+            return await anyio.to_thread.run_sync(_run)
+        except Exception as e:
+            return f"ERROR: {e}"
 
 
 @mcp.tool()
 async def cortex_review() -> str:
-    """Present the human review queue for ambiguous entity disambiguations.
+    """Show merge candidates for human review.
 
-    (Phase 5 — not yet implemented)
-    Will show entities with disambiguation confidence between 0.70–0.85
-    that need human confirmation to merge or keep separate.
+    Finds entity pairs that might be duplicates based on alias overlap
+    and embedding similarity. Shows candidates with confidence below
+    the auto-approve threshold (< 0.95) that need human judgment.
     """
-    return "cortex_review is not yet implemented (Phase 5). Coming soon."
+    async with _get_lock():
+        try:
+            def _run():
+                _ensure_graph()
+                _ensure_config()
+
+                from cortex.reflection.consolidator import Consolidator
+
+                consolidator = Consolidator(
+                    knowledge_graph=_kg,
+                    embedding_manager=_embedding_manager,
+                    config=_config,
+                )
+
+                candidates = consolidator.find_merge_candidates()
+
+                # Filter to review zone (below auto-approve threshold)
+                review = [c for c in candidates if c.confidence < 0.95]
+
+                if not review:
+                    return "No merge candidates for review. Graph is clean."
+
+                lines = [f"Merge Review Queue ({len(review)} candidate(s)):"]
+                for i, c in enumerate(review, 1):
+                    lines.append(
+                        f"\n  {i}. **{c.keep_name}** ← {c.merge_name}"
+                        f"\n     Confidence: {c.confidence:.2f} — {c.reason}"
+                    )
+
+                lines.append(
+                    "\nUse cortex_reflect(mode='merge') to execute merges, "
+                    "or cortex_forget to remove specific entities."
+                )
+                return "\n".join(lines)
+            return await anyio.to_thread.run_sync(_run)
+        except Exception as e:
+            return f"ERROR: {e}"
 
 
 # ---------------------------------------------------------------------------

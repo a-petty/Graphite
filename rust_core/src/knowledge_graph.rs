@@ -532,6 +532,64 @@ impl KnowledgeGraph {
         }
     }
 
+    // ── Reflection utilities ──
+
+    /// Return all entity IDs in the graph.
+    pub fn all_entity_ids(&self) -> Vec<String> {
+        self.entity_index.keys().cloned().collect()
+    }
+
+    /// Return entity IDs with zero edges (no co-occurrences).
+    pub fn find_orphan_entities(&self) -> Vec<String> {
+        self.graph
+            .node_indices()
+            .filter(|&idx| {
+                self.graph
+                    .edges_directed(idx, petgraph::Direction::Outgoing)
+                    .next()
+                    .is_none()
+                    && self
+                        .graph
+                        .edges_directed(idx, petgraph::Direction::Incoming)
+                        .next()
+                        .is_none()
+            })
+            .filter_map(|idx| self.graph.node_weight(idx).map(|n| n.id.clone()))
+            .collect()
+    }
+
+    /// Recalculate edge weights based on co-occurrence frequency.
+    ///
+    /// For each pair of connected entities, counts the number of parallel
+    /// edges and sets each edge's weight to that count. Returns the number
+    /// of edges updated.
+    pub fn recalculate_edge_weights(&mut self) -> usize {
+        // Count edges per (source, target) pair
+        let mut pair_counts: HashMap<(petgraph::graph::NodeIndex, petgraph::graph::NodeIndex), f32> =
+            HashMap::new();
+        for edge in self.graph.edge_indices() {
+            if let Some((src, tgt)) = self.graph.edge_endpoints(edge) {
+                *pair_counts.entry((src, tgt)).or_default() += 1.0;
+            }
+        }
+
+        // Update weights
+        let mut updated = 0;
+        for edge_idx in self.graph.edge_indices() {
+            if let Some((src, tgt)) = self.graph.edge_endpoints(edge_idx) {
+                if let Some(&count) = pair_counts.get(&(src, tgt)) {
+                    if let Some(edge) = self.graph.edge_weight_mut(edge_idx) {
+                        edge.weight = count;
+                        updated += 1;
+                    }
+                }
+            }
+        }
+
+        self.pagerank_dirty = true;
+        updated
+    }
+
     // ── Export ──
 
     /// Export a subgraph containing the specified entities and their interconnecting edges.

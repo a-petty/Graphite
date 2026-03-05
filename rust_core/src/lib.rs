@@ -777,6 +777,37 @@ impl PyKnowledgeGraph {
         serde_json::to_string(&stats)
             .map_err(|e| PyRuntimeError::new_err(format!("Serialize error: {}", e)))
     }
+
+    /// Remove an entity from the graph. Returns true if entity existed.
+    fn remove_entity(&mut self, entity_id: &str) -> bool {
+        self.kg.remove_entity(entity_id).is_some()
+    }
+
+    /// Get top entities by PageRank. Returns JSON array of EntityNodes.
+    fn get_top_entities(&mut self, limit: usize) -> PyResult<String> {
+        let top = self.kg.get_top_entities(limit);
+        serde_json::to_string(&top)
+            .map_err(|e| PyRuntimeError::new_err(format!("Serialize error: {}", e)))
+    }
+
+    /// Get all entity IDs. Returns JSON array of strings.
+    fn all_entity_ids(&self) -> PyResult<String> {
+        let ids = self.kg.all_entity_ids();
+        serde_json::to_string(&ids)
+            .map_err(|e| PyRuntimeError::new_err(format!("Serialize error: {}", e)))
+    }
+
+    /// Find orphan entities (no edges). Returns JSON array of entity IDs.
+    fn find_orphan_entities(&self) -> PyResult<String> {
+        let orphans = self.kg.find_orphan_entities();
+        serde_json::to_string(&orphans)
+            .map_err(|e| PyRuntimeError::new_err(format!("Serialize error: {}", e)))
+    }
+
+    /// Recalculate edge weights by co-occurrence frequency. Returns count of edges updated.
+    fn recalculate_edge_weights(&mut self) -> usize {
+        self.kg.recalculate_edge_weights()
+    }
 }
 
 

@@ -424,3 +424,73 @@ fn test_export_subgraph() {
         assert!(to == &a_id || to == &b_id);
     }
 }
+
+#[test]
+fn test_all_entity_ids() {
+    let mut kg = make_graph();
+
+    let a = make_entity("A", EntityType::Person);
+    let b = make_entity("B", EntityType::Technology);
+    let a_id = a.id.clone();
+    let b_id = b.id.clone();
+
+    kg.add_entity(a);
+    kg.add_entity(b);
+
+    let ids = kg.all_entity_ids();
+    assert_eq!(ids.len(), 2);
+    assert!(ids.contains(&a_id));
+    assert!(ids.contains(&b_id));
+}
+
+#[test]
+fn test_find_orphan_entities() {
+    let mut kg = make_graph();
+
+    let a = make_entity("Connected", EntityType::Person);
+    let b = make_entity("Also Connected", EntityType::Person);
+    let c = make_entity("Orphan", EntityType::Person);
+    let a_id = a.id.clone();
+    let b_id = b.id.clone();
+    let c_id = c.id.clone();
+
+    kg.add_entity(a);
+    kg.add_entity(b);
+    kg.add_entity(c);
+
+    // Connect A and B, leave C orphaned
+    kg.add_cooccurrence(&a_id, &b_id, make_edge("c1")).unwrap();
+
+    let orphans = kg.find_orphan_entities();
+    assert_eq!(orphans.len(), 1);
+    assert_eq!(orphans[0], c_id);
+}
+
+#[test]
+fn test_recalculate_edge_weights() {
+    let mut kg = make_graph();
+
+    let a = make_entity("A", EntityType::Person);
+    let b = make_entity("B", EntityType::Person);
+    let a_id = a.id.clone();
+    let b_id = b.id.clone();
+
+    kg.add_entity(a);
+    kg.add_entity(b);
+
+    // Add two edges between A and B (simulating co-occurrence in 2 chunks)
+    kg.add_cooccurrence(&a_id, &b_id, make_edge("c1")).unwrap();
+    kg.add_cooccurrence(&a_id, &b_id, make_edge("c2")).unwrap();
+
+    // Before recalculation, each edge has weight from chunk_type
+    let updated = kg.recalculate_edge_weights();
+    // 4 directed edges (2 per add_cooccurrence call, bidirectional)
+    assert_eq!(updated, 4);
+
+    // Each A→B edge should now have weight 2.0 (2 parallel A→B edges)
+    let coocs = kg.get_cooccurrences(&a_id);
+    // All edges pointing to B should have weight reflecting the count
+    for (_, edge) in &coocs {
+        assert!(edge.weight >= 2.0, "Weight should be >= 2.0, got {}", edge.weight);
+    }
+}

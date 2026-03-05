@@ -13,6 +13,7 @@ Covers:
 """
 
 import json
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from unittest.mock import MagicMock, patch
@@ -229,6 +230,109 @@ class FakeKnowledgeGraph:
         # Sort most recent first (None timestamps last)
         tagged.sort(key=lambda c: c.get("timestamp") or 0, reverse=True)
         return json.dumps(tagged)
+
+    def remove_entity(self, entity_id):
+        """Remove entity and its edges. Returns True if entity existed."""
+        if entity_id not in self._entities:
+            return False
+        del self._entities[entity_id]
+        self._edges = [
+            (s, t, e) for s, t, e in self._edges
+            if s != entity_id and t != entity_id
+        ]
+        return True
+
+    def all_entity_ids(self):
+        """Returns JSON array of all entity IDs."""
+        return json.dumps(list(self._entities.keys()))
+
+    def find_orphan_entities(self):
+        """Returns JSON array of entity IDs with no edges."""
+        connected = set()
+        for s, t, _ in self._edges:
+            connected.add(s)
+            connected.add(t)
+        orphans = [eid for eid in self._entities if eid not in connected]
+        return json.dumps(orphans)
+
+    def merge_entities(self, keep_id, merge_id):
+        """Absorb merge entity into keep entity. Returns kept ID."""
+        if keep_id not in self._entities:
+            raise RuntimeError(f"Entity not found: {keep_id}")
+        if merge_id not in self._entities:
+            raise RuntimeError(f"Entity not found: {merge_id}")
+
+        keep = self._entities[keep_id]
+        merge = self._entities[merge_id]
+
+        # Absorb aliases
+        if merge["canonical_name"] not in keep["aliases"]:
+            keep["aliases"].append(merge["canonical_name"])
+        for alias in merge.get("aliases", []):
+            if alias not in keep["aliases"]:
+                keep["aliases"].append(alias)
+
+        # Absorb chunks and docs
+        for c in merge.get("source_chunks", []):
+            if c not in keep["source_chunks"]:
+                keep["source_chunks"].append(c)
+        for d in merge.get("source_documents", []):
+            if d not in keep["source_documents"]:
+                keep["source_documents"].append(d)
+
+        keep["access_count"] = keep.get("access_count", 0) + merge.get("access_count", 0)
+
+        # Redirect edges
+        new_edges = []
+        for s, t, e in self._edges:
+            ns = keep_id if s == merge_id else s
+            nt = keep_id if t == merge_id else t
+            if ns != nt:  # skip self-loops
+                new_edges.append((ns, nt, e))
+        self._edges = new_edges
+
+        # Update chunk tags
+        for chunk in self._chunks.values():
+            if merge_id in chunk.get("tags", []):
+                idx = chunk["tags"].index(merge_id)
+                chunk["tags"][idx] = keep_id
+
+        del self._entities[merge_id]
+        return keep_id
+
+    def get_top_entities(self, limit):
+        """Returns JSON array of entities sorted by rank."""
+        entities = sorted(
+            self._entities.values(),
+            key=lambda e: e.get("rank", 0.0),
+            reverse=True,
+        )[:limit]
+        return json.dumps(entities)
+
+    def recalculate_edge_weights(self):
+        """No-op, returns edge count."""
+        return len(self._edges)
+
+    def store_chunk(self, chunk_json):
+        """Store a chunk from JSON string (matches PyKnowledgeGraph API)."""
+        chunk = json.loads(chunk_json) if isinstance(chunk_json, str) else chunk_json
+        import uuid
+        if "id" not in chunk:
+            chunk["id"] = str(uuid.uuid4())
+        if "created_at" not in chunk:
+            chunk["created_at"] = int(time.time())
+        self._chunks[chunk["id"]] = chunk
+        return chunk["id"]
+
+    def decay_scores(self, half_life_days):
+        """Apply exponential decay to access counts in the fake graph."""
+        import math
+        now = int(time.time())
+        half_life_secs = half_life_days * 86400
+        for entity in self._entities.values():
+            age_secs = now - entity.get("updated_at", now)
+            decay_factor = math.exp(-math.log(2) * age_secs / half_life_secs)
+            entity["access_count"] = round(entity.get("access_count", 0) * decay_factor)
 
     def save(self, path):
         """No-op save for testing."""
