@@ -37,7 +37,7 @@ The transformation follows 8 phases. Track current progress against this list:
 | **Phase 3** | Context assembly adaptation — Anchor & Expand for knowledge, evidence chunk retrieval, temporal filtering, entity summaries | **Complete** |
 | **Phase 4** | MCP server tool redesign — new knowledge-centric tool set | **Complete** |
 | **Phase 5** | Reflection & consolidation — entity merging, decay scoring, stale evidence detection, synthesis | **Complete** |
-| **Phase 6** | Incremental update handling — two-tier document change/delete model | Not started |
+| **Phase 6** | Incremental update handling — two-tier document change/delete model | **Complete** |
 | **Phase 7** | Evaluation framework — synthetic test corpus, benchmark suite, RAG baseline comparison | Not started |
 
 **Update the Status column as phases are completed.** The plan document has full details for each phase.

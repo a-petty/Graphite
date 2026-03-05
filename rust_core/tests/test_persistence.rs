@@ -133,3 +133,24 @@ fn test_export_json() {
     assert!(parsed["chunks"].is_array());
     assert_eq!(parsed["entities"].as_array().unwrap().len(), 2);
 }
+
+#[test]
+fn test_persistence_with_document_hashes() {
+    let dir = tempfile::tempdir().unwrap();
+    let root = dir.path();
+
+    let mut original = make_test_graph(root);
+    original.set_document_hash("standup.md".to_string(), "sha256_abc123".to_string());
+    original.set_document_hash("retro.md".to_string(), "sha256_def456".to_string());
+
+    let store = GraphStore::new(root);
+    store.save(&original).unwrap();
+
+    let loaded = store.load(root).unwrap();
+
+    // Hashes should survive round-trip
+    assert_eq!(loaded.get_document_hash("standup.md"), Some("sha256_abc123"));
+    assert_eq!(loaded.get_document_hash("retro.md"), Some("sha256_def456"));
+    assert_eq!(loaded.tracked_documents().len(), 2);
+    assert!(loaded.get_document_hash("nonexistent.md").is_none());
+}

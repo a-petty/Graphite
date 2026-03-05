@@ -911,6 +911,34 @@ async def cortex_ingest(path: str) -> str:
                     return f"ERROR: Path does not exist: {p}"
 
                 if p.is_file():
+                    # If file was previously ingested, use update path (idempotent)
+                    existing_hash = _kg.get_document_hash(str(p))
+                    if existing_hash is not None:
+                        update_result = _pipeline.update_document(p)
+                        if update_result.action == "unchanged":
+                            return f"Document unchanged (same content hash): {p.name}"
+                        # Format update result
+                        lines = [f"Document Updated: {p.name}"]
+                        lines.append(
+                            f"  Removed: {update_result.chunks_removed} chunks, "
+                            f"{update_result.edges_removed} edges, "
+                            f"{update_result.entities_removed} entities orphaned"
+                        )
+                        if update_result.ingestion_result:
+                            ir = update_result.ingestion_result
+                            ent_count = ir.entities_created + ir.entities_linked
+                            lines.append(
+                                f"  Re-ingested: {ir.chunks_tagged} chunks, "
+                                f"{ent_count} entities, {ir.edges_created} edges "
+                                f"({update_result.duration_seconds:.1f}s)"
+                            )
+                        if update_result.errors:
+                            for err in update_result.errors:
+                                lines.append(f"  ⚠ {err}")
+                        _graph_dirty = True
+                        _auto_save()
+                        lines.append("Graph saved.")
+                        return "\n".join(lines)
                     results = [_pipeline.ingest_file(p)]
                 elif p.is_dir():
                     results = _pipeline.ingest_directory(p)
@@ -1025,6 +1053,124 @@ async def cortex_reingest() -> str:
                     f"{total_chunks} chunks, {total_entities} entities, "
                     f"{total_edges} edges. Graph saved."
                 )
+            return await anyio.to_thread.run_sync(_run)
+        except Exception as e:
+            return f"ERROR: {e}"
+
+
+# ---------------------------------------------------------------------------
+# Phase 6: Incremental update tools (2)
+# ---------------------------------------------------------------------------
+
+@mcp.tool()
+async def cortex_update_document(path: str) -> str:
+    """Update a previously-ingested document in the knowledge graph.
+
+    Compares the file's content hash against the stored hash. If unchanged,
+    returns immediately. If changed, removes old artifacts (chunks, edges,
+    orphaned entities) and re-runs the three-pass extraction pipeline.
+
+    The graph is auto-saved after update.
+
+    Args:
+        path: Absolute or project-relative path to the document file.
+    """
+    async with _get_lock():
+        try:
+            def _run():
+                global _graph_dirty
+                _ensure_pipeline()
+
+                p = Path(path)
+                if not p.is_absolute():
+                    p = _project_root / p
+                p = p.resolve()
+
+                if not p.exists():
+                    return f"ERROR: File does not exist: {p}"
+                if not p.is_file():
+                    return f"ERROR: Path is not a file: {p}"
+
+                update_result = _pipeline.update_document(p)
+
+                if update_result.action == "unchanged":
+                    return f"Document unchanged (same content hash): {p.name}"
+
+                if update_result.action == "failed":
+                    errors = "; ".join(update_result.errors) if update_result.errors else "unknown"
+                    return f"ERROR: Update failed for {p.name}: {errors}"
+
+                lines = [f"Document Updated: {p.name}"]
+                lines.append(
+                    f"  Removed: {update_result.chunks_removed} chunks, "
+                    f"{update_result.edges_removed} edges, "
+                    f"{update_result.entities_removed} entities orphaned"
+                )
+                if update_result.ingestion_result:
+                    ir = update_result.ingestion_result
+                    ent_count = ir.entities_created + ir.entities_linked
+                    lines.append(
+                        f"  Re-ingested: {ir.chunks_tagged} chunks, "
+                        f"{ent_count} entities, {ir.edges_created} edges "
+                        f"({update_result.duration_seconds:.1f}s)"
+                    )
+                if update_result.errors:
+                    for err in update_result.errors:
+                        lines.append(f"  ⚠ {err}")
+
+                _graph_dirty = True
+                _auto_save()
+                lines.append("Graph saved.")
+                return "\n".join(lines)
+            return await anyio.to_thread.run_sync(_run)
+        except Exception as e:
+            return f"ERROR: {e}"
+
+
+@mcp.tool()
+async def cortex_remove_document(path: str) -> str:
+    """Remove a document and all its artifacts from the knowledge graph.
+
+    Cascade-removes the document's chunks, co-occurrence edges, and any
+    entities that were solely sourced from this document. Entities shared
+    with other documents are updated (source list trimmed) but kept.
+
+    The graph is auto-saved after removal.
+
+    Args:
+        path: Absolute or project-relative path to the document.
+    """
+    async with _get_lock():
+        try:
+            def _run():
+                global _graph_dirty
+                _ensure_pipeline()
+
+                p = Path(path)
+                if not p.is_absolute():
+                    p = _project_root / p
+                p = p.resolve()
+
+                result = _pipeline.remove_document(p)
+
+                if result.action == "failed":
+                    errors = "; ".join(result.errors) if result.errors else "unknown"
+                    return f"ERROR: Removal failed for {p.name}: {errors}"
+
+                total_removed = result.chunks_removed + result.edges_removed + result.entities_removed
+                if total_removed == 0:
+                    return f"No artifacts found for document: {p.name}"
+
+                lines = [f"Document Removed: {p.name}"]
+                lines.append(f"  Chunks removed: {result.chunks_removed}")
+                lines.append(f"  Edges removed: {result.edges_removed}")
+                lines.append(f"  Entities removed (orphaned): {result.entities_removed}")
+                lines.append(f"  Entities updated (trimmed): {result.entities_updated}")
+
+                _graph_dirty = True
+                _auto_save()
+                lines.append("Graph saved.")
+                return "\n".join(lines)
             return await anyio.to_thread.run_sync(_run)
         except Exception as e:
             return f"ERROR: {e}"

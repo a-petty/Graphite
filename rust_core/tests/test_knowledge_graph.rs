@@ -3,7 +3,7 @@ use std::path::Path;
 use semantic_engine::chunk::{Chunk, ChunkType, MemoryCategory};
 use semantic_engine::cooccurrence::CoOccurrenceEdge;
 use semantic_engine::entity::{EntityNode, EntityType};
-use semantic_engine::knowledge_graph::KnowledgeGraph;
+use semantic_engine::knowledge_graph::{KnowledgeGraph, DocumentRemovalResult};
 
 fn make_graph() -> KnowledgeGraph {
     KnowledgeGraph::new(Path::new("/tmp/test"))
@@ -493,4 +493,237 @@ fn test_recalculate_edge_weights() {
     for (_, edge) in &coocs {
         assert!(edge.weight >= 2.0, "Weight should be >= 2.0, got {}", edge.weight);
     }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Phase 6: Incremental update tests
+// ═══════════════════════════════════════════════════════════════════════
+
+fn make_entity_with_doc(name: &str, etype: EntityType, doc: &str) -> EntityNode {
+    let mut e = EntityNode::new(name.to_string(), etype);
+    e.source_documents.push(doc.to_string());
+    e
+}
+
+fn make_edge_for_doc(chunk_id: &str, doc: &str) -> CoOccurrenceEdge {
+    CoOccurrenceEdge::new(
+        chunk_id.to_string(),
+        ChunkType::Decision,
+        MemoryCategory::Episodic,
+        Some(1000),
+        doc.to_string(),
+    )
+}
+
+#[test]
+fn test_get_chunks_by_document() {
+    let mut kg = make_graph();
+
+    let c1 = Chunk::new("doc1.md".to_string(), ChunkType::Discussion, MemoryCategory::Episodic, "Chunk 1".to_string());
+    let c2 = Chunk::new("doc1.md".to_string(), ChunkType::Decision, MemoryCategory::Episodic, "Chunk 2".to_string());
+    let c3 = Chunk::new("doc2.md".to_string(), ChunkType::Discussion, MemoryCategory::Episodic, "Chunk 3".to_string());
+
+    kg.store_chunk(c1);
+    kg.store_chunk(c2);
+    kg.store_chunk(c3);
+
+    let doc1_chunks = kg.get_chunks_by_document("doc1.md");
+    assert_eq!(doc1_chunks.len(), 2);
+
+    let doc2_chunks = kg.get_chunks_by_document("doc2.md");
+    assert_eq!(doc2_chunks.len(), 1);
+
+    let no_chunks = kg.get_chunks_by_document("nonexistent.md");
+    assert!(no_chunks.is_empty());
+}
+
+#[test]
+fn test_remove_document_chunks_and_edges() {
+    let mut kg = make_graph();
+
+    // Two documents, each with entities, chunks, and edges
+    let mut alice = make_entity_with_doc("Alice", EntityType::Person, "doc1.md");
+    let mut bob = make_entity_with_doc("Bob", EntityType::Person, "doc1.md");
+    let mut charlie = make_entity_with_doc("Charlie", EntityType::Person, "doc2.md");
+    let alice_id = alice.id.clone();
+    let bob_id = bob.id.clone();
+    let charlie_id = charlie.id.clone();
+
+    kg.add_entity(alice);
+    kg.add_entity(bob);
+    kg.add_entity(charlie);
+
+    // Chunks for doc1
+    let mut c1 = Chunk::new("doc1.md".to_string(), ChunkType::Decision, MemoryCategory::Episodic, "Alice and Bob.".to_string());
+    let c1_id = c1.id.clone();
+    c1.tags = vec![alice_id.clone(), bob_id.clone()];
+    kg.store_chunk(c1);
+
+    // Chunks for doc2
+    let mut c2 = Chunk::new("doc2.md".to_string(), ChunkType::Discussion, MemoryCategory::Episodic, "Charlie here.".to_string());
+    c2.tags = vec![charlie_id.clone()];
+    kg.store_chunk(c2);
+
+    // Edges for doc1
+    kg.add_cooccurrence(&alice_id, &bob_id, make_edge_for_doc(&c1_id, "doc1.md")).unwrap();
+
+    // Remove doc1
+    let result = kg.remove_document("doc1.md");
+    assert_eq!(result.chunks_removed, 1);
+    assert_eq!(result.edges_removed, 2); // bidirectional
+    assert_eq!(result.entities_removed, 2); // Alice and Bob (sole-source)
+
+    // doc2 should be intact
+    assert_eq!(kg.chunk_count(), 1);
+    assert!(kg.get_entity(&charlie_id).is_some());
+    assert!(kg.get_entity(&alice_id).is_none());
+    assert!(kg.get_entity(&bob_id).is_none());
+}
+
+#[test]
+fn test_remove_document_entity_cleanup() {
+    let mut kg = make_graph();
+
+    // "Shared" entity appears in both doc1 and doc2
+    let mut shared = EntityNode::new("Shared".to_string(), EntityType::Concept);
+    shared.source_documents.push("doc1.md".to_string());
+    shared.source_documents.push("doc2.md".to_string());
+    let shared_id = shared.id.clone();
+
+    // "Sole" entity only in doc1
+    let mut sole = make_entity_with_doc("Sole", EntityType::Person, "doc1.md");
+    let sole_id = sole.id.clone();
+
+    kg.add_entity(shared);
+    kg.add_entity(sole);
+
+    let mut c1 = Chunk::new("doc1.md".to_string(), ChunkType::Decision, MemoryCategory::Episodic, "text".to_string());
+    let c1_id = c1.id.clone();
+    c1.tags = vec![shared_id.clone(), sole_id.clone()];
+    kg.store_chunk(c1);
+
+    kg.add_cooccurrence(&shared_id, &sole_id, make_edge_for_doc(&c1_id, "doc1.md")).unwrap();
+
+    let result = kg.remove_document("doc1.md");
+    assert_eq!(result.chunks_removed, 1);
+    assert_eq!(result.entities_removed, 1); // sole removed
+    assert_eq!(result.entities_updated, 1); // shared updated
+
+    // Shared still exists but source_documents trimmed
+    let shared_entity = kg.get_entity(&shared_id).unwrap();
+    assert!(!shared_entity.source_documents.contains(&"doc1.md".to_string()));
+    assert!(shared_entity.source_documents.contains(&"doc2.md".to_string()));
+
+    // Sole is gone
+    assert!(kg.get_entity(&sole_id).is_none());
+}
+
+#[test]
+fn test_remove_document_entity_with_remaining_edges() {
+    let mut kg = make_graph();
+
+    // Entity sourced only from doc1, but has edges from doc2
+    let mut entity = make_entity_with_doc("EdgeKeeper", EntityType::Person, "doc1.md");
+    let entity_id = entity.id.clone();
+
+    let other = make_entity_with_doc("Other", EntityType::Person, "doc2.md");
+    let other_id = other.id.clone();
+
+    kg.add_entity(entity);
+    kg.add_entity(other);
+
+    // Chunk from doc1
+    let mut c1 = Chunk::new("doc1.md".to_string(), ChunkType::Decision, MemoryCategory::Episodic, "text".to_string());
+    let c1_id = c1.id.clone();
+    c1.tags = vec![entity_id.clone()];
+    kg.store_chunk(c1);
+
+    // Edge from doc2 connecting entity and other
+    let mut c2 = Chunk::new("doc2.md".to_string(), ChunkType::Discussion, MemoryCategory::Episodic, "text".to_string());
+    let c2_id = c2.id.clone();
+    c2.tags = vec![entity_id.clone(), other_id.clone()];
+    kg.store_chunk(c2);
+    kg.add_cooccurrence(&entity_id, &other_id, make_edge_for_doc(&c2_id, "doc2.md")).unwrap();
+
+    let result = kg.remove_document("doc1.md");
+    assert_eq!(result.chunks_removed, 1);
+    assert_eq!(result.entities_removed, 0); // entity kept because of edges from doc2
+    assert_eq!(result.entities_updated, 1);
+    assert!(kg.get_entity(&entity_id).is_some());
+}
+
+#[test]
+fn test_remove_document_empty() {
+    let mut kg = make_graph();
+
+    let result = kg.remove_document("nonexistent.md");
+    assert_eq!(result.chunks_removed, 0);
+    assert_eq!(result.edges_removed, 0);
+    assert_eq!(result.entities_removed, 0);
+    assert_eq!(result.entities_updated, 0);
+}
+
+#[test]
+fn test_remove_document_swap_remove_safety() {
+    let mut kg = make_graph();
+
+    // Create 5 entities, all from the same document — removing them all
+    // exercises the swap-remove path multiple times
+    let mut ids = Vec::new();
+    for i in 0..5 {
+        let e = make_entity_with_doc(&format!("Entity{}", i), EntityType::Person, "doc1.md");
+        ids.push(e.id.clone());
+        kg.add_entity(e);
+    }
+
+    // Chunks tagging various entities
+    for i in 0..5 {
+        let mut c = Chunk::new("doc1.md".to_string(), ChunkType::Discussion, MemoryCategory::Episodic, format!("Chunk {}", i));
+        c.tags = vec![ids[i].clone()];
+        kg.store_chunk(c);
+    }
+
+    let result = kg.remove_document("doc1.md");
+    assert_eq!(result.chunks_removed, 5);
+    assert_eq!(result.entities_removed, 5);
+    assert_eq!(kg.entity_count(), 0);
+    assert_eq!(kg.chunk_count(), 0);
+
+    // Graph should be in a consistent state — no dangling references
+    let orphans = kg.find_orphan_entities();
+    assert!(orphans.is_empty());
+    let all_ids = kg.all_entity_ids();
+    assert!(all_ids.is_empty());
+}
+
+#[test]
+fn test_document_hash_crud() {
+    let mut kg = make_graph();
+
+    // Initially no hashes
+    assert!(kg.get_document_hash("doc1.md").is_none());
+    assert!(kg.tracked_documents().is_empty());
+
+    // Set hash
+    kg.set_document_hash("doc1.md".to_string(), "abc123".to_string());
+    assert_eq!(kg.get_document_hash("doc1.md"), Some("abc123"));
+
+    // Update hash
+    kg.set_document_hash("doc1.md".to_string(), "def456".to_string());
+    assert_eq!(kg.get_document_hash("doc1.md"), Some("def456"));
+
+    // Add another
+    kg.set_document_hash("doc2.md".to_string(), "ghi789".to_string());
+    let tracked = kg.tracked_documents();
+    assert_eq!(tracked.len(), 2);
+
+    // Remove hash
+    let removed = kg.remove_document_hash("doc1.md");
+    assert_eq!(removed, Some("def456".to_string()));
+    assert!(kg.get_document_hash("doc1.md").is_none());
+    assert_eq!(kg.tracked_documents().len(), 1);
+
+    // Remove non-existent
+    let removed = kg.remove_document_hash("nonexistent.md");
+    assert!(removed.is_none());
 }

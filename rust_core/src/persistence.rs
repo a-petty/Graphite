@@ -18,6 +18,8 @@ struct KnowledgeGraphState {
     entities: Vec<EntityNode>,
     edges: Vec<(usize, usize, CoOccurrenceEdge)>,
     chunks: Vec<Chunk>,
+    #[serde(default)]
+    document_hashes: HashMap<String, String>,
 }
 
 /// Handles saving and loading KnowledgeGraph to/from disk via MessagePack.
@@ -123,6 +125,7 @@ impl GraphStore {
             entities,
             edges,
             chunks,
+            document_hashes: graph.document_hashes().clone(),
         }
     }
 
@@ -148,6 +151,7 @@ impl GraphStore {
         let mut kg = KnowledgeGraph::new(root_path);
         kg.set_graph(petgraph);
         kg.set_chunks(chunks);
+        kg.set_document_hashes(state.document_hashes);
         kg.rebuild_indexes();
         kg
     }

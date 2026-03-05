@@ -18,6 +18,15 @@ pub struct SubgraphResult {
     pub chunks: Vec<Chunk>,
 }
 
+/// Result of removing a document and cascading cleanup.
+#[derive(Debug, Serialize, Deserialize)]
+pub struct DocumentRemovalResult {
+    pub chunks_removed: usize,
+    pub edges_removed: usize,
+    pub entities_removed: usize,
+    pub entities_updated: usize,
+}
+
 /// Statistics about the knowledge graph.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct KnowledgeGraphStatistics {
@@ -39,6 +48,7 @@ pub struct KnowledgeGraph {
     tag_index: TagIndex,
     pagerank_dirty: bool,
     root_path: PathBuf,
+    document_hashes: HashMap<String, String>,
 }
 
 impl KnowledgeGraph {
@@ -52,6 +62,7 @@ impl KnowledgeGraph {
             tag_index: TagIndex::new(),
             pagerank_dirty: true,
             root_path: root_path.to_path_buf(),
+            document_hashes: HashMap::new(),
         }
     }
 
@@ -315,6 +326,148 @@ impl KnowledgeGraph {
             .collect();
         chunks.sort_by_key(|c| c.timestamp.unwrap_or(c.created_at));
         chunks
+    }
+
+    // ── Document-level operations ──
+
+    /// Get all chunks belonging to a specific document.
+    pub fn get_chunks_by_document(&self, document: &str) -> Vec<&Chunk> {
+        self.chunks
+            .values()
+            .filter(|c| c.source_document == document)
+            .collect()
+    }
+
+    /// Remove a document and cascade-clean all its artifacts:
+    /// chunks, orphaned edges, and orphaned entities.
+    pub fn remove_document(&mut self, document: &str) -> DocumentRemovalResult {
+        // 1. Collect chunk IDs for this document
+        let chunk_ids: std::collections::HashSet<String> = self
+            .chunks
+            .values()
+            .filter(|c| c.source_document == document)
+            .map(|c| c.id.clone())
+            .collect();
+
+        let chunks_removed = chunk_ids.len();
+
+        // 2. Remove edges whose chunk_id is in the document's chunk set
+        let mut edges_to_remove = Vec::new();
+        for edge_idx in self.graph.edge_indices() {
+            if let Some(edge) = self.graph.edge_weight(edge_idx) {
+                if chunk_ids.contains(&edge.chunk_id) {
+                    edges_to_remove.push(edge_idx);
+                }
+            }
+        }
+        // Remove in reverse index order to avoid invalidation
+        edges_to_remove.sort_by(|a, b| b.cmp(a));
+        for edge_idx in &edges_to_remove {
+            self.graph.remove_edge(*edge_idx);
+        }
+        let edges_removed = edges_to_remove.len();
+
+        // 3. Remove chunks from chunk store
+        for cid in &chunk_ids {
+            self.chunks.remove(cid);
+        }
+
+        // 4. Update entities: trim source_documents and source_chunks.
+        //    First pass: mutate nodes. Second pass (read-only): check edges.
+        let mut entities_maybe_orphaned: Vec<(NodeIndex, String)> = Vec::new();
+        let mut entities_updated = 0usize;
+
+        for idx in self.graph.node_indices() {
+            let node = &mut self.graph[idx];
+            let had_doc = node.source_documents.contains(&document.to_string());
+            if !had_doc {
+                continue;
+            }
+
+            // Trim this document from source_documents
+            node.source_documents.retain(|d| d != document);
+            // Trim chunks belonging to this document
+            node.source_chunks.retain(|c| !chunk_ids.contains(c));
+
+            if node.source_documents.is_empty() && node.source_chunks.is_empty() {
+                entities_maybe_orphaned.push((idx, node.id.clone()));
+            } else {
+                entities_updated += 1;
+            }
+        }
+
+        // Second pass: check edges for possibly-orphaned entities (immutable borrow)
+        let mut entities_to_remove = Vec::new();
+        for (idx, eid) in entities_maybe_orphaned {
+            let has_edges = self
+                .graph
+                .edges_directed(idx, petgraph::Direction::Outgoing)
+                .next()
+                .is_some()
+                || self
+                    .graph
+                    .edges_directed(idx, petgraph::Direction::Incoming)
+                    .next()
+                    .is_some();
+            if !has_edges {
+                entities_to_remove.push(eid);
+            } else {
+                entities_updated += 1;
+            }
+        }
+
+        // 5. Remove queued entities (collected first, removed second)
+        let entities_removed = entities_to_remove.len();
+        for eid in entities_to_remove {
+            self.remove_entity(&eid);
+        }
+
+        // 6. Remove document from tag_index.document_to_entities
+        self.tag_index.document_to_entities.remove(document);
+
+        // 7. Mark pagerank dirty
+        if chunks_removed > 0 || edges_removed > 0 || entities_removed > 0 {
+            self.pagerank_dirty = true;
+        }
+
+        DocumentRemovalResult {
+            chunks_removed,
+            edges_removed,
+            entities_removed,
+            entities_updated,
+        }
+    }
+
+    // ── Document hash tracking ──
+
+    /// Get the stored content hash for a document.
+    pub fn get_document_hash(&self, document: &str) -> Option<&str> {
+        self.document_hashes.get(document).map(|s| s.as_str())
+    }
+
+    /// Store a content hash for a document.
+    pub fn set_document_hash(&mut self, document: String, hash: String) {
+        self.document_hashes.insert(document, hash);
+    }
+
+    /// Remove and return the content hash for a document.
+    pub fn remove_document_hash(&mut self, document: &str) -> Option<String> {
+        self.document_hashes.remove(document)
+    }
+
+    /// Get all tracked document paths.
+    pub fn tracked_documents(&self) -> Vec<&str> {
+        self.document_hashes.keys().map(|s| s.as_str()).collect()
+    }
+
+    /// Get reference to document_hashes (for persistence).
+    pub fn document_hashes(&self) -> &HashMap<String, String> {
+        &self.document_hashes
+    }
+
+    /// Set document_hashes (for persistence loading).
+    pub fn set_document_hashes(&mut self, hashes: HashMap<String, String>) {
+        self.document_hashes = hashes;
     }
 
     // ── Query / traversal ──

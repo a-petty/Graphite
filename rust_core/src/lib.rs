@@ -808,6 +808,43 @@ impl PyKnowledgeGraph {
     fn recalculate_edge_weights(&mut self) -> usize {
         self.kg.recalculate_edge_weights()
     }
+
+    /// Remove a document and cascade-clean its chunks, edges, and orphaned entities.
+    /// Returns JSON DocumentRemovalResult.
+    fn remove_document(&mut self, document: &str) -> PyResult<String> {
+        let result = self.kg.remove_document(document);
+        serde_json::to_string(&result)
+            .map_err(|e| PyRuntimeError::new_err(format!("Serialize error: {}", e)))
+    }
+
+    /// Get all chunks belonging to a document. Returns JSON array.
+    fn get_chunks_by_document(&self, document: &str) -> PyResult<String> {
+        let chunks = self.kg.get_chunks_by_document(document);
+        serde_json::to_string(&chunks)
+            .map_err(|e| PyRuntimeError::new_err(format!("Serialize error: {}", e)))
+    }
+
+    /// Get the stored content hash for a document.
+    fn get_document_hash(&self, document: &str) -> Option<String> {
+        self.kg.get_document_hash(document).map(|s| s.to_string())
+    }
+
+    /// Store a content hash for a document.
+    fn set_document_hash(&mut self, document: &str, hash: &str) {
+        self.kg.set_document_hash(document.to_string(), hash.to_string());
+    }
+
+    /// Remove the content hash for a document. Returns true if hash existed.
+    fn remove_document_hash(&mut self, document: &str) -> bool {
+        self.kg.remove_document_hash(document).is_some()
+    }
+
+    /// Get all tracked document paths. Returns JSON array.
+    fn tracked_documents(&self) -> PyResult<String> {
+        let docs = self.kg.tracked_documents();
+        serde_json::to_string(&docs)
+            .map_err(|e| PyRuntimeError::new_err(format!("Serialize error: {}", e)))
+    }
 }
 
 

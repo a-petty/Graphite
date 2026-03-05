@@ -455,6 +455,103 @@ class TestAssembleMemory:
 # ═══════════════════════════════════════════════════════════════════════════════
 
 
+class TestCortexUpdateDocument:
+    def test_update_document_changed(self, tmp_path):
+        """cortex_update_document returns update results when content changed."""
+        import cortex.mcp_server as srv
+        from cortex.ingestion.pipeline import DocumentUpdateResult, IngestionResult
+
+        _setup_populated_graph()
+        srv._project_root = tmp_path
+
+        doc = tmp_path / "test.md"
+        doc.write_text("# Updated content\nNew stuff here")
+
+        mock_pipeline = MagicMock()
+        mock_pipeline.update_document.return_value = DocumentUpdateResult(
+            source_document=str(doc),
+            action="updated",
+            chunks_removed=2,
+            edges_removed=4,
+            entities_removed=1,
+            entities_updated=1,
+            ingestion_result=IngestionResult(
+                source_document=str(doc),
+                status="complete",
+                chunks_tagged=3,
+                entities_created=2,
+                entities_linked=1,
+                edges_created=2,
+                duration_seconds=0.5,
+            ),
+            duration_seconds=0.8,
+        )
+        srv._pipeline = mock_pipeline
+        srv._kg.save = MagicMock()
+
+        from cortex.mcp_server import cortex_update_document
+
+        result = _run_async(cortex_update_document(path=str(doc)))
+        assert "Document Updated" in result
+        assert "2 chunks" in result
+        assert "4 edges" in result
+        mock_pipeline.update_document.assert_called_once()
+
+    def test_update_document_unchanged(self, tmp_path):
+        """cortex_update_document returns 'unchanged' message."""
+        import cortex.mcp_server as srv
+        from cortex.ingestion.pipeline import DocumentUpdateResult
+
+        _setup_populated_graph()
+        srv._project_root = tmp_path
+
+        doc = tmp_path / "test.md"
+        doc.write_text("# Same content")
+
+        mock_pipeline = MagicMock()
+        mock_pipeline.update_document.return_value = DocumentUpdateResult(
+            source_document=str(doc),
+            action="unchanged",
+        )
+        srv._pipeline = mock_pipeline
+
+        from cortex.mcp_server import cortex_update_document
+
+        result = _run_async(cortex_update_document(path=str(doc)))
+        assert "unchanged" in result.lower()
+
+
+class TestCortexRemoveDocument:
+    def test_remove_document(self, tmp_path):
+        """cortex_remove_document returns removal stats."""
+        import cortex.mcp_server as srv
+        from cortex.ingestion.pipeline import DocumentUpdateResult
+
+        _setup_populated_graph()
+        srv._project_root = tmp_path
+
+        mock_pipeline = MagicMock()
+        mock_pipeline.remove_document.return_value = DocumentUpdateResult(
+            source_document=str(tmp_path / "old.md"),
+            action="removed",
+            chunks_removed=3,
+            edges_removed=6,
+            entities_removed=2,
+            entities_updated=1,
+        )
+        srv._pipeline = mock_pipeline
+        srv._kg.save = MagicMock()
+
+        from cortex.mcp_server import cortex_remove_document
+
+        result = _run_async(cortex_remove_document(path=str(tmp_path / "old.md")))
+        assert "Document Removed" in result
+        assert "Chunks removed: 3" in result
+        assert "Edges removed: 6" in result
+        assert "Entities removed (orphaned): 2" in result
+        mock_pipeline.remove_document.assert_called_once()
+
+
 class TestCortexIngest:
     def test_ingest_calls_pipeline(self, tmp_path):
         """cortex_ingest runs the pipeline and auto-saves."""
@@ -487,6 +584,35 @@ class TestCortexIngest:
         assert "complete" in result
         assert "3 chunks" in result
         mock_pipeline.ingest_file.assert_called_once()
+
+    def test_ingest_idempotent(self, tmp_path):
+        """Second ingest of same file uses update path when hash exists."""
+        import cortex.mcp_server as srv
+        from cortex.ingestion.pipeline import DocumentUpdateResult
+
+        _setup_populated_graph()
+        srv._project_root = tmp_path
+
+        doc = tmp_path / "test.md"
+        doc.write_text("# Test\nSome content")
+
+        # Simulate that this file was previously ingested (hash exists)
+        srv._kg._document_hashes[str(doc)] = "some_old_hash"
+
+        mock_pipeline = MagicMock()
+        mock_pipeline.update_document.return_value = DocumentUpdateResult(
+            source_document=str(doc),
+            action="unchanged",
+        )
+        srv._pipeline = mock_pipeline
+
+        from cortex.mcp_server import cortex_ingest
+
+        result = _run_async(cortex_ingest(path=str(doc)))
+        assert "unchanged" in result.lower()
+        # update_document should have been called, NOT ingest_file
+        mock_pipeline.update_document.assert_called_once()
+        mock_pipeline.ingest_file.assert_not_called()
 
     def test_ingest_nonexistent_path(self):
         """cortex_ingest returns error for nonexistent path."""

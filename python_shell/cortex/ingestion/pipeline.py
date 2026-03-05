@@ -9,6 +9,7 @@ Filler chunks are discarded between Pass 2 and Pass 3.
 Co-occurrence edges are created for all entity pairs within each chunk.
 """
 
+import hashlib
 import json
 import logging
 import time
@@ -65,6 +66,28 @@ class IngestionResult:
     edges_created: int = 0
     duration_seconds: float = 0.0
     errors: List[str] = field(default_factory=list)
+
+
+@dataclass
+class DocumentUpdateResult:
+    """Summary of an incremental document update or removal."""
+
+    source_document: str
+    action: str = "unchanged"  # "updated" | "removed" | "unchanged" | "failed"
+    chunks_removed: int = 0
+    edges_removed: int = 0
+    entities_removed: int = 0
+    entities_updated: int = 0
+    ingestion_result: Optional[IngestionResult] = None
+    duration_seconds: float = 0.0
+    errors: List[str] = field(default_factory=list)
+
+
+def _compute_file_hash(file_path: Path) -> str:
+    """Compute SHA-256 hash of a file's contents."""
+    h = hashlib.sha256()
+    h.update(file_path.read_bytes())
+    return h.hexdigest()
 
 
 class IngestionPipeline:
@@ -126,6 +149,7 @@ class IngestionPipeline:
 
         if not text.strip():
             result.status = "complete"
+            self._store_hash(file_path)
             result.duration_seconds = time.time() - start_time
             return result
 
@@ -147,6 +171,7 @@ class IngestionPipeline:
 
         if not raw_chunks:
             result.status = "complete"
+            self._store_hash(file_path)
             result.duration_seconds = time.time() - start_time
             return result
 
@@ -172,6 +197,7 @@ class IngestionPipeline:
 
         if not classified_chunks:
             result.status = "complete"
+            self._store_hash(file_path)
             result.duration_seconds = time.time() - start_time
             return result
 
@@ -208,6 +234,7 @@ class IngestionPipeline:
             return result
 
         result.status = "complete" if result.chunks_failed == 0 else "partial"
+        self._store_hash(file_path)
         result.duration_seconds = time.time() - start_time
         return result
 
@@ -243,6 +270,106 @@ class IngestionPipeline:
             )
 
         return results
+
+    def _store_hash(self, file_path: Path) -> None:
+        """Store content hash for a successfully processed file."""
+        try:
+            content_hash = _compute_file_hash(file_path)
+            self.kg.set_document_hash(str(file_path), content_hash)
+        except Exception as e:
+            logger.warning("Failed to store document hash: %s", e)
+
+    def update_document(self, file_path: Path) -> DocumentUpdateResult:
+        """Update a previously-ingested document (remove old data + re-ingest).
+
+        If the file content hasn't changed (same hash), returns action="unchanged".
+
+        Args:
+            file_path: Path to the document to update.
+
+        Returns:
+            DocumentUpdateResult with removal + re-ingestion stats.
+        """
+        start_time = time.time()
+        doc_str = str(file_path)
+        result = DocumentUpdateResult(source_document=doc_str)
+
+        if not file_path.exists():
+            result.action = "failed"
+            result.errors.append(f"File does not exist: {file_path}")
+            result.duration_seconds = time.time() - start_time
+            return result
+
+        # Check content hash
+        try:
+            new_hash = _compute_file_hash(file_path)
+        except Exception as e:
+            result.action = "failed"
+            result.errors.append(f"Failed to compute file hash: {e}")
+            result.duration_seconds = time.time() - start_time
+            return result
+
+        old_hash = self.kg.get_document_hash(doc_str)
+        if old_hash is not None and old_hash == new_hash:
+            result.action = "unchanged"
+            result.duration_seconds = time.time() - start_time
+            return result
+
+        # Remove old artifacts
+        try:
+            removal_json = self.kg.remove_document(doc_str)
+            removal = json.loads(removal_json)
+            result.chunks_removed = removal.get("chunks_removed", 0)
+            result.edges_removed = removal.get("edges_removed", 0)
+            result.entities_removed = removal.get("entities_removed", 0)
+            result.entities_updated = removal.get("entities_updated", 0)
+        except Exception as e:
+            logger.warning("Failed to remove old document data: %s", e)
+            result.errors.append(f"Removal failed: {e}")
+
+        # Re-ingest
+        ingestion_result = self.ingest_file(file_path)
+        result.ingestion_result = ingestion_result
+
+        if ingestion_result.status == "failed":
+            result.action = "failed"
+            result.errors.extend(ingestion_result.errors)
+        else:
+            result.action = "updated"
+
+        result.duration_seconds = time.time() - start_time
+        return result
+
+    def remove_document(self, file_path: Path) -> DocumentUpdateResult:
+        """Remove all artifacts for a document from the knowledge graph.
+
+        Args:
+            file_path: Path to the document to remove.
+
+        Returns:
+            DocumentUpdateResult with removal stats.
+        """
+        start_time = time.time()
+        doc_str = str(file_path)
+        result = DocumentUpdateResult(source_document=doc_str)
+
+        try:
+            removal_json = self.kg.remove_document(doc_str)
+            removal = json.loads(removal_json)
+            result.chunks_removed = removal.get("chunks_removed", 0)
+            result.edges_removed = removal.get("edges_removed", 0)
+            result.entities_removed = removal.get("entities_removed", 0)
+            result.entities_updated = removal.get("entities_updated", 0)
+            result.action = "removed"
+        except Exception as e:
+            result.action = "failed"
+            result.errors.append(f"Removal failed: {e}")
+
+        # Clean up hash
+        self.kg.remove_document_hash(doc_str)
+
+        result.duration_seconds = time.time() - start_time
+        return result
 
     def _write_to_graph(
         self,

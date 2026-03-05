@@ -55,6 +55,7 @@ class FakeKnowledgeGraph:
         self._chunks = {}     # id -> chunk dict
         self._edges = []      # [(source_id, target_id, edge_dict), ...]
         self._pagerank_computed = False
+        self._document_hashes = {}  # document path -> content hash
 
     def add_test_entity(
         self, entity_id, canonical_name, entity_type="Person",
@@ -337,6 +338,92 @@ class FakeKnowledgeGraph:
     def save(self, path):
         """No-op save for testing."""
         pass
+
+    def remove_document(self, document):
+        """Remove a document and cascade-clean its chunks, edges, and orphaned entities.
+
+        Returns JSON DocumentRemovalResult matching the Rust API.
+        """
+        # Collect chunk IDs for this document
+        chunk_ids = {
+            cid for cid, c in self._chunks.items()
+            if c.get("source_document") == document
+        }
+        chunks_removed = len(chunk_ids)
+
+        # Remove edges whose chunk_id is in the document's chunk set
+        edges_before = len(self._edges)
+        self._edges = [
+            (s, t, e) for s, t, e in self._edges
+            if e.get("chunk_id") not in chunk_ids
+        ]
+        edges_removed = edges_before - len(self._edges)
+
+        # Remove chunks
+        for cid in chunk_ids:
+            del self._chunks[cid]
+
+        # Update entities
+        entities_to_remove = []
+        entities_updated = 0
+        for eid, entity in list(self._entities.items()):
+            if document not in entity.get("source_documents", []):
+                continue
+            entity["source_documents"] = [
+                d for d in entity["source_documents"] if d != document
+            ]
+            entity["source_chunks"] = [
+                c for c in entity.get("source_chunks", []) if c not in chunk_ids
+            ]
+            if not entity["source_documents"] and not entity.get("source_chunks"):
+                # Check for remaining edges
+                has_edges = any(
+                    s == eid or t == eid for s, t, _ in self._edges
+                )
+                if not has_edges:
+                    entities_to_remove.append(eid)
+                else:
+                    entities_updated += 1
+            else:
+                entities_updated += 1
+
+        entities_removed = len(entities_to_remove)
+        for eid in entities_to_remove:
+            del self._entities[eid]
+
+        return json.dumps({
+            "chunks_removed": chunks_removed,
+            "edges_removed": edges_removed,
+            "entities_removed": entities_removed,
+            "entities_updated": entities_updated,
+        })
+
+    def get_chunks_by_document(self, document):
+        """Get all chunks belonging to a document. Returns JSON array."""
+        chunks = [
+            c for c in self._chunks.values()
+            if c.get("source_document") == document
+        ]
+        return json.dumps(chunks)
+
+    def get_document_hash(self, document):
+        """Get stored content hash for a document, or None."""
+        return self._document_hashes.get(document)
+
+    def set_document_hash(self, document, hash_val):
+        """Store a content hash for a document."""
+        self._document_hashes[document] = hash_val
+
+    def remove_document_hash(self, document):
+        """Remove the content hash for a document. Returns True if existed."""
+        if document in self._document_hashes:
+            del self._document_hashes[document]
+            return True
+        return False
+
+    def tracked_documents(self):
+        """Get all tracked document paths. Returns JSON array."""
+        return json.dumps(list(self._document_hashes.keys()))
 
     def get_statistics(self):
         """Returns JSON statistics."""
