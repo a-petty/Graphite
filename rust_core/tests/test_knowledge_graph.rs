@@ -727,3 +727,145 @@ fn test_document_hash_crud() {
     let removed = kg.remove_document_hash("nonexistent.md");
     assert!(removed.is_none());
 }
+
+// ═══════════════════════════════════════════════════════════════════════
+// Bug fix tests
+// ═══════════════════════════════════════════════════════════════════════
+
+#[test]
+fn test_query_neighborhood_excludes_none_timestamp() {
+    // Bug #3: edges with timestamp=None should be excluded when a time filter is active
+    let mut kg = make_graph();
+
+    let a = make_entity("A", EntityType::Person);
+    let b = make_entity("B", EntityType::Person);
+    let c = make_entity("C", EntityType::Person);
+    let a_id = a.id.clone();
+    let b_id = b.id.clone();
+    let c_id = c.id.clone();
+
+    kg.add_entity(a);
+    kg.add_entity(b);
+    kg.add_entity(c);
+
+    // Edge A→B with timestamp=500 (in range)
+    let mut edge_ab = make_edge("c1");
+    edge_ab.timestamp = Some(500);
+    kg.add_cooccurrence(&a_id, &b_id, edge_ab).unwrap();
+
+    // Edge A→C with timestamp=None (should be excluded by time filter)
+    let mut edge_ac = CoOccurrenceEdge::new(
+        "c2".to_string(), ChunkType::Discussion, MemoryCategory::Episodic,
+        None, "doc.md".to_string(),
+    );
+    kg.add_cooccurrence(&a_id, &c_id, edge_ac).unwrap();
+
+    // Query with time filter — C should NOT be reached via the None-timestamp edge
+    let result = kg.query_neighborhood(&a_id, 1, Some(0), Some(1000));
+    let names: Vec<&str> = result.entities.iter().map(|e| e.canonical_name.as_str()).collect();
+    assert!(names.contains(&"A"));
+    assert!(names.contains(&"B"));
+    assert!(!names.contains(&"C"), "C should be excluded: its edge has no timestamp");
+
+    // Without time filter, C should be reachable
+    let result_no_filter = kg.query_neighborhood(&a_id, 1, None, None);
+    let names: Vec<&str> = result_no_filter.entities.iter().map(|e| e.canonical_name.as_str()).collect();
+    assert!(names.contains(&"C"), "C should be reachable without time filter");
+}
+
+#[test]
+fn test_add_cooccurrence_rejects_self_loop() {
+    // Bug #2: self-loops should be rejected
+    let mut kg = make_graph();
+
+    let entity = make_entity("Alice", EntityType::Person);
+    let id = entity.id.clone();
+    kg.add_entity(entity);
+
+    let edge = make_edge("c1");
+    let result = kg.add_cooccurrence(&id, &id, edge);
+    assert!(result.is_err(), "Self-loop should be rejected");
+    assert!(result.unwrap_err().contains("self-loop"));
+    assert_eq!(kg.edge_count(), 0, "No edges should be added");
+}
+
+#[test]
+fn test_store_chunk_populates_entity_source_chunks() {
+    // Bug #9: store_chunk should update tagged entities' source_chunks
+    let mut kg = make_graph();
+
+    let alice = make_entity("Alice", EntityType::Person);
+    let bob = make_entity("Bob", EntityType::Person);
+    let alice_id = alice.id.clone();
+    let bob_id = bob.id.clone();
+    kg.add_entity(alice);
+    kg.add_entity(bob);
+
+    let mut chunk = Chunk::new(
+        "doc.md".to_string(), ChunkType::Decision,
+        MemoryCategory::Episodic, "Alice and Bob discussed.".to_string(),
+    );
+    let chunk_id = chunk.id.clone();
+    chunk.tags = vec![alice_id.clone(), bob_id.clone()];
+    kg.store_chunk(chunk);
+
+    // Both entities should now list this chunk in source_chunks
+    let alice_entity = kg.get_entity(&alice_id).unwrap();
+    assert!(alice_entity.source_chunks.contains(&chunk_id),
+        "Alice's source_chunks should contain the chunk ID");
+
+    let bob_entity = kg.get_entity(&bob_id).unwrap();
+    assert!(bob_entity.source_chunks.contains(&chunk_id),
+        "Bob's source_chunks should contain the chunk ID");
+}
+
+#[test]
+fn test_store_chunk_no_duplicate_source_chunks() {
+    // Bug #9: storing the same chunk twice should not create duplicate entries
+    let mut kg = make_graph();
+
+    let entity = make_entity("Alice", EntityType::Person);
+    let entity_id = entity.id.clone();
+    kg.add_entity(entity);
+
+    let mut chunk = Chunk::new(
+        "doc.md".to_string(), ChunkType::Decision,
+        MemoryCategory::Episodic, "Alice decided.".to_string(),
+    );
+    let chunk_id = chunk.id.clone();
+    chunk.tags = vec![entity_id.clone()];
+
+    // Store the same chunk twice (e.g., re-ingestion)
+    kg.store_chunk(chunk.clone());
+    kg.store_chunk(chunk);
+
+    let entity = kg.get_entity(&entity_id).unwrap();
+    let count = entity.source_chunks.iter().filter(|c| *c == &chunk_id).count();
+    assert_eq!(count, 1, "source_chunks should not contain duplicates");
+}
+
+#[test]
+fn test_merge_entities_records_history() {
+    // Bug #13: merge should record audit trail
+    let mut kg = make_graph();
+
+    let alice = make_entity("Alice Smith", EntityType::Person);
+    let alice2 = make_entity("A. Smith", EntityType::Person);
+    let alice_id = alice.id.clone();
+    let alice2_id = alice2.id.clone();
+    let alice2_name = alice2.canonical_name.clone();
+
+    kg.add_entity(alice);
+    kg.add_entity(alice2);
+
+    let kept_id = kg.merge_entities(&alice_id, &alice2_id).unwrap();
+
+    let entity = kg.get_entity(&kept_id).unwrap();
+    assert_eq!(entity.merge_history.len(), 1, "Should have one merge record");
+
+    let record = &entity.merge_history[0];
+    assert_eq!(record.merged_entity_id, alice2_id);
+    assert_eq!(record.merged_entity_name, alice2_name);
+    assert_eq!(record.method, "direct");
+    assert!(record.merged_at > 0);
+}

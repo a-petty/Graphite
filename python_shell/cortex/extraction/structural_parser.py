@@ -459,22 +459,14 @@ class StructuralParser:
         return None
 
     def _parse_date_string(self, date_str: str) -> Optional[int]:
-        """Parse a date string into a Unix timestamp."""
-        # ISO format
-        try:
-            dt = datetime.strptime(date_str.strip(), "%Y-%m-%d")
-            return int(dt.timestamp())
-        except ValueError:
-            pass
-
-        # Written formats
-        for fmt in ["%B %d, %Y", "%B %d %Y", "%b %d, %Y", "%b %d %Y"]:
+        """Parse a date string into a UTC Unix timestamp."""
+        from datetime import timezone
+        for fmt in ["%Y-%m-%d", "%B %d, %Y", "%B %d %Y", "%b %d, %Y", "%b %d %Y"]:
             try:
-                dt = datetime.strptime(date_str.strip(), fmt)
+                dt = datetime.strptime(date_str.strip(), fmt).replace(tzinfo=timezone.utc)
                 return int(dt.timestamp())
             except ValueError:
                 continue
-
         return None
 
     def _estimate_tokens(self, text: str) -> int:

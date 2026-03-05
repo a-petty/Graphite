@@ -181,7 +181,7 @@ impl KnowledgeGraph {
         // Update the kept entity
         let keep_node = &mut self.graph[keep_idx];
         if !keep_node.aliases.contains(&merge_name) {
-            keep_node.aliases.push(merge_name);
+            keep_node.aliases.push(merge_name.clone());
         }
         for alias in merge_aliases {
             if !keep_node.aliases.contains(&alias) {
@@ -200,6 +200,15 @@ impl KnowledgeGraph {
         }
         keep_node.access_count += merge_node.access_count;
         keep_node.updated_at = chrono::Utc::now().timestamp();
+
+        // Record merge in audit trail
+        keep_node.merge_history.push(crate::entity::MergeRecord {
+            merged_entity_id: merge_id.to_string(),
+            merged_entity_name: merge_name.clone(),
+            merged_at: chrono::Utc::now().timestamp(),
+            confidence: 0.0,
+            method: "direct".to_string(),
+        });
 
         // Redirect edges to the kept entity (skip self-loops)
         for (target, edge) in outgoing {
@@ -267,6 +276,13 @@ impl KnowledgeGraph {
         entity_b_id: &str,
         edge: CoOccurrenceEdge,
     ) -> Result<(), String> {
+        if entity_a_id == entity_b_id {
+            return Err(format!(
+                "Cannot create self-loop: entity '{}' cannot co-occur with itself",
+                entity_a_id
+            ));
+        }
+
         let &a_idx = self
             .entity_index
             .get(entity_a_id)
@@ -299,9 +315,19 @@ impl KnowledgeGraph {
 
     // ── Chunk storage ──
 
-    /// Store a chunk in the side-map.
+    /// Store a chunk in the side-map and update tagged entities' source_chunks.
     pub fn store_chunk(&mut self, chunk: Chunk) {
-        self.chunks.insert(chunk.id.clone(), chunk);
+        let chunk_id = chunk.id.clone();
+        let tags = chunk.tags.clone();
+        self.chunks.insert(chunk_id.clone(), chunk);
+
+        for entity_id in &tags {
+            if let Some(entity) = self.get_entity_mut(entity_id) {
+                if !entity.source_chunks.contains(&chunk_id) {
+                    entity.source_chunks.push(chunk_id.clone());
+                }
+            }
+        }
     }
 
     /// Get a chunk by ID.
@@ -318,12 +344,23 @@ impl KnowledgeGraph {
     }
 
     /// Get chunks for a single entity, sorted by timestamp (ascending).
+    /// Uses entity's source_chunks for O(k) lookup when available,
+    /// with fallback to full scan for pre-fix graphs.
     pub fn get_temporal_chain(&self, entity_id: &str) -> Vec<&Chunk> {
-        let mut chunks: Vec<&Chunk> = self
-            .chunks
-            .values()
-            .filter(|chunk| chunk.tags.contains(&entity_id.to_string()))
-            .collect();
+        let mut chunks: Vec<&Chunk> = if let Some(entity) = self.get_entity(entity_id) {
+            if !entity.source_chunks.is_empty() {
+                entity.source_chunks.iter()
+                    .filter_map(|cid| self.chunks.get(cid))
+                    .collect()
+            } else {
+                self.chunks
+                    .values()
+                    .filter(|chunk| chunk.tags.contains(&entity_id.to_string()))
+                    .collect()
+            }
+        } else {
+            return Vec::new();
+        };
         chunks.sort_by_key(|c| c.timestamp.unwrap_or(c.created_at));
         chunks
     }
@@ -500,17 +537,22 @@ impl KnowledgeGraph {
                     .edges_directed(node_idx, petgraph::Direction::Outgoing)
                 {
                     // Apply temporal filter on edge timestamps
-                    if let Some(ts) = edge.weight().timestamp {
-                        if let Some(start) = time_start {
-                            if ts < start {
-                                continue;
+                    let has_time_filter = time_start.is_some() || time_end.is_some();
+                    match edge.weight().timestamp {
+                        Some(ts) => {
+                            if let Some(start) = time_start {
+                                if ts < start {
+                                    continue;
+                                }
+                            }
+                            if let Some(end) = time_end {
+                                if ts > end {
+                                    continue;
+                                }
                             }
                         }
-                        if let Some(end) = time_end {
-                            if ts > end {
-                                continue;
-                            }
-                        }
+                        None if has_time_filter => continue,
+                        None => {}
                     }
 
                     let target = edge.target();

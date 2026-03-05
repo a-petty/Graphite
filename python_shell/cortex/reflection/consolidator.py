@@ -242,7 +242,10 @@ class Consolidator:
             if not candidate.confirmed:
                 continue
             try:
-                self._kg.merge_entities(candidate.keep_id, candidate.merge_id)
+                self._kg.merge_entities(
+                    candidate.keep_id, candidate.merge_id,
+                    confidence=candidate.confidence, method=candidate.reason,
+                )
                 # Invalidate embedding cache for both
                 if self._embedding_manager is not None:
                     self._embedding_manager.invalidate_entity_cache(candidate.keep_id)

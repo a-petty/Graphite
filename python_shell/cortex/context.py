@@ -598,6 +598,12 @@ class MemoryContextManager:
 
     # ── Public API ──
 
+    def invalidate_caches(self) -> None:
+        """Clear all internal caches after graph mutations."""
+        self._entities_embedded = False
+        self._entity_cache.clear()
+        self._pagerank_cache.clear()
+
     def assemble_context(
         self,
         query: str,

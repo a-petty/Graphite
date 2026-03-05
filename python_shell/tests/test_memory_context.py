@@ -76,6 +76,8 @@ class FakeKnowledgeGraph:
             "access_count": 0,
             "embedding": None,
             "rank": 0.0,
+            "extraction_confidence": None,
+            "merge_history": [],
         }
 
     def add_test_chunk(
@@ -162,12 +164,15 @@ class FakeKnowledgeGraph:
         visited = {entity_id}
         frontier = {entity_id}
         collected_edges = []
+        has_time_filter = time_start is not None or time_end is not None
 
         for _ in range(hops):
             next_frontier = set()
             for s, t, e in self._edges:
-                # Temporal filter
+                # Temporal filter (Bug #3 fix: exclude None-timestamp edges)
                 ts = e.get("timestamp")
+                if has_time_filter and ts is None:
+                    continue
                 if time_start is not None and ts is not None and ts < time_start:
                     continue
                 if time_end is not None and ts is not None and ts > time_end:
@@ -256,7 +261,7 @@ class FakeKnowledgeGraph:
         orphans = [eid for eid in self._entities if eid not in connected]
         return json.dumps(orphans)
 
-    def merge_entities(self, keep_id, merge_id):
+    def merge_entities(self, keep_id, merge_id, confidence=None, method=None):
         """Absorb merge entity into keep entity. Returns kept ID."""
         if keep_id not in self._entities:
             raise RuntimeError(f"Entity not found: {keep_id}")
@@ -282,6 +287,15 @@ class FakeKnowledgeGraph:
                 keep["source_documents"].append(d)
 
         keep["access_count"] = keep.get("access_count", 0) + merge.get("access_count", 0)
+
+        # Record merge history (Bug #13 fix)
+        keep.setdefault("merge_history", []).append({
+            "merged_entity_id": merge_id,
+            "merged_entity_name": merge["canonical_name"],
+            "merged_at": int(time.time()),
+            "confidence": confidence if confidence is not None else 0.0,
+            "method": method if method is not None else "direct",
+        })
 
         # Redirect edges
         new_edges = []
@@ -322,8 +336,16 @@ class FakeKnowledgeGraph:
             chunk["id"] = str(uuid.uuid4())
         if "created_at" not in chunk:
             chunk["created_at"] = int(time.time())
-        self._chunks[chunk["id"]] = chunk
-        return chunk["id"]
+        chunk_id = chunk["id"]
+        self._chunks[chunk_id] = chunk
+
+        # Populate entity source_chunks (Bug #9 fix)
+        for tag in chunk.get("tags", []):
+            if tag in self._entities:
+                if chunk_id not in self._entities[tag].get("source_chunks", []):
+                    self._entities[tag].setdefault("source_chunks", []).append(chunk_id)
+
+        return chunk_id
 
     def decay_scores(self, half_life_days):
         """Apply exponential decay to access counts in the fake graph."""

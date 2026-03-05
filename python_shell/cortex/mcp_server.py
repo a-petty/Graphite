@@ -247,6 +247,14 @@ def _auto_save() -> None:
         log.error("Auto-save failed: %s", e)
 
 
+def _invalidate_caches() -> None:
+    """Invalidate embedding and context caches after graph mutations."""
+    if _embedding_manager is not None:
+        _embedding_manager.invalidate_entity_cache()
+    if _context_manager is not None:
+        _context_manager.invalidate_caches()
+
+
 def _parse_date(s: str) -> Optional[int]:
     """Parse ISO date string 'YYYY-MM-DD' to Unix timestamp, or None for empty."""
     if not s or not s.strip():
@@ -936,6 +944,7 @@ async def cortex_ingest(path: str) -> str:
                             for err in update_result.errors:
                                 lines.append(f"  ⚠ {err}")
                         _graph_dirty = True
+                        _invalidate_caches()
                         _auto_save()
                         lines.append("Graph saved.")
                         return "\n".join(lines)
@@ -949,6 +958,7 @@ async def cortex_ingest(path: str) -> str:
                     return "No files to ingest."
 
                 _graph_dirty = True
+                _invalidate_caches()
 
                 # Format results
                 lines = ["Ingestion Results:"]
@@ -1119,6 +1129,7 @@ async def cortex_update_document(path: str) -> str:
                         lines.append(f"  ⚠ {err}")
 
                 _graph_dirty = True
+                _invalidate_caches()
                 _auto_save()
                 lines.append("Graph saved.")
                 return "\n".join(lines)
@@ -1168,6 +1179,7 @@ async def cortex_remove_document(path: str) -> str:
                 lines.append(f"  Entities updated (trimmed): {result.entities_updated}")
 
                 _graph_dirty = True
+                _invalidate_caches()
                 _auto_save()
                 lines.append("Graph saved.")
                 return "\n".join(lines)
@@ -1253,6 +1265,7 @@ async def cortex_reflect(mode: str = "full") -> str:
                     lines.append(f"  Duration: {result.duration_seconds:.1f}s")
 
                 _graph_dirty = True
+                _invalidate_caches()
                 _auto_save()
                 lines.append("Graph saved.")
 
@@ -1287,11 +1300,8 @@ async def cortex_forget(entity: str) -> str:
                 if not removed:
                     return f"ERROR: Failed to remove entity '{name}' ({entity_id})."
 
-                # Invalidate embedding cache
-                if _embedding_manager is not None:
-                    _embedding_manager.invalidate_entity_cache(entity_id)
-
                 _graph_dirty = True
+                _invalidate_caches()
                 _auto_save()
 
                 return f"Removed entity '{name}' ({entity_id}). Graph saved."

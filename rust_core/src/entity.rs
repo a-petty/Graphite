@@ -32,6 +32,16 @@ impl fmt::Display for EntityType {
     }
 }
 
+/// A record of a merge operation for audit trail.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MergeRecord {
+    pub merged_entity_id: String,
+    pub merged_entity_name: String,
+    pub merged_at: i64,
+    pub confidence: f64,
+    pub method: String,
+}
+
 /// A node in the knowledge graph representing an extracted entity.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EntityNode {
@@ -46,6 +56,10 @@ pub struct EntityNode {
     pub access_count: u32,
     pub embedding: Option<Vec<f32>>,
     pub rank: f64,
+    #[serde(default)]
+    pub extraction_confidence: Option<f64>,
+    #[serde(default)]
+    pub merge_history: Vec<MergeRecord>,
 }
 
 impl EntityNode {
@@ -63,6 +77,8 @@ impl EntityNode {
             access_count: 0,
             embedding: None,
             rank: 0.0,
+            extraction_confidence: None,
+            merge_history: Vec::new(),
         }
     }
 }

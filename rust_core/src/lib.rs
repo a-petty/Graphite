@@ -679,10 +679,31 @@ impl PyKnowledgeGraph {
     }
 
     /// Merge two entities. Returns the ID of the kept entity.
-    fn merge_entities(&mut self, keep_id: &str, merge_id: &str) -> PyResult<String> {
-        self.kg
+    /// Optionally records confidence and method on the merge history record.
+    #[pyo3(signature = (keep_id, merge_id, confidence=None, method=None))]
+    fn merge_entities(
+        &mut self,
+        keep_id: &str,
+        merge_id: &str,
+        confidence: Option<f64>,
+        method: Option<&str>,
+    ) -> PyResult<String> {
+        let result = self.kg
             .merge_entities(keep_id, merge_id)
-            .map_err(|e| PyRuntimeError::new_err(e))
+            .map_err(|e| PyRuntimeError::new_err(e))?;
+        if confidence.is_some() || method.is_some() {
+            if let Some(entity) = self.kg.get_entity_mut(&result) {
+                if let Some(record) = entity.merge_history.last_mut() {
+                    if let Some(c) = confidence {
+                        record.confidence = c;
+                    }
+                    if let Some(m) = method {
+                        record.method = m.to_string();
+                    }
+                }
+            }
+        }
+        Ok(result)
     }
 
     /// Query the neighborhood of an entity via BFS. Returns JSON SubgraphResult.

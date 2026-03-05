@@ -108,6 +108,81 @@ class CortexConfig:
         default_factory=lambda: Path(__file__).parent / "extraction" / "prompts"
     )
 
+    def __post_init__(self):
+        """Validate configuration values."""
+        errors = []
+
+        # Float fields in [0.0, 1.0]
+        unit_fields = {
+            "tier1_budget_pct": self.tier1_budget_pct,
+            "tier2_budget_pct": self.tier2_budget_pct,
+            "similarity_weight": self.similarity_weight,
+            "pagerank_weight": self.pagerank_weight,
+            "disambiguation_auto_merge_threshold": self.disambiguation_auto_merge_threshold,
+            "disambiguation_review_threshold": self.disambiguation_review_threshold,
+            "circuit_breaker_failure_rate": self.circuit_breaker_failure_rate,
+            "merge_embedding_threshold": self.merge_embedding_threshold,
+            "merge_alias_overlap_threshold": self.merge_alias_overlap_threshold,
+        }
+        for name, value in unit_fields.items():
+            if not (0.0 <= value <= 1.0):
+                errors.append(f"{name} must be in [0.0, 1.0], got {value}")
+
+        # Budget sum
+        if self.tier1_budget_pct + self.tier2_budget_pct > 1.0:
+            errors.append(
+                f"tier1_budget_pct + tier2_budget_pct must be <= 1.0, "
+                f"got {self.tier1_budget_pct} + {self.tier2_budget_pct} = "
+                f"{self.tier1_budget_pct + self.tier2_budget_pct}"
+            )
+
+        # Positive integers (must be > 0)
+        pos_int_fields = {
+            "llm_max_tokens": self.llm_max_tokens,
+            "max_chunk_tokens": self.max_chunk_tokens,
+            "anchor_count_min": self.anchor_count_min,
+            "anchor_count_max": self.anchor_count_max,
+            "neighborhood_max_hops_sparse": self.neighborhood_max_hops_sparse,
+            "neighborhood_max_hops_dense": self.neighborhood_max_hops_dense,
+            "neighborhood_max_entities": self.neighborhood_max_entities,
+            "synthesis_max_chunks_per_entity": self.synthesis_max_chunks_per_entity,
+        }
+        for name, value in pos_int_fields.items():
+            if value <= 0:
+                errors.append(f"{name} must be a positive integer, got {value}")
+
+        # Non-negative integers (0 is valid — e.g., orphan_max_age_days=0 means no grace period)
+        nonneg_int_fields = {
+            "orphan_max_age_days": self.orphan_max_age_days,
+        }
+        for name, value in nonneg_int_fields.items():
+            if value < 0:
+                errors.append(f"{name} must be a non-negative integer, got {value}")
+
+        # Positive floats
+        if self.decay_half_life_days <= 0:
+            errors.append(
+                f"decay_half_life_days must be positive, got {self.decay_half_life_days}"
+            )
+
+        # Logical constraints
+        if self.anchor_count_min > self.anchor_count_max:
+            errors.append(
+                f"anchor_count_min ({self.anchor_count_min}) must be "
+                f"<= anchor_count_max ({self.anchor_count_max})"
+            )
+        if self.disambiguation_review_threshold > self.disambiguation_auto_merge_threshold:
+            errors.append(
+                f"disambiguation_review_threshold ({self.disambiguation_review_threshold}) "
+                f"must be <= disambiguation_auto_merge_threshold "
+                f"({self.disambiguation_auto_merge_threshold})"
+            )
+
+        if errors:
+            raise ValueError(
+                "Invalid CortexConfig:\n  " + "\n  ".join(errors)
+            )
+
     def get_prompt(self, name: str) -> str:
         """Load a prompt template by name (without extension).
 
