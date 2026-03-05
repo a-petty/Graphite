@@ -207,14 +207,52 @@ class FakeKnowledgeGraph:
         ]
         return json.dumps(chunks)
 
+    def search_entities(self, query, limit):
+        """Substring search on entity canonical_name and aliases."""
+        query_lower = query.lower()
+        results = []
+        for entity in self._entities.values():
+            name = entity["canonical_name"].lower()
+            aliases = [a.lower() for a in entity.get("aliases", [])]
+            if query_lower in name or any(query_lower in a for a in aliases):
+                results.append(entity)
+                if len(results) >= limit:
+                    break
+        return json.dumps(results)
+
+    def get_temporal_chain(self, entity_id):
+        """Returns JSON array of chunks tagged with entity, sorted by timestamp desc."""
+        tagged = [
+            c for c in self._chunks.values()
+            if entity_id in c.get("tags", [])
+        ]
+        # Sort most recent first (None timestamps last)
+        tagged.sort(key=lambda c: c.get("timestamp") or 0, reverse=True)
+        return json.dumps(tagged)
+
+    def save(self, path):
+        """No-op save for testing."""
+        pass
+
     def get_statistics(self):
         """Returns JSON statistics."""
+        # Count entities by type
+        by_type = {}
+        for entity in self._entities.values():
+            etype = entity.get("entity_type", "Unknown")
+            by_type[etype] = by_type.get(etype, 0) + 1
+        # Count unique source documents
+        docs = set()
+        for chunk in self._chunks.values():
+            doc = chunk.get("source_document")
+            if doc:
+                docs.add(doc)
         return json.dumps({
             "entity_count": len(self._entities),
             "edge_count": len(self._edges),
             "chunk_count": len(self._chunks),
-            "entities_by_type": {},
-            "documents_indexed": 0,
+            "entities_by_type": by_type,
+            "documents_indexed": len(docs),
         })
 
 

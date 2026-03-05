@@ -187,7 +187,7 @@ def handle_ingest_command(args: argparse.Namespace):
 
     if graph_path.exists():
         console.print(f"[dim]Loading existing graph from {graph_path}[/dim]")
-        kg = PyKnowledgeGraph.load(str(graph_path))
+        kg = PyKnowledgeGraph.load(str(project_root))
     else:
         console.print("[dim]Creating new knowledge graph[/dim]")
         kg = PyKnowledgeGraph(str(project_root))
@@ -253,8 +253,9 @@ def handle_ingest_command(args: argparse.Namespace):
             for err in r.errors:
                 console.print(f"  [red]- {err}[/red]")
 
-    # Save graph
-    pipeline.save_graph(str(graph_path))
+    # Save graph — pass project_root, not graph_path
+    # (GraphStore internally appends .cortex/graph.msgpack)
+    pipeline.save_graph(str(project_root))
     console.print(f"\n[green]Graph saved to {graph_path}[/green]")
 
 

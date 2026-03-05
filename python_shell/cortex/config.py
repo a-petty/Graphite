@@ -4,12 +4,17 @@ Provides CortexConfig dataclass with sensible defaults for all pipeline
 settings: LLM provider/model, classification categories, tagging thresholds,
 chunking parameters, and directory paths.
 
-TOML loading deferred to Phase 4 — for now, instantiate with overrides.
+Use CortexConfig.from_toml(path) to load from a .cortex.toml file,
+or instantiate directly with keyword overrides.
 """
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 # Default valid chunk types for classification (Pass 2)
@@ -40,7 +45,7 @@ class CortexConfig:
     """Configuration for the Cortex extraction pipeline.
 
     All fields have sensible defaults. Override individual fields
-    as needed — no TOML file required (Phase 4 adds TOML loading).
+    as needed, or load from a .cortex.toml file via from_toml().
     """
 
     # ── LLM ──
@@ -108,3 +113,77 @@ class CortexConfig:
         """
         path = self.prompts_dir / f"{name}.txt"
         return path.read_text()
+
+    @classmethod
+    def from_toml(cls, toml_path: Path) -> "CortexConfig":
+        """Load configuration from a .cortex.toml file.
+
+        Reads known keys from the TOML file and uses defaults for anything
+        not specified. Unknown keys are silently ignored.
+
+        Args:
+            toml_path: Path to the .cortex.toml file.
+
+        Returns:
+            A CortexConfig populated from the file.
+
+        Raises:
+            FileNotFoundError: If the file does not exist.
+        """
+        try:
+            import tomllib
+        except ImportError:
+            try:
+                import tomli as tomllib  # type: ignore[no-redef]
+            except ImportError:
+                logger.warning(
+                    "Neither tomllib nor tomli available; using default config."
+                )
+                return cls()
+
+        with open(toml_path, "rb") as f:
+            data = tomllib.load(f)
+
+        kwargs: Dict = {}
+
+        # [llm] section
+        llm = data.get("llm", {})
+        if "provider" in llm:
+            kwargs["llm_provider"] = llm["provider"]
+        if "model" in llm:
+            kwargs["llm_model"] = llm["model"]
+        if "temperature" in llm:
+            kwargs["llm_temperature"] = float(llm["temperature"])
+        if "max_tokens" in llm:
+            kwargs["llm_max_tokens"] = int(llm["max_tokens"])
+
+        # [extraction] section
+        extraction = data.get("extraction", {})
+        if "auto_merge_threshold" in extraction:
+            kwargs["disambiguation_auto_merge_threshold"] = float(
+                extraction["auto_merge_threshold"]
+            )
+        if "review_threshold" in extraction:
+            kwargs["disambiguation_review_threshold"] = float(
+                extraction["review_threshold"]
+            )
+        if "max_chunk_tokens" in extraction:
+            kwargs["max_chunk_tokens"] = int(extraction["max_chunk_tokens"])
+
+        # [context] section
+        context = data.get("context", {})
+        if "tier1_budget_pct" in context:
+            kwargs["tier1_budget_pct"] = float(context["tier1_budget_pct"])
+        if "tier2_budget_pct" in context:
+            kwargs["tier2_budget_pct"] = float(context["tier2_budget_pct"])
+        if "similarity_weight" in context:
+            kwargs["similarity_weight"] = float(context["similarity_weight"])
+        if "pagerank_weight" in context:
+            kwargs["pagerank_weight"] = float(context["pagerank_weight"])
+
+        # [paths] section
+        paths = data.get("paths", {})
+        if "memory_root" in paths:
+            kwargs["memory_root"] = Path(paths["memory_root"])
+
+        return cls(**kwargs)
