@@ -47,6 +47,22 @@
             "entity_b": "Service Mesh Rollout"
         },
         {
+            "entity_a": "Service Mesh Rollout",
+            "entity_b": "Istio"
+        },
+        {
+            "entity_a": "Service Mesh Rollout",
+            "entity_b": "Kubernetes"
+        },
+        {
+            "entity_a": "Service Mesh Rollout",
+            "entity_b": "Envoy"
+        },
+        {
+            "entity_a": "Service Mesh Rollout",
+            "entity_b": "Prometheus"
+        },
+        {
             "entity_a": "Ryan O'Brien",
             "entity_b": "Istio"
         },
@@ -55,15 +71,15 @@
             "entity_b": "Kubernetes"
         },
         {
-            "entity_a": "Ryan O'Brien",
+            "entity_a": "Derek Washington",
             "entity_b": "Envoy"
         },
         {
-            "entity_a": "Ryan O'Brien",
+            "entity_a": "Derek Washington",
             "entity_b": "Prometheus"
         }
     ],
     "expected_chunks_min": 4,
-    "expected_chunks_max": 10,
+    "expected_chunks_max": 12,
     "expected_filler_chunks": 0
 }

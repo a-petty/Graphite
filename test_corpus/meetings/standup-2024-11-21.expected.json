@@ -1,57 +1,81 @@
 {
     "entities": [
         {
-            "name": "Emily Zhang",
+            "name": "Daniel Reeves",
             "type": "person"
         },
         {
-            "name": "Tom Brennan",
+            "name": "Derek Washington",
             "type": "person"
         },
         {
-            "name": "Lisa Wang",
+            "name": "Maria Santos",
             "type": "person"
         },
         {
-            "name": "Alex Petrov",
+            "name": "Ryan O'Brien",
             "type": "person"
         },
         {
-            "name": "PyTorch",
+            "name": "Kafka",
             "type": "technology"
         },
         {
-            "name": "Docker",
+            "name": "Grafana",
             "type": "technology"
         },
         {
-            "name": "PostgreSQL",
+            "name": "Observability Initiative",
+            "type": "project"
+        },
+        {
+            "name": "Next.js",
             "type": "technology"
         },
         {
-            "name": "RabbitMQ",
+            "name": "Developer Portal",
+            "type": "project"
+        },
+        {
+            "name": "Kubernetes",
             "type": "technology"
+        },
+        {
+            "name": "Service Mesh Rollout",
+            "type": "project"
         }
     ],
     "cooccurrences": [
         {
-            "entity_a": "Emily Zhang",
-            "entity_b": "PyTorch"
+            "entity_a": "Daniel Reeves",
+            "entity_b": "Kafka"
         },
         {
-            "entity_a": "Tom Brennan",
-            "entity_b": "Docker"
+            "entity_a": "Derek Washington",
+            "entity_b": "Grafana"
         },
         {
-            "entity_a": "Lisa Wang",
-            "entity_b": "PostgreSQL"
+            "entity_a": "Derek Washington",
+            "entity_b": "Observability Initiative"
         },
         {
-            "entity_a": "Alex Petrov",
-            "entity_b": "RabbitMQ"
+            "entity_a": "Maria Santos",
+            "entity_b": "Next.js"
+        },
+        {
+            "entity_a": "Maria Santos",
+            "entity_b": "Developer Portal"
+        },
+        {
+            "entity_a": "Ryan O'Brien",
+            "entity_b": "Kubernetes"
+        },
+        {
+            "entity_a": "Ryan O'Brien",
+            "entity_b": "Service Mesh Rollout"
         }
     ],
     "expected_chunks_min": 4,
-    "expected_chunks_max": 8,
+    "expected_chunks_max": 9,
     "expected_filler_chunks_min": 1
 }

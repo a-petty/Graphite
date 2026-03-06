@@ -1,0 +1,69 @@
+{
+    "entities": [
+        {
+            "name": "James Liu",
+            "type": "person"
+        },
+        {
+            "name": "John Doe",
+            "type": "person"
+        },
+        {
+            "name": "Olivia Foster",
+            "type": "person"
+        },
+        {
+            "name": "Airflow",
+            "type": "technology"
+        },
+        {
+            "name": "ML Recommendation Engine",
+            "type": "project"
+        },
+        {
+            "name": "Kafka",
+            "type": "technology"
+        },
+        {
+            "name": "Payment Gateway Refactor",
+            "type": "project"
+        },
+        {
+            "name": "Next.js",
+            "type": "technology"
+        },
+        {
+            "name": "Internal Tools Consolidation",
+            "type": "project"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "James Liu",
+            "entity_b": "Airflow"
+        },
+        {
+            "entity_a": "James Liu",
+            "entity_b": "ML Recommendation Engine"
+        },
+        {
+            "entity_a": "John Doe",
+            "entity_b": "Kafka"
+        },
+        {
+            "entity_a": "John Doe",
+            "entity_b": "Payment Gateway Refactor"
+        },
+        {
+            "entity_a": "Olivia Foster",
+            "entity_b": "Next.js"
+        },
+        {
+            "entity_a": "Olivia Foster",
+            "entity_b": "Internal Tools Consolidation"
+        }
+    ],
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 7,
+    "expected_filler_chunks_min": 1
+}

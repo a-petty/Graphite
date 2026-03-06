@@ -1,0 +1,73 @@
+{
+    "entities": [
+        {
+            "name": "Ryan O'Brien",
+            "type": "person"
+        },
+        {
+            "name": "David Kim",
+            "type": "person"
+        },
+        {
+            "name": "Derek Washington",
+            "type": "person"
+        },
+        {
+            "name": "Kevin Park",
+            "type": "person"
+        },
+        {
+            "name": "ArgoCD",
+            "type": "technology"
+        },
+        {
+            "name": "GitHub Actions",
+            "type": "technology"
+        },
+        {
+            "name": "Helm",
+            "type": "technology"
+        },
+        {
+            "name": "Prometheus",
+            "type": "technology"
+        },
+        {
+            "name": "Observability Initiative",
+            "type": "project"
+        },
+        {
+            "name": "Service Mesh Rollout",
+            "type": "project"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "David Kim",
+            "entity_b": "ArgoCD"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "GitHub Actions"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "Helm"
+        },
+        {
+            "entity_a": "Derek Washington",
+            "entity_b": "Prometheus"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "Observability Initiative"
+        },
+        {
+            "entity_a": "Derek Washington",
+            "entity_b": "Service Mesh Rollout"
+        }
+    ],
+    "expected_chunks_min": 4,
+    "expected_chunks_max": 12,
+    "expected_filler_chunks": 0
+}

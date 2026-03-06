@@ -17,7 +17,7 @@
             "type": "project"
         },
         {
-            "name": "Nina Kowalski",
+            "name": "Marcus Johnson",
             "type": "person"
         },
         {
@@ -25,7 +25,15 @@
             "type": "person"
         },
         {
-            "name": "Marcus Johnson",
+            "name": "Nina Kowalski",
+            "type": "person"
+        },
+        {
+            "name": "Lisa Wang",
+            "type": "person"
+        },
+        {
+            "name": "Tom Brennan",
             "type": "person"
         }
     ],
@@ -44,7 +52,7 @@
         },
         {
             "entity_a": "Sarah Chen",
-            "entity_b": "Nina Kowalski"
+            "entity_b": "Marcus Johnson"
         },
         {
             "entity_a": "Sarah Chen",
@@ -52,10 +60,18 @@
         },
         {
             "entity_a": "Sarah Chen",
-            "entity_b": "Marcus Johnson"
+            "entity_b": "Nina Kowalski"
+        },
+        {
+            "entity_a": "Sarah Chen",
+            "entity_b": "Lisa Wang"
+        },
+        {
+            "entity_a": "Sarah Chen",
+            "entity_b": "Tom Brennan"
         }
     ],
     "expected_chunks_min": 3,
-    "expected_chunks_max": 8,
+    "expected_chunks_max": 10,
     "expected_filler_chunks": 0
 }

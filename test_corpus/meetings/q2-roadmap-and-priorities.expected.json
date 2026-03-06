@@ -1,0 +1,57 @@
+{
+    "entities": [
+        {
+            "name": "Aisha Hassan",
+            "type": "person"
+        },
+        {
+            "name": "Sarah Chen",
+            "type": "person"
+        },
+        {
+            "name": "Angela Rivera",
+            "type": "person"
+        },
+        {
+            "name": "David Kim",
+            "type": "person"
+        },
+        {
+            "name": "ArgoCD",
+            "type": "technology"
+        },
+        {
+            "name": "GitHub Actions",
+            "type": "technology"
+        },
+        {
+            "name": "Helm",
+            "type": "technology"
+        },
+        {
+            "name": "Terraform",
+            "type": "technology"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "David Kim",
+            "entity_b": "ArgoCD"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "GitHub Actions"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "Helm"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "Terraform"
+        }
+    ],
+    "expected_chunks_min": 4,
+    "expected_chunks_max": 12,
+    "expected_filler_chunks": 0
+}

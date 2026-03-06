@@ -13,57 +13,49 @@
             "type": "person"
         },
         {
-            "name": "PagerDuty",
+            "name": "Redis",
             "type": "technology"
         },
         {
-            "name": "Helm",
+            "name": "Datadog",
             "type": "technology"
         },
         {
-            "name": "Prometheus",
+            "name": "Kubernetes",
             "type": "technology"
         },
         {
-            "name": "GraphQL",
-            "type": "technology"
-        },
-        {
-            "name": "ArgoCD",
-            "type": "technology"
-        },
-        {
-            "name": "Playwright",
-            "type": "technology"
+            "name": "ML Recommendation Engine",
+            "type": "project"
         }
     ],
     "cooccurrences": [
         {
-            "entity_a": "Derek Washington",
-            "entity_b": "PagerDuty"
-        },
-        {
-            "entity_a": "Derek Washington",
-            "entity_b": "Prometheus"
-        },
-        {
             "entity_a": "Priya Patel",
-            "entity_b": "Playwright"
+            "entity_b": "Redis"
         },
         {
-            "entity_a": "Priya Patel",
-            "entity_b": "GraphQL"
+            "entity_a": "Derek Washington",
+            "entity_b": "Datadog"
         },
         {
             "entity_a": "David Kim",
-            "entity_b": "Helm"
+            "entity_b": "Kubernetes"
+        },
+        {
+            "entity_a": "Derek Washington",
+            "entity_b": "ML Recommendation Engine"
+        },
+        {
+            "entity_a": "Priya Patel",
+            "entity_b": "ML Recommendation Engine"
         },
         {
             "entity_a": "David Kim",
-            "entity_b": "ArgoCD"
+            "entity_b": "ML Recommendation Engine"
         }
     ],
     "expected_chunks_min": 3,
-    "expected_chunks_max": 8,
+    "expected_chunks_max": 10,
     "expected_filler_chunks": 0
 }

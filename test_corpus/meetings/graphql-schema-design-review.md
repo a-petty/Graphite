@@ -1,27 +1,25 @@
-# Graphql Schema Design Review — 2024-07-15
+# Graphql Schema Design Review — 2024-07-08
 
 ## Attendees
-Priya Patel, Marcus Johnson, Sophie Martin
 
+Priya Patel, Marcus Johnson, Sophie Martin
 
 ## Discussion
 
-**Priya Patel:** The documentation for Swagger is solid. I've drafted an RFC that outlines the migration path.
+**Priya Patel:** What's our fallback if this doesn't work? We should discuss our Django configuration. The ORM query optimization brought the endpoint from 800ms to 120ms.
 
-**Marcus Johnson:** I've been looking into Redis and I think it could solve our GraphQL schema design review challenges. The performance benchmarks look promising.
+**Priya Patel:** This connects to our earlier decision to adopted snowflake as primary data warehouse back in June 2024.
 
-**Marcus Johnson:** This also affects the API Migration project timeline.
+**Marcus Johnson:** This is going to be a big win for us. I've been working with Swagger and the performance characteristics are solid — The auto-generated docs are staying in sync with the API changes.
 
-**Sophie Martin:** The documentation for GraphQL is solid. I've drafted an RFC that outlines the migration path.
-
+**Sophie Martin:** Marcus Johnson raises a good point. let me walk through the data on this. I ran benchmarks on GraphQL last week. Query complexity scoring is preventing the N+1 issues we saw before.
 
 ## Decisions
 
-**Priya Patel:** Based on this discussion, we'll proceed with Swagger for the next phase.
-
+**Priya Patel:** Based on this discussion, we've decided: Chose Apollo Server over Hasura for GraphQL. Apollo provides more control over resolver logic and integrates better with existing Django auth middleware
 
 ## Action Items
 
-- Priya Patel will follow up on Redis integration by end of week
-- Marcus Johnson will follow up on WebSocket integration by end of week
-- Sophie Martin will follow up on TypeScript integration by end of week
+- Priya Patel will investigate Django configuration and report findings by end of week
+- Marcus Johnson will investigate GraphQL configuration and report findings by end of week
+- Sophie Martin will investigate Swagger configuration and report findings by end of week

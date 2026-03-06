@@ -1,25 +1,29 @@
-# Data Pipeline Architecture — 2024-07-20
+# Data Pipeline Architecture — 2024-07-17
 
 ## Attendees
-James Liu, Emily Zhang, Priya Patel
 
+James Liu, Emily Zhang, Priya Patel
 
 ## Discussion
 
-**James Liu:** I ran some tests with Python last week. The results were positive — about 40% improvement in throughput.
+**James Liu:** I've been analyzing the metrics and our Airflow setup needs attention. The DAG execution times are consistent at about 12 minutes per run.
 
-**Emily Zhang:** From my perspective, we should prioritize GraphQL integration. The current approach has scalability concerns.
+**Emily Zhang:** I've been analyzing the metrics and the Spark integration is coming along well. The historical backfill job processed 2TB in about 4 hours.
 
-**Priya Patel:** I spoke with the scikit-learn team and they're willing to provide support during the rollout.
+**Priya Patel:** I have concerns about this approach. We should discuss our dbt configuration. The test coverage for data models is at 85% with schema tests on all tables.
 
+**Priya Patel:** This connects to our earlier decision to adopted snowflake as primary data warehouse back in June 2024.
 
 ## Decisions
 
-**James Liu:** Based on this discussion, we'll proceed with PyTorch for the next phase.
+**Priya Patel:** Based on this discussion, we've decided: Chose Apollo Server over Hasura for GraphQL. Apollo provides more control over resolver logic and integrates better with existing Django auth middleware
 
+## Related Projects
+
+The Data Lake Migration project (completed) is relevant to this discussion.
 
 ## Action Items
 
-- James Liu will follow up on PyTorch integration by end of week
-- Emily Zhang will follow up on GraphQL integration by end of week
-- Priya Patel will follow up on GraphQL integration by end of week
+- James Liu will investigate Airflow configuration and report findings by end of week
+- Emily Zhang will investigate Spark configuration and report findings by end of week
+- Priya Patel will investigate dbt configuration and report findings by end of week

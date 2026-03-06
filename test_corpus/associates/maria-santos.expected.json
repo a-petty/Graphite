@@ -29,11 +29,19 @@
             "type": "project"
         },
         {
-            "name": "Sophie Martin",
+            "name": "Internal Tools Consolidation",
+            "type": "project"
+        },
+        {
+            "name": "Olivia Foster",
             "type": "person"
         },
         {
             "name": "Angela Rivera",
+            "type": "person"
+        },
+        {
+            "name": "Sophie Martin",
             "type": "person"
         }
     ],
@@ -64,14 +72,22 @@
         },
         {
             "entity_a": "Maria Santos",
-            "entity_b": "Sophie Martin"
+            "entity_b": "Internal Tools Consolidation"
+        },
+        {
+            "entity_a": "Maria Santos",
+            "entity_b": "Olivia Foster"
         },
         {
             "entity_a": "Maria Santos",
             "entity_b": "Angela Rivera"
+        },
+        {
+            "entity_a": "Maria Santos",
+            "entity_b": "Sophie Martin"
         }
     ],
     "expected_chunks_min": 3,
-    "expected_chunks_max": 8,
+    "expected_chunks_max": 10,
     "expected_filler_chunks": 0
 }

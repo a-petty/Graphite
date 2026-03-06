@@ -1,61 +1,85 @@
 {
     "entities": [
         {
-            "name": "John Doe",
-            "type": "person"
-        },
-        {
-            "name": "Ryan O'Brien",
-            "type": "person"
-        },
-        {
             "name": "Sarah Chen",
             "type": "person"
         },
         {
-            "name": "Alex Petrov",
+            "name": "Kevin Park",
             "type": "person"
         },
         {
-            "name": "Rachel Torres",
+            "name": "Olivia Foster",
             "type": "person"
         },
         {
-            "name": "PostgreSQL",
+            "name": "David Kim",
+            "type": "person"
+        },
+        {
+            "name": "Tom Brennan",
+            "type": "person"
+        },
+        {
+            "name": "Vault",
             "type": "technology"
         },
         {
-            "name": "Istio",
+            "name": "Auth Service Modernization",
+            "type": "project"
+        },
+        {
+            "name": "TypeScript",
             "type": "technology"
         },
         {
-            "name": "Node.js",
+            "name": "GitHub Actions",
             "type": "technology"
         },
         {
-            "name": "Cypress",
+            "name": "Data Lake Migration",
+            "type": "project"
+        },
+        {
+            "name": "Python",
             "type": "technology"
+        },
+        {
+            "name": "Payment Gateway Refactor",
+            "type": "project"
         }
     ],
     "cooccurrences": [
         {
-            "entity_a": "John Doe",
-            "entity_b": "PostgreSQL"
+            "entity_a": "Kevin Park",
+            "entity_b": "Vault"
         },
         {
-            "entity_a": "Ryan O'Brien",
-            "entity_b": "Istio"
+            "entity_a": "Kevin Park",
+            "entity_b": "Auth Service Modernization"
         },
         {
-            "entity_a": "Alex Petrov",
-            "entity_b": "Node.js"
+            "entity_a": "Olivia Foster",
+            "entity_b": "TypeScript"
         },
         {
-            "entity_a": "Rachel Torres",
-            "entity_b": "Cypress"
+            "entity_a": "David Kim",
+            "entity_b": "GitHub Actions"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "Data Lake Migration"
+        },
+        {
+            "entity_a": "Tom Brennan",
+            "entity_b": "Python"
+        },
+        {
+            "entity_a": "Tom Brennan",
+            "entity_b": "Payment Gateway Refactor"
         }
     ],
     "expected_chunks_min": 5,
-    "expected_chunks_max": 10,
+    "expected_chunks_max": 11,
     "expected_filler_chunks_min": 1
 }

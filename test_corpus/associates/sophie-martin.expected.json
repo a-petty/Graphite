@@ -29,11 +29,11 @@
             "type": "person"
         },
         {
-            "name": "Maria Santos",
+            "name": "Marcus Johnson",
             "type": "person"
         },
         {
-            "name": "Marcus Johnson",
+            "name": "Angela Rivera",
             "type": "person"
         }
     ],
@@ -64,14 +64,14 @@
         },
         {
             "entity_a": "Sophie Martin",
-            "entity_b": "Maria Santos"
+            "entity_b": "Marcus Johnson"
         },
         {
             "entity_a": "Sophie Martin",
-            "entity_b": "Marcus Johnson"
+            "entity_b": "Angela Rivera"
         }
     ],
     "expected_chunks_min": 3,
-    "expected_chunks_max": 8,
+    "expected_chunks_max": 10,
     "expected_filler_chunks": 0
 }

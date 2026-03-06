@@ -13,24 +13,20 @@
             "type": "person"
         },
         {
-            "name": "AWS EKS",
+            "name": "Redis",
             "type": "technology"
         },
         {
-            "name": "Python",
+            "name": "PostgreSQL",
             "type": "technology"
         },
         {
-            "name": "GraphQL",
+            "name": "Snowflake",
             "type": "technology"
         },
         {
-            "name": "Kafka",
-            "type": "technology"
-        },
-        {
-            "name": "Spark",
-            "type": "technology"
+            "name": "Observability Initiative",
+            "type": "project"
         },
         {
             "name": "API Migration",
@@ -39,24 +35,20 @@
     ],
     "cooccurrences": [
         {
-            "entity_a": "John Doe",
-            "entity_b": "AWS EKS"
-        },
-        {
-            "entity_a": "John Doe",
-            "entity_b": "Kafka"
-        },
-        {
-            "entity_a": "John Doe",
-            "entity_b": "Python"
-        },
-        {
             "entity_a": "Priya Patel",
-            "entity_b": "GraphQL"
+            "entity_b": "Redis"
+        },
+        {
+            "entity_a": "John Doe",
+            "entity_b": "PostgreSQL"
         },
         {
             "entity_a": "James Liu",
-            "entity_b": "Spark"
+            "entity_b": "Snowflake"
+        },
+        {
+            "entity_a": "John Doe",
+            "entity_b": "Observability Initiative"
         },
         {
             "entity_a": "Priya Patel",

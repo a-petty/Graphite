@@ -1,29 +1,27 @@
-# Developer Portal Content Strategy — 2024-10-26
+# Developer Portal Content Strategy — 2024-10-28
 
 ## Attendees
-Sophie Martin, Angela Rivera, Maria Santos
 
+Sophie Martin, Angela Rivera, Maria Santos
 
 ## Discussion
 
-**Sophie Martin:** We need to consider the trade-offs here. Tailwind CSS has a steeper learning curve but better long-term maintainability.
+**Sophie Martin:** Let me walk through the data on this. Our Swagger setup needs attention. The auto-generated docs are staying in sync with the API changes.
 
-**Sophie Martin:** This also affects the Mobile App V2 project timeline.
+**Angela Rivera:** Sophie Martin raises a good point. the trade-off we need to evaluate is straightforward. The Next.js integration is coming along well. The SSR pages are loading in under 1.5 seconds on mobile.
 
-**Angela Rivera:** I have concerns about Swagger compatibility with our existing infrastructure. We should run a proof of concept first.
+**Angela Rivera:** We should keep in mind the payment service outage incident from July 2024.
 
-**Maria Santos:** Based on our metrics, switching to Tailwind CSS would reduce latency by approximately 30%.
+**Maria Santos:** I think we need to be practical here. I ran benchmarks on React last week. The component re-render performance is within our 16ms budget.
 
-**Maria Santos:** This also affects the Mobile App V2 project timeline.
+## Related Projects
 
+The Mobile App V2 project (in_progress) is relevant to this discussion.
 
-## Decisions
-
-**Sophie Martin:** Based on this discussion, we'll proceed with Swagger for the next phase.
-
+The Developer Portal project (completed) is relevant to this discussion.
 
 ## Action Items
 
-- Sophie Martin will follow up on Swagger integration by end of week
-- Angela Rivera will follow up on Tailwind CSS integration by end of week
-- Maria Santos will follow up on Tailwind CSS integration by end of week
+- Sophie Martin will investigate Swagger configuration and report findings by end of week
+- Angela Rivera will investigate Next.js configuration and report findings by end of week
+- Maria Santos will investigate React configuration and report findings by end of week

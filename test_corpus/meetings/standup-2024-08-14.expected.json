@@ -1,45 +1,85 @@
 {
     "entities": [
         {
+            "name": "Lisa Wang",
+            "type": "person"
+        },
+        {
+            "name": "Maria Santos",
+            "type": "person"
+        },
+        {
             "name": "Kevin Park",
             "type": "person"
         },
         {
-            "name": "David Kim",
+            "name": "Ryan O'Brien",
             "type": "person"
         },
         {
-            "name": "Tom Brennan",
-            "type": "person"
+            "name": "PostgreSQL",
+            "type": "technology"
+        },
+        {
+            "name": "Payment Gateway Refactor",
+            "type": "project"
+        },
+        {
+            "name": "Next.js",
+            "type": "technology"
+        },
+        {
+            "name": "Developer Portal",
+            "type": "project"
         },
         {
             "name": "OAuth",
             "type": "technology"
         },
         {
-            "name": "GitHub Actions",
+            "name": "Kubernetes",
             "type": "technology"
         },
         {
-            "name": "Docker",
-            "type": "technology"
+            "name": "Observability Initiative",
+            "type": "project"
         }
     ],
     "cooccurrences": [
+        {
+            "entity_a": "Lisa Wang",
+            "entity_b": "PostgreSQL"
+        },
+        {
+            "entity_a": "Lisa Wang",
+            "entity_b": "Payment Gateway Refactor"
+        },
+        {
+            "entity_a": "Maria Santos",
+            "entity_b": "Next.js"
+        },
+        {
+            "entity_a": "Maria Santos",
+            "entity_b": "Developer Portal"
+        },
         {
             "entity_a": "Kevin Park",
             "entity_b": "OAuth"
         },
         {
-            "entity_a": "David Kim",
-            "entity_b": "GitHub Actions"
+            "entity_a": "Kevin Park",
+            "entity_b": "Payment Gateway Refactor"
         },
         {
-            "entity_a": "Tom Brennan",
-            "entity_b": "Docker"
+            "entity_a": "Ryan O'Brien",
+            "entity_b": "Kubernetes"
+        },
+        {
+            "entity_a": "Ryan O'Brien",
+            "entity_b": "Observability Initiative"
         }
     ],
-    "expected_chunks_min": 3,
-    "expected_chunks_max": 6,
+    "expected_chunks_min": 4,
+    "expected_chunks_max": 9,
     "expected_filler_chunks_min": 1
 }

@@ -13,7 +13,7 @@
             "type": "person"
         },
         {
-            "name": "PagerDuty",
+            "name": "Grafana",
             "type": "technology"
         },
         {
@@ -21,28 +21,8 @@
             "type": "technology"
         },
         {
-            "name": "Kubernetes",
+            "name": "PagerDuty",
             "type": "technology"
-        },
-        {
-            "name": "Terraform",
-            "type": "technology"
-        },
-        {
-            "name": "Datadog",
-            "type": "technology"
-        },
-        {
-            "name": "AWS",
-            "type": "technology"
-        },
-        {
-            "name": "Data Lake Migration",
-            "type": "project"
-        },
-        {
-            "name": "Auth Service Modernization",
-            "type": "project"
         },
         {
             "name": "Observability Initiative",
@@ -52,47 +32,19 @@
     "cooccurrences": [
         {
             "entity_a": "Derek Washington",
-            "entity_b": "Datadog"
-        },
-        {
-            "entity_a": "Derek Washington",
-            "entity_b": "PagerDuty"
+            "entity_b": "Grafana"
         },
         {
             "entity_a": "Derek Washington",
             "entity_b": "Prometheus"
         },
         {
-            "entity_a": "David Kim",
-            "entity_b": "Terraform"
-        },
-        {
-            "entity_a": "David Kim",
-            "entity_b": "AWS"
-        },
-        {
-            "entity_a": "Ryan O'Brien",
-            "entity_b": "Kubernetes"
-        },
-        {
             "entity_a": "Derek Washington",
-            "entity_b": "Observability Initiative"
+            "entity_b": "PagerDuty"
         },
         {
             "entity_a": "David Kim",
             "entity_b": "Observability Initiative"
-        },
-        {
-            "entity_a": "David Kim",
-            "entity_b": "Data Lake Migration"
-        },
-        {
-            "entity_a": "Ryan O'Brien",
-            "entity_b": "Observability Initiative"
-        },
-        {
-            "entity_a": "Ryan O'Brien",
-            "entity_b": "Auth Service Modernization"
         }
     ],
     "expected_chunks_min": 3,

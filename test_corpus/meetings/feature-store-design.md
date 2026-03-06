@@ -1,29 +1,27 @@
-# Feature Store Design — 2024-10-01
+# Feature Store Design — 2024-10-03
 
 ## Attendees
-Emily Zhang, James Liu, John Doe
 
+Emily Zhang, James Liu, John Doe
 
 ## Discussion
 
-**Emily Zhang:** I spoke with the AWS EKS team and they're willing to provide support during the rollout.
+**Emily Zhang:** Let me walk through the data on this. I've been working with Airflow and the performance characteristics are solid — The DAG execution times are consistent at about 12 minutes per run.
 
-**Emily Zhang:** This also affects the Observability Initiative project timeline.
+**James Liu:** I've been analyzing the metrics and our PyTorch setup needs attention. The model training is converging in about 45 epochs on the current dataset.
 
-**James Liu:** I have concerns about Python compatibility with our existing infrastructure. We should run a proof of concept first.
+**John Doe:** James Liu raises a good point. i've been analyzing the metrics and we should discuss our dbt configuration. The test coverage for data models is at 85% with schema tests on all tables.
 
-**James Liu:** This also affects the ML Recommendation Engine project timeline.
+**John Doe:** We can build on the lessons from the Auth Service Modernization project which shipped in September 2024.
 
-**John Doe:** I have concerns about scikit-learn compatibility with our existing infrastructure. We should run a proof of concept first.
+## Related Projects
 
+The Data Lake Migration project (completed) is relevant to this discussion.
 
-## Decisions
-
-**Emily Zhang:** Based on this discussion, we'll proceed with MLflow for the next phase.
-
+The ML Recommendation Engine project (in_progress) is relevant to this discussion.
 
 ## Action Items
 
-- Emily Zhang will follow up on AWS EKS integration by end of week
-- James Liu will follow up on Kafka integration by end of week
-- John Doe will follow up on MLflow integration by end of week
+- Emily Zhang will investigate Airflow configuration and report findings by end of week
+- James Liu will investigate PyTorch configuration and report findings by end of week
+- John Doe will investigate dbt configuration and report findings by end of week

@@ -1,37 +1,53 @@
 {
     "entities": [
         {
-            "name": "Sarah Chen",
+            "name": "James Liu",
             "type": "person"
         },
         {
-            "name": "Maria Santos",
+            "name": "Marcus Johnson",
             "type": "person"
         },
         {
-            "name": "John Doe",
+            "name": "Carlos Mendez",
             "type": "person"
         },
         {
-            "name": "Tailwind CSS",
+            "name": "Snowflake",
             "type": "technology"
         },
         {
-            "name": "Kafka",
+            "name": "Data Lake Migration",
+            "type": "project"
+        },
+        {
+            "name": "Figma",
+            "type": "technology"
+        },
+        {
+            "name": "Swift",
             "type": "technology"
         }
     ],
     "cooccurrences": [
         {
-            "entity_a": "Maria Santos",
-            "entity_b": "Tailwind CSS"
+            "entity_a": "James Liu",
+            "entity_b": "Snowflake"
         },
         {
-            "entity_a": "John Doe",
-            "entity_b": "Kafka"
+            "entity_a": "James Liu",
+            "entity_b": "Data Lake Migration"
+        },
+        {
+            "entity_a": "Marcus Johnson",
+            "entity_b": "Figma"
+        },
+        {
+            "entity_a": "Carlos Mendez",
+            "entity_b": "Swift"
         }
     ],
     "expected_chunks_min": 3,
-    "expected_chunks_max": 6,
+    "expected_chunks_max": 7,
     "expected_filler_chunks_min": 1
 }

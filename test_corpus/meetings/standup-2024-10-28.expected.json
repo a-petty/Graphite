@@ -1,7 +1,11 @@
 {
     "entities": [
         {
-            "name": "David Kim",
+            "name": "Tom Brennan",
+            "type": "person"
+        },
+        {
+            "name": "Kevin Park",
             "type": "person"
         },
         {
@@ -9,49 +13,53 @@
             "type": "person"
         },
         {
-            "name": "Emily Zhang",
-            "type": "person"
-        },
-        {
-            "name": "John Doe",
-            "type": "person"
-        },
-        {
-            "name": "GitHub Actions",
+            "name": "Python",
             "type": "technology"
         },
         {
-            "name": "Snowflake",
+            "name": "Payment Gateway Refactor",
+            "type": "project"
+        },
+        {
+            "name": "Vault",
             "type": "technology"
         },
         {
-            "name": "scikit-learn",
+            "name": "Airflow",
             "type": "technology"
         },
         {
-            "name": "AWS EKS",
-            "type": "technology"
+            "name": "Data Lake Migration",
+            "type": "project"
         }
     ],
     "cooccurrences": [
         {
-            "entity_a": "David Kim",
-            "entity_b": "GitHub Actions"
+            "entity_a": "Tom Brennan",
+            "entity_b": "Python"
+        },
+        {
+            "entity_a": "Tom Brennan",
+            "entity_b": "Payment Gateway Refactor"
+        },
+        {
+            "entity_a": "Kevin Park",
+            "entity_b": "Vault"
+        },
+        {
+            "entity_a": "Kevin Park",
+            "entity_b": "Payment Gateway Refactor"
         },
         {
             "entity_a": "James Liu",
-            "entity_b": "Snowflake"
+            "entity_b": "Airflow"
         },
         {
-            "entity_a": "Emily Zhang",
-            "entity_b": "scikit-learn"
-        },
-        {
-            "entity_a": "John Doe",
-            "entity_b": "AWS EKS"
+            "entity_a": "James Liu",
+            "entity_b": "Data Lake Migration"
         }
     ],
-    "expected_chunks_min": 4,
-    "expected_chunks_max": 8,
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 7,
     "expected_filler_chunks_min": 1
 }

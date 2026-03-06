@@ -1,25 +1,25 @@
-# Payment Gateway Security Review — 2024-11-15
+# Payment Gateway Security Review — 2024-11-09
 
 ## Attendees
-Kevin Park, John Doe, Tom Brennan
 
+Kevin Park, John Doe, Tom Brennan
 
 ## Discussion
 
-**Kevin Park:** I spoke with the PostgreSQL team and they're willing to provide support during the rollout.
+**Kevin Park:** Before we commit, we should consider the risks. We should discuss our OAuth configuration. Token refresh flow is working correctly with the 15-minute expiry.
 
-**John Doe:** Based on our metrics, switching to Docker would reduce latency by approximately 30%.
+**John Doe:** Let me walk through the data on this. I ran benchmarks on Vault last week. The dynamic secret rotation is running every 24 hours without issues.
 
-**Tom Brennan:** I spoke with the AWS EKS team and they're willing to provide support during the rollout.
+**Tom Brennan:** I think we need to be practical here. Our PostgreSQL setup needs attention. The query planner is choosing index scans correctly after the ANALYZE.
 
+**Tom Brennan:** We should keep in mind the payment service outage incident from July 2024.
 
 ## Decisions
 
-**Kevin Park:** Based on this discussion, we'll proceed with Go for the next phase.
-
+**John Doe:** Based on this discussion, we've decided: Scheduled CockroachDB migration for Q1 2025. Need horizontally scalable SQL database for payment service growth projections exceeding single-node PostgreSQL limits
 
 ## Action Items
 
-- Kevin Park will follow up on AWS EKS integration by end of week
-- John Doe will follow up on Docker integration by end of week
-- Tom Brennan will follow up on AWS EKS integration by end of week
+- Kevin Park will investigate OAuth configuration and report findings by end of week
+- John Doe will investigate Vault configuration and report findings by end of week
+- Tom Brennan will investigate PostgreSQL configuration and report findings by end of week

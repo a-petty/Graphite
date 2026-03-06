@@ -1,0 +1,69 @@
+{
+    "entities": [
+        {
+            "name": "Maria Santos",
+            "type": "person"
+        },
+        {
+            "name": "Emily Zhang",
+            "type": "person"
+        },
+        {
+            "name": "Priya Patel",
+            "type": "person"
+        },
+        {
+            "name": "React",
+            "type": "technology"
+        },
+        {
+            "name": "Internal Tools Consolidation",
+            "type": "project"
+        },
+        {
+            "name": "PyTorch",
+            "type": "technology"
+        },
+        {
+            "name": "Data Lake Migration",
+            "type": "project"
+        },
+        {
+            "name": "Redis",
+            "type": "technology"
+        },
+        {
+            "name": "ML Recommendation Engine",
+            "type": "project"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Maria Santos",
+            "entity_b": "React"
+        },
+        {
+            "entity_a": "Maria Santos",
+            "entity_b": "Internal Tools Consolidation"
+        },
+        {
+            "entity_a": "Emily Zhang",
+            "entity_b": "PyTorch"
+        },
+        {
+            "entity_a": "Emily Zhang",
+            "entity_b": "Data Lake Migration"
+        },
+        {
+            "entity_a": "Priya Patel",
+            "entity_b": "Redis"
+        },
+        {
+            "entity_a": "Priya Patel",
+            "entity_b": "ML Recommendation Engine"
+        }
+    ],
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 7,
+    "expected_filler_chunks_min": 1
+}

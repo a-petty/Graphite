@@ -1,0 +1,20 @@
+{
+    "entities": [
+        {
+            "name": "Marcus Johnson",
+            "type": "person"
+        },
+        {
+            "name": "Maria Santos",
+            "type": "person"
+        },
+        {
+            "name": "Nina Kowalski",
+            "type": "person"
+        }
+    ],
+    "cooccurrences": [],
+    "expected_chunks_min": 2,
+    "expected_chunks_max": 5,
+    "expected_filler_chunks": 2
+}

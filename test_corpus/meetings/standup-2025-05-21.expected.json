@@ -1,0 +1,97 @@
+{
+    "entities": [
+        {
+            "name": "Rachel Torres",
+            "type": "person"
+        },
+        {
+            "name": "Tom Brennan",
+            "type": "person"
+        },
+        {
+            "name": "Alex Petrov",
+            "type": "person"
+        },
+        {
+            "name": "Kevin Park",
+            "type": "person"
+        },
+        {
+            "name": "Carlos Mendez",
+            "type": "person"
+        },
+        {
+            "name": "Playwright",
+            "type": "technology"
+        },
+        {
+            "name": "Python",
+            "type": "technology"
+        },
+        {
+            "name": "Payment Gateway Refactor",
+            "type": "project"
+        },
+        {
+            "name": "MongoDB",
+            "type": "technology"
+        },
+        {
+            "name": "API Migration",
+            "type": "project"
+        },
+        {
+            "name": "Vault",
+            "type": "technology"
+        },
+        {
+            "name": "React Native",
+            "type": "technology"
+        },
+        {
+            "name": "Mobile App V2",
+            "type": "project"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Rachel Torres",
+            "entity_b": "Playwright"
+        },
+        {
+            "entity_a": "Tom Brennan",
+            "entity_b": "Python"
+        },
+        {
+            "entity_a": "Tom Brennan",
+            "entity_b": "Payment Gateway Refactor"
+        },
+        {
+            "entity_a": "Alex Petrov",
+            "entity_b": "MongoDB"
+        },
+        {
+            "entity_a": "Alex Petrov",
+            "entity_b": "API Migration"
+        },
+        {
+            "entity_a": "Kevin Park",
+            "entity_b": "Vault"
+        },
+        {
+            "entity_a": "Kevin Park",
+            "entity_b": "Payment Gateway Refactor"
+        },
+        {
+            "entity_a": "Carlos Mendez",
+            "entity_b": "React Native"
+        },
+        {
+            "entity_a": "Carlos Mendez",
+            "entity_b": "Mobile App V2"
+        }
+    ],
+    "expected_chunks_min": 5,
+    "expected_chunks_max": 11,
+    "expected_filler_chunks_min": 1
+}

@@ -1,45 +1,89 @@
 {
     "entities": [
         {
-            "name": "Ryan O'Brien",
+            "name": "Olivia Foster",
             "type": "person"
         },
         {
-            "name": "Rachel Torres",
+            "name": "John Doe",
             "type": "person"
         },
         {
-            "name": "Carlos Mendez",
+            "name": "Priya Patel",
             "type": "person"
         },
         {
-            "name": "Istio",
+            "name": "Daniel Reeves",
+            "type": "person"
+        },
+        {
+            "name": "Derek Washington",
+            "type": "person"
+        },
+        {
+            "name": "Next.js",
             "type": "technology"
         },
         {
-            "name": "Playwright",
+            "name": "AWS EKS",
             "type": "technology"
         },
         {
-            "name": "Firebase",
+            "name": "Observability Initiative",
+            "type": "project"
+        },
+        {
+            "name": "GraphQL",
+            "type": "technology"
+        },
+        {
+            "name": "Dashboard Redesign",
+            "type": "project"
+        },
+        {
+            "name": "PostgreSQL",
+            "type": "technology"
+        },
+        {
+            "name": "Prometheus",
             "type": "technology"
         }
     ],
     "cooccurrences": [
         {
-            "entity_a": "Ryan O'Brien",
-            "entity_b": "Istio"
+            "entity_a": "Olivia Foster",
+            "entity_b": "Next.js"
         },
         {
-            "entity_a": "Rachel Torres",
-            "entity_b": "Playwright"
+            "entity_a": "John Doe",
+            "entity_b": "AWS EKS"
         },
         {
-            "entity_a": "Carlos Mendez",
-            "entity_b": "Firebase"
+            "entity_a": "John Doe",
+            "entity_b": "Observability Initiative"
+        },
+        {
+            "entity_a": "Priya Patel",
+            "entity_b": "GraphQL"
+        },
+        {
+            "entity_a": "Priya Patel",
+            "entity_b": "Dashboard Redesign"
+        },
+        {
+            "entity_a": "Daniel Reeves",
+            "entity_b": "PostgreSQL"
+        },
+        {
+            "entity_a": "Derek Washington",
+            "entity_b": "Prometheus"
+        },
+        {
+            "entity_a": "Derek Washington",
+            "entity_b": "Observability Initiative"
         }
     ],
-    "expected_chunks_min": 3,
-    "expected_chunks_max": 6,
+    "expected_chunks_min": 5,
+    "expected_chunks_max": 11,
     "expected_filler_chunks_min": 1
 }

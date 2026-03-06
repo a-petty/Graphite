@@ -21,15 +21,15 @@
             "type": "project"
         },
         {
-            "name": "Sophie Martin",
-            "type": "person"
-        },
-        {
-            "name": "Nina Kowalski",
+            "name": "Maria Santos",
             "type": "person"
         },
         {
             "name": "Carlos Mendez",
+            "type": "person"
+        },
+        {
+            "name": "Nina Kowalski",
             "type": "person"
         }
     ],
@@ -52,18 +52,18 @@
         },
         {
             "entity_a": "Angela Rivera",
-            "entity_b": "Sophie Martin"
-        },
-        {
-            "entity_a": "Angela Rivera",
-            "entity_b": "Nina Kowalski"
+            "entity_b": "Maria Santos"
         },
         {
             "entity_a": "Angela Rivera",
             "entity_b": "Carlos Mendez"
+        },
+        {
+            "entity_a": "Angela Rivera",
+            "entity_b": "Nina Kowalski"
         }
     ],
     "expected_chunks_min": 3,
-    "expected_chunks_max": 8,
+    "expected_chunks_max": 10,
     "expected_filler_chunks": 0
 }

@@ -1,31 +1,25 @@
-# Q2 Retrospective — 2024-06-01
+# Q2 Retrospective — 2024-06-24
 
 ## Attendees
-Sarah Chen, Aisha Hassan, Angela Rivera, David Kim
 
+Sarah Chen, Aisha Hassan, Angela Rivera, David Kim
 
 ## Discussion
 
-**Sarah Chen:** We need to consider the trade-offs here. Terraform has a steeper learning curve but better long-term maintainability.
+**Sarah Chen:** Let me walk through the data on this. We should discuss our ArgoCD configuration. The GitOps sync is completing within 90 seconds of merge.
 
-**Sarah Chen:** This also affects the Observability Initiative project timeline.
+**Aisha Hassan:** Building on what Sarah Chen said, the trade-off we need to evaluate is straightforward. We should discuss our GitHub Actions configuration. The CI pipeline runs in about 8 minutes end to end.
 
-**Aisha Hassan:** I've been looking into Terraform and I think it could solve our Q2 retrospective challenges. The performance benchmarks look promising.
+**Angela Rivera:** Let's focus on what we can ship this quarter. Our Helm setup needs attention. The chart templating is correctly parameterizing per-environment configs.
 
-**Angela Rivera:** I have concerns about Terraform compatibility with our existing infrastructure. We should run a proof of concept first.
-
-**Angela Rivera:** This also affects the Observability Initiative project timeline.
-
-**David Kim:** I spoke with the Terraform team and they're willing to provide support during the rollout.
-
+**David Kim:** Let's focus on what we can ship this quarter. I've been working with Kubernetes and the performance characteristics are solid — The HPA scaling is keeping pods between 2 and 8 replicas as expected.
 
 ## Decisions
 
-**Sarah Chen:** Based on this discussion, we'll proceed with Terraform for the next phase.
-
+**James Liu:** Based on this discussion, we've decided: Adopted Snowflake as primary data warehouse. Need scalable analytics warehouse that separates compute from storage to handle growing data volumes cost-effectively
 
 ## Action Items
 
-- Sarah Chen will follow up on Terraform integration by end of week
-- Aisha Hassan will follow up on Terraform integration by end of week
-- Angela Rivera will follow up on Terraform integration by end of week
+- Sarah Chen will investigate ArgoCD configuration and report findings by end of week
+- Aisha Hassan will investigate GitHub Actions configuration and report findings by end of week
+- Angela Rivera will investigate Helm configuration and report findings by end of week

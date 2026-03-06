@@ -1,29 +1,29 @@
-# Observability Stack Evaluation — 2024-09-02
+# Observability Stack Evaluation — 2024-09-14
 
 ## Attendees
-Derek Washington, David Kim, Ryan O'Brien
 
+Derek Washington, David Kim, Ryan O'Brien
 
 ## Discussion
 
-**Derek Washington:** From my perspective, we should prioritize PagerDuty integration. The current approach has scalability concerns.
+**Derek Washington:** What's the simplest path to getting this done? We should discuss our Prometheus configuration. The scrape interval is at 15s which gives us good resolution without overhead.
 
-**Derek Washington:** This also affects the Data Lake Migration project timeline.
+**David Kim:** Derek Washington raises a good point. let's focus on what we can ship this quarter. I ran benchmarks on PagerDuty last week. The escalation policies are working and mean time to acknowledge is under 3 minutes.
 
-**David Kim:** I spoke with the Prometheus team and they're willing to provide support during the rollout.
+**Ryan O'Brien:** Building on what David Kim said, before we commit, we should consider the risks. I've been working with Grafana and the performance characteristics are solid — The new dashboards are being used daily by the on-call team.
 
-**David Kim:** This also affects the Auth Service Modernization project timeline.
-
-**Ryan O'Brien:** From my perspective, we should prioritize Kubernetes integration. The current approach has scalability concerns.
-
+**Ryan O'Brien:** We should keep in mind the payment service outage incident from July 2024.
 
 ## Decisions
 
-**Derek Washington:** Based on this discussion, we'll proceed with Kubernetes for the next phase.
+**Sarah Chen:** Based on this discussion, we've decided: Adopted trunk-based development. Reduce merge conflicts and enable continuous deployment by keeping branches short-lived
 
+## Related Projects
+
+The Observability Initiative project (in_progress) is relevant to this discussion.
 
 ## Action Items
 
-- Derek Washington will follow up on Kubernetes integration by end of week
-- David Kim will follow up on Prometheus integration by end of week
-- Ryan O'Brien will follow up on Terraform integration by end of week
+- Derek Washington will investigate Grafana configuration and report findings by end of week
+- David Kim will investigate Prometheus configuration and report findings by end of week
+- Ryan O'Brien will investigate PagerDuty configuration and report findings by end of week

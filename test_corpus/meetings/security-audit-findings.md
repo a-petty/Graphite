@@ -1,31 +1,25 @@
-# Security Audit Findings — 2024-07-11
+# Security Audit Findings — 2024-07-01
 
 ## Attendees
-Kevin Park, Aisha Hassan, Ryan O'Brien
 
+Kevin Park, Aisha Hassan, Ryan O'Brien
 
 ## Discussion
 
-**Kevin Park:** I have concerns about Go compatibility with our existing infrastructure. We should run a proof of concept first.
+**Kevin Park:** I'm not fully convinced yet. I've been working with Vault and the performance characteristics are solid — The dynamic secret rotation is running every 24 hours without issues.
 
-**Kevin Park:** This also affects the Service Mesh Rollout project timeline.
+**Aisha Hassan:** To add to Kevin Park's point, what's the simplest path to getting this done? The Go integration is coming along well. The auth service is handling 10K req/s with 8MB memory footprint.
 
-**Aisha Hassan:** Based on our metrics, switching to Vault would reduce latency by approximately 30%.
+**Ryan O'Brien:** I have concerns about this approach. I ran benchmarks on gRPC last week. We're making good progress on the implementation.
 
-**Aisha Hassan:** This also affects the Service Mesh Rollout project timeline.
+**Ryan O'Brien:** This connects to our earlier decision to adopted snowflake as primary data warehouse back in June 2024.
 
-**Ryan O'Brien:** From my perspective, we should prioritize gRPC integration. The current approach has scalability concerns.
+## Related Projects
 
-**Ryan O'Brien:** This also affects the Service Mesh Rollout project timeline.
-
-
-## Decisions
-
-**Kevin Park:** Based on this discussion, we'll proceed with Istio for the next phase.
-
+The Auth Service Modernization project (completed) is relevant to this discussion.
 
 ## Action Items
 
-- Kevin Park will follow up on Go integration by end of week
-- Aisha Hassan will follow up on Istio integration by end of week
-- Ryan O'Brien will follow up on Istio integration by end of week
+- Kevin Park will investigate Go configuration and report findings by end of week
+- Aisha Hassan will investigate gRPC configuration and report findings by end of week
+- Ryan O'Brien will investigate Vault configuration and report findings by end of week

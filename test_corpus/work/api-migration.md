@@ -4,31 +4,29 @@
 
 The API Migration project was initiated in July 2024 and is led by Priya Patel. The core team includes Marcus Johnson, Alex Petrov, Sophie Martin.
 
+Goal: Migrate internal services from REST to GraphQL for flexible querying and reduced over-fetching.
 
 ## Technical Architecture
 
-The technical stack includes GraphQL, Apollo Server, REST, Swagger. 
-GraphQL integrates well with the existing infrastructure and reduces operational complexity. 
-The team selected Apollo Server after evaluating several alternatives, based on performance and developer experience. 
-The team selected REST after evaluating several alternatives, based on performance and developer experience. 
+The technical stack includes GraphQL, Apollo Server, REST, Swagger.
 
+GraphQL was selected for reduces over-fetching and enables client-driven queries.
 
+Apollo Server was selected for mature ecosystem with caching and federation support.
+
+The team selected REST based on performance benchmarks and developer experience.
+
+Swagger was selected for documentation for legacy REST endpoints during transition.
 
 ## Key Decisions
 
-1. Adopted GraphQL as the primary framework
-
-2. Implemented CI/CD pipeline using GitHub Actions for automated testing and deployment
-
-3. Established weekly sync meetings between Priya Patel and stakeholders
-
+1. Chose Apollo Server over Hasura for GraphQL (July 2024)
+1. Selected React over Vue for Dashboard Redesign (August 2024)
 
 ## Timeline
 
-- July 2024: Project kickoff, initial architecture design
-
+- July 2024: Project kickoff and initial architecture design
 - Ongoing: Active development and iteration
-
 
 ## Status
 

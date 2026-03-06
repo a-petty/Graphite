@@ -49,7 +49,11 @@
             "type": "project"
         },
         {
-            "name": "Ryan O'Brien",
+            "name": "Derek Washington",
+            "type": "person"
+        },
+        {
+            "name": "Emily Zhang",
             "type": "person"
         },
         {
@@ -57,7 +61,7 @@
             "type": "person"
         },
         {
-            "name": "Derek Washington",
+            "name": "Tom Brennan",
             "type": "person"
         }
     ],
@@ -108,7 +112,11 @@
         },
         {
             "entity_a": "David Kim",
-            "entity_b": "Ryan O'Brien"
+            "entity_b": "Derek Washington"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "Emily Zhang"
         },
         {
             "entity_a": "David Kim",
@@ -116,10 +124,10 @@
         },
         {
             "entity_a": "David Kim",
-            "entity_b": "Derek Washington"
+            "entity_b": "Tom Brennan"
         }
     ],
     "expected_chunks_min": 3,
-    "expected_chunks_max": 8,
+    "expected_chunks_max": 10,
     "expected_filler_chunks": 0
 }

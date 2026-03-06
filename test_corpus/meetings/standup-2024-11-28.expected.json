@@ -1,19 +1,11 @@
 {
     "entities": [
         {
-            "name": "Marcus Johnson",
+            "name": "Derek Washington",
             "type": "person"
         },
         {
-            "name": "James Liu",
-            "type": "person"
-        },
-        {
-            "name": "Ryan O'Brien",
-            "type": "person"
-        },
-        {
-            "name": "Lisa Wang",
+            "name": "Daniel Reeves",
             "type": "person"
         },
         {
@@ -21,49 +13,73 @@
             "type": "person"
         },
         {
-            "name": "Figma",
+            "name": "James Liu",
+            "type": "person"
+        },
+        {
+            "name": "Sarah Chen",
+            "type": "person"
+        },
+        {
+            "name": "Grafana",
             "type": "technology"
         },
         {
-            "name": "dbt",
+            "name": "Observability Initiative",
+            "type": "project"
+        },
+        {
+            "name": "Kafka",
             "type": "technology"
         },
         {
-            "name": "Istio",
+            "name": "PostgreSQL",
             "type": "technology"
         },
         {
-            "name": "Python",
+            "name": "Payment Gateway Refactor",
+            "type": "project"
+        },
+        {
+            "name": "Airflow",
             "type": "technology"
         },
         {
-            "name": "AWS EKS",
-            "type": "technology"
+            "name": "ML Recommendation Engine",
+            "type": "project"
         }
     ],
     "cooccurrences": [
         {
-            "entity_a": "Marcus Johnson",
-            "entity_b": "Figma"
+            "entity_a": "Derek Washington",
+            "entity_b": "Grafana"
         },
         {
-            "entity_a": "James Liu",
-            "entity_b": "dbt"
+            "entity_a": "Derek Washington",
+            "entity_b": "Observability Initiative"
         },
         {
-            "entity_a": "Ryan O'Brien",
-            "entity_b": "Istio"
-        },
-        {
-            "entity_a": "Lisa Wang",
-            "entity_b": "Python"
+            "entity_a": "Daniel Reeves",
+            "entity_b": "Kafka"
         },
         {
             "entity_a": "John Doe",
-            "entity_b": "AWS EKS"
+            "entity_b": "PostgreSQL"
+        },
+        {
+            "entity_a": "John Doe",
+            "entity_b": "Payment Gateway Refactor"
+        },
+        {
+            "entity_a": "James Liu",
+            "entity_b": "Airflow"
+        },
+        {
+            "entity_a": "James Liu",
+            "entity_b": "ML Recommendation Engine"
         }
     ],
     "expected_chunks_min": 5,
-    "expected_chunks_max": 10,
+    "expected_chunks_max": 11,
     "expected_filler_chunks_min": 1
 }

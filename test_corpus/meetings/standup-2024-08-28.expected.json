@@ -1,15 +1,11 @@
 {
     "entities": [
         {
-            "name": "Lisa Wang",
+            "name": "John Doe",
             "type": "person"
         },
         {
-            "name": "David Kim",
-            "type": "person"
-        },
-        {
-            "name": "Maria Santos",
+            "name": "Marcus Johnson",
             "type": "person"
         },
         {
@@ -17,53 +13,57 @@
             "type": "person"
         },
         {
-            "name": "James Liu",
-            "type": "person"
-        },
-        {
-            "name": "FastAPI",
+            "name": "PostgreSQL",
             "type": "technology"
         },
         {
-            "name": "Kubernetes",
+            "name": "Payment Gateway Refactor",
+            "type": "project"
+        },
+        {
+            "name": "React",
             "type": "technology"
         },
         {
-            "name": "Next.js",
+            "name": "API Migration",
+            "type": "project"
+        },
+        {
+            "name": "MLflow",
             "type": "technology"
         },
         {
-            "name": "Python",
-            "type": "technology"
-        },
-        {
-            "name": "Snowflake",
-            "type": "technology"
+            "name": "Data Lake Migration",
+            "type": "project"
         }
     ],
     "cooccurrences": [
         {
-            "entity_a": "Lisa Wang",
-            "entity_b": "FastAPI"
+            "entity_a": "John Doe",
+            "entity_b": "PostgreSQL"
         },
         {
-            "entity_a": "David Kim",
-            "entity_b": "Kubernetes"
+            "entity_a": "John Doe",
+            "entity_b": "Payment Gateway Refactor"
         },
         {
-            "entity_a": "Maria Santos",
-            "entity_b": "Next.js"
+            "entity_a": "Marcus Johnson",
+            "entity_b": "React"
+        },
+        {
+            "entity_a": "Marcus Johnson",
+            "entity_b": "API Migration"
         },
         {
             "entity_a": "Emily Zhang",
-            "entity_b": "Python"
+            "entity_b": "MLflow"
         },
         {
-            "entity_a": "James Liu",
-            "entity_b": "Snowflake"
+            "entity_a": "Emily Zhang",
+            "entity_b": "Data Lake Migration"
         }
     ],
-    "expected_chunks_min": 5,
-    "expected_chunks_max": 10,
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 7,
     "expected_filler_chunks_min": 1
 }

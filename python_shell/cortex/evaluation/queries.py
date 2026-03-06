@@ -27,7 +27,7 @@ class TestQuery:
 class TestQueryLoader:
     """Loads and validates eval_queries.json."""
 
-    VALID_TYPES = {"retrieval", "temporal", "multi_hop"}
+    VALID_TYPES = {"retrieval", "temporal", "multi_hop", "filler_rejection", "cross_document_chain"}
 
     @classmethod
     def load(cls, path: Path) -> List[TestQuery]:

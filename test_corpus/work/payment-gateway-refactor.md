@@ -4,31 +4,29 @@
 
 The Payment Gateway Refactor project was initiated in June 2024 and is led by John Doe. The core team includes Lisa Wang, Tom Brennan, Kevin Park.
 
+Goal: Replace monolithic payment processor with event-driven architecture for reliability and PCI compliance.
 
 ## Technical Architecture
 
-The technical stack includes Python, Kafka, PostgreSQL, Stripe. 
-Python integrates well with the existing infrastructure and reduces operational complexity. 
-Kafka integrates well with the existing infrastructure and reduces operational complexity. 
-PostgreSQL was chosen for its strong community support and proven track record in production. 
+The technical stack includes Python, Kafka, PostgreSQL, Stripe.
 
+Python was selected for team expertise and existing library ecosystem.
 
+Kafka was selected for async event streaming for payment events with guaranteed delivery.
+
+PostgreSQL was selected for ACID transactions for payment state management.
+
+Stripe was selected for PCI-compliant payment processing with webhook integration.
 
 ## Key Decisions
 
-1. Adopted Python as the primary framework
-
-2. Implemented CI/CD pipeline using GitHub Actions for automated testing and deployment
-
-3. Established weekly sync meetings between John Doe and stakeholders
-
+1. Scheduled CockroachDB migration for Q1 2025 (November 2024)
+1. Chose event sourcing over CQRS-only for core domain services (March 2025)
 
 ## Timeline
 
-- June 2024: Project kickoff, initial architecture design
-
+- June 2024: Project kickoff and initial architecture design
 - Ongoing: Active development and iteration
-
 
 ## Status
 

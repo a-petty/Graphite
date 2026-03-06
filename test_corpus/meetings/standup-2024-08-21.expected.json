@@ -1,57 +1,85 @@
 {
     "entities": [
         {
+            "name": "Ryan O'Brien",
+            "type": "person"
+        },
+        {
+            "name": "Rachel Torres",
+            "type": "person"
+        },
+        {
+            "name": "Marcus Johnson",
+            "type": "person"
+        },
+        {
+            "name": "Daniel Reeves",
+            "type": "person"
+        },
+        {
             "name": "Carlos Mendez",
             "type": "person"
         },
         {
-            "name": "Lisa Wang",
-            "type": "person"
-        },
-        {
-            "name": "Emily Zhang",
-            "type": "person"
-        },
-        {
-            "name": "James Liu",
-            "type": "person"
-        },
-        {
-            "name": "Kotlin",
+            "name": "gRPC",
             "type": "technology"
         },
         {
-            "name": "FastAPI",
+            "name": "Auth Service Modernization",
+            "type": "project"
+        },
+        {
+            "name": "Playwright",
             "type": "technology"
         },
         {
-            "name": "PyTorch",
+            "name": "TypeScript",
             "type": "technology"
         },
         {
-            "name": "Snowflake",
+            "name": "API Migration",
+            "type": "project"
+        },
+        {
+            "name": "PostgreSQL",
+            "type": "technology"
+        },
+        {
+            "name": "React Native",
             "type": "technology"
         }
     ],
     "cooccurrences": [
         {
+            "entity_a": "Ryan O'Brien",
+            "entity_b": "gRPC"
+        },
+        {
+            "entity_a": "Ryan O'Brien",
+            "entity_b": "Auth Service Modernization"
+        },
+        {
+            "entity_a": "Rachel Torres",
+            "entity_b": "Playwright"
+        },
+        {
+            "entity_a": "Marcus Johnson",
+            "entity_b": "TypeScript"
+        },
+        {
+            "entity_a": "Marcus Johnson",
+            "entity_b": "API Migration"
+        },
+        {
+            "entity_a": "Daniel Reeves",
+            "entity_b": "PostgreSQL"
+        },
+        {
             "entity_a": "Carlos Mendez",
-            "entity_b": "Kotlin"
-        },
-        {
-            "entity_a": "Lisa Wang",
-            "entity_b": "FastAPI"
-        },
-        {
-            "entity_a": "Emily Zhang",
-            "entity_b": "PyTorch"
-        },
-        {
-            "entity_a": "James Liu",
-            "entity_b": "Snowflake"
+            "entity_b": "React Native"
         }
     ],
-    "expected_chunks_min": 4,
-    "expected_chunks_max": 8,
+    "expected_chunks_min": 5,
+    "expected_chunks_max": 11,
     "expected_filler_chunks_min": 1
 }

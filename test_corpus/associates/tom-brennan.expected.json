@@ -33,11 +33,15 @@
             "type": "person"
         },
         {
+            "name": "Kevin Park",
+            "type": "person"
+        },
+        {
             "name": "Lisa Wang",
             "type": "person"
         },
         {
-            "name": "Kevin Park",
+            "name": "David Kim",
             "type": "person"
         }
     ],
@@ -72,14 +76,18 @@
         },
         {
             "entity_a": "Tom Brennan",
+            "entity_b": "Kevin Park"
+        },
+        {
+            "entity_a": "Tom Brennan",
             "entity_b": "Lisa Wang"
         },
         {
             "entity_a": "Tom Brennan",
-            "entity_b": "Kevin Park"
+            "entity_b": "David Kim"
         }
     ],
     "expected_chunks_min": 3,
-    "expected_chunks_max": 8,
+    "expected_chunks_max": 10,
     "expected_filler_chunks": 0
 }

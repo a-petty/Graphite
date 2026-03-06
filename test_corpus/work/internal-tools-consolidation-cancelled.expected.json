@@ -1,0 +1,69 @@
+{
+    "entities": [
+        {
+            "name": "Internal Tools Consolidation",
+            "type": "project"
+        },
+        {
+            "name": "Maria Santos",
+            "type": "person"
+        },
+        {
+            "name": "Marcus Johnson",
+            "type": "person"
+        },
+        {
+            "name": "Olivia Foster",
+            "type": "person"
+        },
+        {
+            "name": "React",
+            "type": "technology"
+        },
+        {
+            "name": "Next.js",
+            "type": "technology"
+        },
+        {
+            "name": "Tailwind CSS",
+            "type": "technology"
+        },
+        {
+            "name": "TypeScript",
+            "type": "technology"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Internal Tools Consolidation",
+            "entity_b": "Maria Santos"
+        },
+        {
+            "entity_a": "Internal Tools Consolidation",
+            "entity_b": "Marcus Johnson"
+        },
+        {
+            "entity_a": "Internal Tools Consolidation",
+            "entity_b": "Olivia Foster"
+        },
+        {
+            "entity_a": "Internal Tools Consolidation",
+            "entity_b": "React"
+        },
+        {
+            "entity_a": "Internal Tools Consolidation",
+            "entity_b": "Next.js"
+        },
+        {
+            "entity_a": "Internal Tools Consolidation",
+            "entity_b": "Tailwind CSS"
+        },
+        {
+            "entity_a": "Internal Tools Consolidation",
+            "entity_b": "TypeScript"
+        }
+    ],
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 7,
+    "expected_filler_chunks": 0
+}

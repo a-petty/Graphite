@@ -1,27 +1,27 @@
-# Mobile App Ux Review — 2024-10-07
+# Mobile App Ux Review — 2024-10-06
 
 ## Attendees
-Nina Kowalski, Carlos Mendez, Angela Rivera
 
+Nina Kowalski, Carlos Mendez, Angela Rivera
 
 ## Discussion
 
-**Nina Kowalski:** From my perspective, we should prioritize Kotlin integration. The current approach has scalability concerns.
+**Nina Kowalski:** I'm really excited about this direction. I've been working with React Native and the performance characteristics are solid — The shared component library is working across iOS and Android.
 
-**Carlos Mendez:** I spoke with the Figma team and they're willing to provide support during the rollout.
+**Carlos Mendez:** To add to Nina Kowalski's point, i think this could transform our workflow. The Swift integration is coming along well. We're making good progress on the implementation.
 
-**Angela Rivera:** I have concerns about React Native compatibility with our existing infrastructure. We should run a proof of concept first.
+**Carlos Mendez:** We can build on the lessons from the Auth Service Modernization project which shipped in September 2024.
 
-**Angela Rivera:** This also affects the Dashboard Redesign project timeline.
+**Angela Rivera:** What's the simplest path to getting this done? The Kotlin integration is coming along well. We're making good progress on the implementation.
 
+## Related Projects
 
-## Decisions
+The Mobile App V2 project (in_progress) is relevant to this discussion.
 
-**Nina Kowalski:** Based on this discussion, we'll proceed with Figma for the next phase.
-
+The Developer Portal project (completed) is relevant to this discussion.
 
 ## Action Items
 
-- Nina Kowalski will follow up on Figma integration by end of week
-- Carlos Mendez will follow up on Firebase integration by end of week
-- Angela Rivera will follow up on Firebase integration by end of week
+- Nina Kowalski will investigate React Native configuration and report findings by end of week
+- Carlos Mendez will investigate Swift configuration and report findings by end of week
+- Angela Rivera will investigate Kotlin configuration and report findings by end of week

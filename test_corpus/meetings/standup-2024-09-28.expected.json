@@ -1,15 +1,15 @@
 {
     "entities": [
         {
+            "name": "Olivia Foster",
+            "type": "person"
+        },
+        {
             "name": "Alex Petrov",
             "type": "person"
         },
         {
-            "name": "John Doe",
-            "type": "person"
-        },
-        {
-            "name": "Kevin Park",
+            "name": "Maria Santos",
             "type": "person"
         },
         {
@@ -17,41 +17,61 @@
             "type": "person"
         },
         {
-            "name": "Node.js",
+            "name": "TypeScript",
             "type": "technology"
+        },
+        {
+            "name": "MongoDB",
+            "type": "technology"
+        },
+        {
+            "name": "Auth Service Modernization",
+            "type": "project"
+        },
+        {
+            "name": "Tailwind CSS",
+            "type": "technology"
+        },
+        {
+            "name": "Developer Portal",
+            "type": "project"
         },
         {
             "name": "Go",
-            "type": "technology"
-        },
-        {
-            "name": "Vault",
-            "type": "technology"
-        },
-        {
-            "name": "gRPC",
             "type": "technology"
         }
     ],
     "cooccurrences": [
         {
+            "entity_a": "Olivia Foster",
+            "entity_b": "TypeScript"
+        },
+        {
             "entity_a": "Alex Petrov",
-            "entity_b": "Node.js"
+            "entity_b": "MongoDB"
         },
         {
-            "entity_a": "John Doe",
-            "entity_b": "Go"
+            "entity_a": "Alex Petrov",
+            "entity_b": "Auth Service Modernization"
         },
         {
-            "entity_a": "Kevin Park",
-            "entity_b": "Vault"
+            "entity_a": "Maria Santos",
+            "entity_b": "Tailwind CSS"
+        },
+        {
+            "entity_a": "Maria Santos",
+            "entity_b": "Developer Portal"
         },
         {
             "entity_a": "Ryan O'Brien",
-            "entity_b": "gRPC"
+            "entity_b": "Go"
+        },
+        {
+            "entity_a": "Ryan O'Brien",
+            "entity_b": "Auth Service Modernization"
         }
     ],
     "expected_chunks_min": 4,
-    "expected_chunks_max": 8,
+    "expected_chunks_max": 9,
     "expected_filler_chunks_min": 1
 }

@@ -17,23 +17,11 @@
             "type": "person"
         },
         {
-            "name": "Helm",
-            "type": "technology"
-        },
-        {
             "name": "Storybook",
             "type": "technology"
         },
         {
-            "name": "Figma",
-            "type": "technology"
-        },
-        {
-            "name": "WebSocket",
-            "type": "technology"
-        },
-        {
-            "name": "Terraform",
+            "name": "GitHub Actions",
             "type": "technology"
         },
         {
@@ -41,19 +29,15 @@
             "type": "technology"
         },
         {
-            "name": "Playwright",
+            "name": "Redis",
             "type": "technology"
         },
         {
-            "name": "Service Mesh Rollout",
+            "name": "Observability Initiative",
             "type": "project"
         },
         {
             "name": "Dashboard Redesign",
-            "type": "project"
-        },
-        {
-            "name": "Observability Initiative",
             "type": "project"
         }
     ],
@@ -63,40 +47,24 @@
             "entity_b": "Storybook"
         },
         {
-            "entity_a": "Marcus Johnson",
-            "entity_b": "Figma"
-        },
-        {
-            "entity_a": "Priya Patel",
-            "entity_b": "WebSocket"
-        },
-        {
-            "entity_a": "Priya Patel",
-            "entity_b": "Playwright"
-        },
-        {
             "entity_a": "David Kim",
-            "entity_b": "Terraform"
+            "entity_b": "GitHub Actions"
         },
         {
             "entity_a": "David Kim",
             "entity_b": "ArgoCD"
         },
         {
-            "entity_a": "David Kim",
-            "entity_b": "Helm"
+            "entity_a": "Priya Patel",
+            "entity_b": "Redis"
         },
         {
-            "entity_a": "Priya Patel",
+            "entity_a": "Marcus Johnson",
             "entity_b": "Dashboard Redesign"
         },
         {
             "entity_a": "David Kim",
             "entity_b": "Observability Initiative"
-        },
-        {
-            "entity_a": "David Kim",
-            "entity_b": "Service Mesh Rollout"
         }
     ],
     "expected_chunks_min": 4,

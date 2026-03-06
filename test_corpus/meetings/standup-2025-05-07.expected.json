@@ -1,0 +1,101 @@
+{
+    "entities": [
+        {
+            "name": "Lisa Wang",
+            "type": "person"
+        },
+        {
+            "name": "John Doe",
+            "type": "person"
+        },
+        {
+            "name": "Alex Petrov",
+            "type": "person"
+        },
+        {
+            "name": "Rachel Torres",
+            "type": "person"
+        },
+        {
+            "name": "Ryan O'Brien",
+            "type": "person"
+        },
+        {
+            "name": "Python",
+            "type": "technology"
+        },
+        {
+            "name": "Payment Gateway Refactor",
+            "type": "project"
+        },
+        {
+            "name": "Go",
+            "type": "technology"
+        },
+        {
+            "name": "Observability Initiative",
+            "type": "project"
+        },
+        {
+            "name": "RabbitMQ",
+            "type": "technology"
+        },
+        {
+            "name": "API Migration",
+            "type": "project"
+        },
+        {
+            "name": "Selenium",
+            "type": "technology"
+        },
+        {
+            "name": "Kubernetes",
+            "type": "technology"
+        },
+        {
+            "name": "Service Mesh Rollout",
+            "type": "project"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Lisa Wang",
+            "entity_b": "Python"
+        },
+        {
+            "entity_a": "Lisa Wang",
+            "entity_b": "Payment Gateway Refactor"
+        },
+        {
+            "entity_a": "John Doe",
+            "entity_b": "Go"
+        },
+        {
+            "entity_a": "John Doe",
+            "entity_b": "Observability Initiative"
+        },
+        {
+            "entity_a": "Alex Petrov",
+            "entity_b": "RabbitMQ"
+        },
+        {
+            "entity_a": "Alex Petrov",
+            "entity_b": "API Migration"
+        },
+        {
+            "entity_a": "Rachel Torres",
+            "entity_b": "Selenium"
+        },
+        {
+            "entity_a": "Ryan O'Brien",
+            "entity_b": "Kubernetes"
+        },
+        {
+            "entity_a": "Ryan O'Brien",
+            "entity_b": "Service Mesh Rollout"
+        }
+    ],
+    "expected_chunks_min": 5,
+    "expected_chunks_max": 11,
+    "expected_filler_chunks_min": 1
+}

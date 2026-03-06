@@ -13,16 +13,20 @@
             "type": "person"
         },
         {
+            "name": "Storybook",
+            "type": "technology"
+        },
+        {
+            "name": "Shadcn UI",
+            "type": "technology"
+        },
+        {
             "name": "Tailwind CSS",
             "type": "technology"
         },
         {
-            "name": "Figma",
-            "type": "technology"
-        },
-        {
-            "name": "React",
-            "type": "technology"
+            "name": "API Migration",
+            "type": "project"
         },
         {
             "name": "Dashboard Redesign",
@@ -32,19 +36,23 @@
     "cooccurrences": [
         {
             "entity_a": "Marcus Johnson",
-            "entity_b": "React"
+            "entity_b": "Storybook"
+        },
+        {
+            "entity_a": "Marcus Johnson",
+            "entity_b": "Shadcn UI"
         },
         {
             "entity_a": "Maria Santos",
             "entity_b": "Tailwind CSS"
         },
         {
-            "entity_a": "Nina Kowalski",
-            "entity_b": "Figma"
+            "entity_a": "Marcus Johnson",
+            "entity_b": "Dashboard Redesign"
         },
         {
-            "entity_a": "Nina Kowalski",
-            "entity_b": "Dashboard Redesign"
+            "entity_a": "Marcus Johnson",
+            "entity_b": "API Migration"
         }
     ],
     "expected_chunks_min": 3,

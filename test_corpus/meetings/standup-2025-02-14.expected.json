@@ -1,0 +1,69 @@
+{
+    "entities": [
+        {
+            "name": "Derek Washington",
+            "type": "person"
+        },
+        {
+            "name": "Marcus Johnson",
+            "type": "person"
+        },
+        {
+            "name": "Alex Petrov",
+            "type": "person"
+        },
+        {
+            "name": "Prometheus",
+            "type": "technology"
+        },
+        {
+            "name": "Observability Initiative",
+            "type": "project"
+        },
+        {
+            "name": "TypeScript",
+            "type": "technology"
+        },
+        {
+            "name": "Mobile App V2",
+            "type": "project"
+        },
+        {
+            "name": "RabbitMQ",
+            "type": "technology"
+        },
+        {
+            "name": "API Migration",
+            "type": "project"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Derek Washington",
+            "entity_b": "Prometheus"
+        },
+        {
+            "entity_a": "Derek Washington",
+            "entity_b": "Observability Initiative"
+        },
+        {
+            "entity_a": "Marcus Johnson",
+            "entity_b": "TypeScript"
+        },
+        {
+            "entity_a": "Marcus Johnson",
+            "entity_b": "Mobile App V2"
+        },
+        {
+            "entity_a": "Alex Petrov",
+            "entity_b": "RabbitMQ"
+        },
+        {
+            "entity_a": "Alex Petrov",
+            "entity_b": "API Migration"
+        }
+    ],
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 7,
+    "expected_filler_chunks_min": 1
+}

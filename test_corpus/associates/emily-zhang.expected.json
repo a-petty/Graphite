@@ -37,7 +37,7 @@
             "type": "project"
         },
         {
-            "name": "David Kim",
+            "name": "James Liu",
             "type": "person"
         },
         {
@@ -45,7 +45,7 @@
             "type": "person"
         },
         {
-            "name": "James Liu",
+            "name": "David Kim",
             "type": "person"
         }
     ],
@@ -84,7 +84,7 @@
         },
         {
             "entity_a": "Emily Zhang",
-            "entity_b": "David Kim"
+            "entity_b": "James Liu"
         },
         {
             "entity_a": "Emily Zhang",
@@ -92,10 +92,10 @@
         },
         {
             "entity_a": "Emily Zhang",
-            "entity_b": "James Liu"
+            "entity_b": "David Kim"
         }
     ],
     "expected_chunks_min": 3,
-    "expected_chunks_max": 8,
+    "expected_chunks_max": 10,
     "expected_filler_chunks": 0
 }

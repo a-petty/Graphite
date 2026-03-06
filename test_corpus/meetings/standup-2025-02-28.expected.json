@@ -1,0 +1,69 @@
+{
+    "entities": [
+        {
+            "name": "Olivia Foster",
+            "type": "person"
+        },
+        {
+            "name": "David Kim",
+            "type": "person"
+        },
+        {
+            "name": "Tom Brennan",
+            "type": "person"
+        },
+        {
+            "name": "TypeScript",
+            "type": "technology"
+        },
+        {
+            "name": "Internal Tools Consolidation",
+            "type": "project"
+        },
+        {
+            "name": "Kubernetes",
+            "type": "technology"
+        },
+        {
+            "name": "Service Mesh Rollout",
+            "type": "project"
+        },
+        {
+            "name": "Python",
+            "type": "technology"
+        },
+        {
+            "name": "Payment Gateway Refactor",
+            "type": "project"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Olivia Foster",
+            "entity_b": "TypeScript"
+        },
+        {
+            "entity_a": "Olivia Foster",
+            "entity_b": "Internal Tools Consolidation"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "Kubernetes"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "Service Mesh Rollout"
+        },
+        {
+            "entity_a": "Tom Brennan",
+            "entity_b": "Python"
+        },
+        {
+            "entity_a": "Tom Brennan",
+            "entity_b": "Payment Gateway Refactor"
+        }
+    ],
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 7,
+    "expected_filler_chunks_min": 1
+}

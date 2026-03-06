@@ -29,6 +29,10 @@
             "type": "project"
         },
         {
+            "name": "Event Sourcing Migration",
+            "type": "project"
+        },
+        {
             "name": "Kevin Park",
             "type": "person"
         },
@@ -37,7 +41,7 @@
             "type": "person"
         },
         {
-            "name": "Tom Brennan",
+            "name": "Ryan O'Brien",
             "type": "person"
         }
     ],
@@ -68,6 +72,10 @@
         },
         {
             "entity_a": "Lisa Wang",
+            "entity_b": "Event Sourcing Migration"
+        },
+        {
+            "entity_a": "Lisa Wang",
             "entity_b": "Kevin Park"
         },
         {
@@ -76,10 +84,14 @@
         },
         {
             "entity_a": "Lisa Wang",
-            "entity_b": "Tom Brennan"
+            "entity_b": "Ryan O'Brien"
+        },
+        {
+            "entity_a": "Lisa Wang",
+            "entity_b": "John Doe"
         }
     ],
     "expected_chunks_min": 3,
-    "expected_chunks_max": 8,
+    "expected_chunks_max": 10,
     "expected_filler_chunks": 0
 }

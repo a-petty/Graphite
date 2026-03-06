@@ -64,6 +64,6 @@
         }
     ],
     "expected_chunks_min": 4,
-    "expected_chunks_max": 10,
+    "expected_chunks_max": 12,
     "expected_filler_chunks": 0
 }

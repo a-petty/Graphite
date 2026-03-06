@@ -31,6 +31,10 @@
         {
             "name": "Prometheus",
             "type": "technology"
+        },
+        {
+            "name": "Grafana",
+            "type": "technology"
         }
     ],
     "cooccurrences": [
@@ -47,11 +51,31 @@
             "entity_b": "Observability Initiative"
         },
         {
+            "entity_a": "Observability Initiative",
+            "entity_b": "Jaeger"
+        },
+        {
+            "entity_a": "Observability Initiative",
+            "entity_b": "OpenTelemetry"
+        },
+        {
+            "entity_a": "Observability Initiative",
+            "entity_b": "Datadog"
+        },
+        {
+            "entity_a": "Observability Initiative",
+            "entity_b": "Prometheus"
+        },
+        {
+            "entity_a": "Observability Initiative",
+            "entity_b": "Grafana"
+        },
+        {
             "entity_a": "Derek Washington",
             "entity_b": "Jaeger"
         },
         {
-            "entity_a": "Derek Washington",
+            "entity_a": "John Doe",
             "entity_b": "OpenTelemetry"
         },
         {
@@ -61,9 +85,13 @@
         {
             "entity_a": "Derek Washington",
             "entity_b": "Prometheus"
+        },
+        {
+            "entity_a": "Derek Washington",
+            "entity_b": "Grafana"
         }
     ],
     "expected_chunks_min": 4,
-    "expected_chunks_max": 10,
+    "expected_chunks_max": 12,
     "expected_filler_chunks": 0
 }

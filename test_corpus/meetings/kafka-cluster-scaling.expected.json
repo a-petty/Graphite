@@ -13,54 +13,46 @@
             "type": "person"
         },
         {
-            "name": "PagerDuty",
+            "name": "ArgoCD",
             "type": "technology"
         },
         {
-            "name": "GitHub Actions",
+            "name": "Helm",
             "type": "technology"
         },
         {
-            "name": "Kubernetes",
+            "name": "Kafka",
             "type": "technology"
         },
         {
-            "name": "Go",
-            "type": "technology"
+            "name": "Data Lake Migration",
+            "type": "project"
         },
         {
-            "name": "Datadog",
-            "type": "technology"
-        },
-        {
-            "name": "Service Mesh Rollout",
+            "name": "Payment Gateway Refactor",
             "type": "project"
         }
     ],
     "cooccurrences": [
         {
+            "entity_a": "David Kim",
+            "entity_b": "ArgoCD"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "Helm"
+        },
+        {
             "entity_a": "John Doe",
-            "entity_b": "Go"
+            "entity_b": "Kafka"
+        },
+        {
+            "entity_a": "John Doe",
+            "entity_b": "Payment Gateway Refactor"
         },
         {
             "entity_a": "David Kim",
-            "entity_b": "Kubernetes"
-        },
-        {
-            "entity_a": "David Kim",
-            "entity_b": "GitHub Actions"
-        },
-        {
-            "entity_a": "Derek Washington",
-            "entity_b": "Datadog"
-        },
-        {
-            "entity_a": "Derek Washington",
-            "entity_b": "PagerDuty"
-        },
-        {
-            "entity_a": "Derek Washington",
-            "entity_b": "Service Mesh Rollout"
+            "entity_b": "Data Lake Migration"
         }
     ],
     "expected_chunks_min": 3,

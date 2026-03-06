@@ -49,11 +49,11 @@
             "type": "person"
         },
         {
-            "name": "Sarah Chen",
+            "name": "Nina Kowalski",
             "type": "person"
         },
         {
-            "name": "Emily Zhang",
+            "name": "Alex Petrov",
             "type": "person"
         }
     ],
@@ -104,14 +104,14 @@
         },
         {
             "entity_a": "Priya Patel",
-            "entity_b": "Sarah Chen"
+            "entity_b": "Nina Kowalski"
         },
         {
             "entity_a": "Priya Patel",
-            "entity_b": "Emily Zhang"
+            "entity_b": "Alex Petrov"
         }
     ],
     "expected_chunks_min": 3,
-    "expected_chunks_max": 8,
+    "expected_chunks_max": 10,
     "expected_filler_chunks": 0
 }

@@ -13,27 +13,7 @@
             "type": "person"
         },
         {
-            "name": "PostgreSQL",
-            "type": "technology"
-        },
-        {
-            "name": "Docker",
-            "type": "technology"
-        },
-        {
-            "name": "AWS EKS",
-            "type": "technology"
-        },
-        {
-            "name": "Redis",
-            "type": "technology"
-        },
-        {
-            "name": "Python",
-            "type": "technology"
-        },
-        {
-            "name": "Go",
+            "name": "OAuth",
             "type": "technology"
         },
         {
@@ -41,54 +21,22 @@
             "type": "technology"
         },
         {
-            "name": "Payment Gateway Refactor",
-            "type": "project"
-        },
-        {
-            "name": "Observability Initiative",
-            "type": "project"
+            "name": "PostgreSQL",
+            "type": "technology"
         }
     ],
     "cooccurrences": [
+        {
+            "entity_a": "Kevin Park",
+            "entity_b": "OAuth"
+        },
         {
             "entity_a": "Kevin Park",
             "entity_b": "Vault"
         },
         {
             "entity_a": "John Doe",
-            "entity_b": "AWS EKS"
-        },
-        {
-            "entity_a": "John Doe",
             "entity_b": "PostgreSQL"
-        },
-        {
-            "entity_a": "John Doe",
-            "entity_b": "Go"
-        },
-        {
-            "entity_a": "Tom Brennan",
-            "entity_b": "Redis"
-        },
-        {
-            "entity_a": "Tom Brennan",
-            "entity_b": "Docker"
-        },
-        {
-            "entity_a": "Tom Brennan",
-            "entity_b": "Python"
-        },
-        {
-            "entity_a": "John Doe",
-            "entity_b": "Payment Gateway Refactor"
-        },
-        {
-            "entity_a": "John Doe",
-            "entity_b": "Observability Initiative"
-        },
-        {
-            "entity_a": "Tom Brennan",
-            "entity_b": "Payment Gateway Refactor"
         }
     ],
     "expected_chunks_min": 3,

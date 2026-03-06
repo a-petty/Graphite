@@ -13,30 +13,58 @@
             "type": "person"
         },
         {
+            "name": "Airflow",
+            "type": "technology"
+        },
+        {
             "name": "dbt",
             "type": "technology"
         },
         {
-            "name": "Python",
+            "name": "Snowflake",
             "type": "technology"
         },
         {
-            "name": "Terraform",
-            "type": "technology"
+            "name": "Data Lake Migration",
+            "type": "project"
+        },
+        {
+            "name": "ML Recommendation Engine",
+            "type": "project"
+        },
+        {
+            "name": "Service Mesh Rollout",
+            "type": "project"
         }
     ],
     "cooccurrences": [
+        {
+            "entity_a": "James Liu",
+            "entity_b": "Airflow"
+        },
         {
             "entity_a": "James Liu",
             "entity_b": "dbt"
         },
         {
             "entity_a": "James Liu",
-            "entity_b": "Python"
+            "entity_b": "Snowflake"
+        },
+        {
+            "entity_a": "James Liu",
+            "entity_b": "ML Recommendation Engine"
+        },
+        {
+            "entity_a": "James Liu",
+            "entity_b": "Data Lake Migration"
         },
         {
             "entity_a": "David Kim",
-            "entity_b": "Terraform"
+            "entity_b": "Data Lake Migration"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "Service Mesh Rollout"
         }
     ],
     "expected_chunks_min": 3,

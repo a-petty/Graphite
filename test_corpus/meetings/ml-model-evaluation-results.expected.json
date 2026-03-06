@@ -17,46 +17,30 @@
             "type": "technology"
         },
         {
-            "name": "scikit-learn",
+            "name": "PyTorch",
             "type": "technology"
         },
         {
-            "name": "PyTorch",
+            "name": "dbt",
             "type": "technology"
         },
         {
             "name": "Developer Portal",
             "type": "project"
-        },
-        {
-            "name": "Data Lake Migration",
-            "type": "project"
-        },
-        {
-            "name": "ML Recommendation Engine",
-            "type": "project"
         }
     ],
     "cooccurrences": [
-        {
-            "entity_a": "Emily Zhang",
-            "entity_b": "PyTorch"
-        },
-        {
-            "entity_a": "Emily Zhang",
-            "entity_b": "scikit-learn"
-        },
         {
             "entity_a": "James Liu",
             "entity_b": "Airflow"
         },
         {
-            "entity_a": "James Liu",
-            "entity_b": "ML Recommendation Engine"
+            "entity_a": "Emily Zhang",
+            "entity_b": "PyTorch"
         },
         {
             "entity_a": "James Liu",
-            "entity_b": "Data Lake Migration"
+            "entity_b": "dbt"
         },
         {
             "entity_a": "Angela Rivera",

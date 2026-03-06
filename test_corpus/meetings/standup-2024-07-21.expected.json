@@ -1,19 +1,7 @@
 {
     "entities": [
         {
-            "name": "Rachel Torres",
-            "type": "person"
-        },
-        {
-            "name": "Kevin Park",
-            "type": "person"
-        },
-        {
-            "name": "Derek Washington",
-            "type": "person"
-        },
-        {
-            "name": "Ryan O'Brien",
+            "name": "Daniel Reeves",
             "type": "person"
         },
         {
@@ -21,49 +9,45 @@
             "type": "person"
         },
         {
-            "name": "Cypress",
+            "name": "Olivia Foster",
+            "type": "person"
+        },
+        {
+            "name": "Python",
             "type": "technology"
         },
         {
-            "name": "Vault",
+            "name": "Spark",
             "type": "technology"
         },
         {
-            "name": "PagerDuty",
-            "type": "technology"
+            "name": "Data Lake Migration",
+            "type": "project"
         },
         {
-            "name": "Kubernetes",
-            "type": "technology"
-        },
-        {
-            "name": "Airflow",
+            "name": "React",
             "type": "technology"
         }
     ],
     "cooccurrences": [
         {
-            "entity_a": "Rachel Torres",
-            "entity_b": "Cypress"
-        },
-        {
-            "entity_a": "Kevin Park",
-            "entity_b": "Vault"
-        },
-        {
-            "entity_a": "Derek Washington",
-            "entity_b": "PagerDuty"
-        },
-        {
-            "entity_a": "Ryan O'Brien",
-            "entity_b": "Kubernetes"
+            "entity_a": "Daniel Reeves",
+            "entity_b": "Python"
         },
         {
             "entity_a": "James Liu",
-            "entity_b": "Airflow"
+            "entity_b": "Spark"
+        },
+        {
+            "entity_a": "James Liu",
+            "entity_b": "Data Lake Migration"
+        },
+        {
+            "entity_a": "Olivia Foster",
+            "entity_b": "React"
         }
     ],
-    "expected_chunks_min": 5,
-    "expected_chunks_max": 10,
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 7,
     "expected_filler_chunks_min": 1
 }

@@ -1,0 +1,77 @@
+{
+    "entities": [
+        {
+            "name": "David Kim",
+            "type": "person"
+        },
+        {
+            "name": "Emily Zhang",
+            "type": "person"
+        },
+        {
+            "name": "John Doe",
+            "type": "person"
+        },
+        {
+            "name": "Rachel Torres",
+            "type": "person"
+        },
+        {
+            "name": "ArgoCD",
+            "type": "technology"
+        },
+        {
+            "name": "Observability Initiative",
+            "type": "project"
+        },
+        {
+            "name": "PyTorch",
+            "type": "technology"
+        },
+        {
+            "name": "Data Lake Migration",
+            "type": "project"
+        },
+        {
+            "name": "Python",
+            "type": "technology"
+        },
+        {
+            "name": "Selenium",
+            "type": "technology"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "David Kim",
+            "entity_b": "ArgoCD"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "Observability Initiative"
+        },
+        {
+            "entity_a": "Emily Zhang",
+            "entity_b": "PyTorch"
+        },
+        {
+            "entity_a": "Emily Zhang",
+            "entity_b": "Data Lake Migration"
+        },
+        {
+            "entity_a": "John Doe",
+            "entity_b": "Python"
+        },
+        {
+            "entity_a": "John Doe",
+            "entity_b": "Observability Initiative"
+        },
+        {
+            "entity_a": "Rachel Torres",
+            "entity_b": "Selenium"
+        }
+    ],
+    "expected_chunks_min": 4,
+    "expected_chunks_max": 9,
+    "expected_filler_chunks_min": 1
+}

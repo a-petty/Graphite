@@ -13,38 +13,34 @@
             "type": "person"
         },
         {
-            "name": "Kotlin",
-            "type": "technology"
-        },
-        {
-            "name": "Figma",
-            "type": "technology"
-        },
-        {
             "name": "React Native",
             "type": "technology"
         },
         {
-            "name": "Firebase",
+            "name": "Swift",
             "type": "technology"
         },
         {
-            "name": "Dashboard Redesign",
+            "name": "Kotlin",
+            "type": "technology"
+        },
+        {
+            "name": "Mobile App V2",
+            "type": "project"
+        },
+        {
+            "name": "Developer Portal",
             "type": "project"
         }
     ],
     "cooccurrences": [
         {
-            "entity_a": "Nina Kowalski",
-            "entity_b": "Figma"
-        },
-        {
-            "entity_a": "Carlos Mendez",
-            "entity_b": "Firebase"
-        },
-        {
             "entity_a": "Carlos Mendez",
             "entity_b": "React Native"
+        },
+        {
+            "entity_a": "Carlos Mendez",
+            "entity_b": "Swift"
         },
         {
             "entity_a": "Carlos Mendez",
@@ -52,7 +48,11 @@
         },
         {
             "entity_a": "Nina Kowalski",
-            "entity_b": "Dashboard Redesign"
+            "entity_b": "Mobile App V2"
+        },
+        {
+            "entity_a": "Angela Rivera",
+            "entity_b": "Developer Portal"
         }
     ],
     "expected_chunks_min": 3,

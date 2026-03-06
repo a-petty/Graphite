@@ -1,57 +1,65 @@
 {
     "entities": [
         {
-            "name": "Derek Washington",
+            "name": "Emily Zhang",
             "type": "person"
         },
         {
-            "name": "Lisa Wang",
+            "name": "Rachel Torres",
             "type": "person"
         },
         {
-            "name": "David Kim",
+            "name": "Marcus Johnson",
             "type": "person"
         },
         {
-            "name": "James Liu",
+            "name": "Daniel Reeves",
             "type": "person"
         },
         {
-            "name": "Prometheus",
+            "name": "PyTorch",
             "type": "technology"
         },
         {
-            "name": "FastAPI",
+            "name": "Data Lake Migration",
+            "type": "project"
+        },
+        {
+            "name": "Cypress",
             "type": "technology"
         },
         {
-            "name": "Helm",
+            "name": "React",
             "type": "technology"
         },
         {
-            "name": "Spark",
+            "name": "Kafka",
             "type": "technology"
         }
     ],
     "cooccurrences": [
         {
-            "entity_a": "Derek Washington",
-            "entity_b": "Prometheus"
+            "entity_a": "Emily Zhang",
+            "entity_b": "PyTorch"
         },
         {
-            "entity_a": "Lisa Wang",
-            "entity_b": "FastAPI"
+            "entity_a": "Emily Zhang",
+            "entity_b": "Data Lake Migration"
         },
         {
-            "entity_a": "David Kim",
-            "entity_b": "Helm"
+            "entity_a": "Rachel Torres",
+            "entity_b": "Cypress"
         },
         {
-            "entity_a": "James Liu",
-            "entity_b": "Spark"
+            "entity_a": "Marcus Johnson",
+            "entity_b": "React"
+        },
+        {
+            "entity_a": "Daniel Reeves",
+            "entity_b": "Kafka"
         }
     ],
     "expected_chunks_min": 4,
-    "expected_chunks_max": 8,
+    "expected_chunks_max": 9,
     "expected_filler_chunks_min": 1
 }

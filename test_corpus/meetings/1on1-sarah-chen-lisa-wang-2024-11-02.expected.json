@@ -1,0 +1,37 @@
+{
+    "entities": [
+        {
+            "name": "Sarah Chen",
+            "type": "person"
+        },
+        {
+            "name": "Lisa Wang",
+            "type": "person"
+        },
+        {
+            "name": "Payment Gateway Refactor",
+            "type": "project"
+        },
+        {
+            "name": "PostgreSQL",
+            "type": "technology"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Sarah Chen",
+            "entity_b": "Lisa Wang"
+        },
+        {
+            "entity_a": "Lisa Wang",
+            "entity_b": "Payment Gateway Refactor"
+        },
+        {
+            "entity_a": "Lisa Wang",
+            "entity_b": "PostgreSQL"
+        }
+    ],
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 8,
+    "expected_filler_chunks": 0
+}

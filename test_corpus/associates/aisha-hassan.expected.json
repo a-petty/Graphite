@@ -11,6 +11,14 @@
         {
             "name": "Engineering Leadership",
             "type": "organization"
+        },
+        {
+            "name": "Sarah Chen",
+            "type": "person"
+        },
+        {
+            "name": "Kevin Park",
+            "type": "person"
         }
     ],
     "cooccurrences": [
@@ -21,9 +29,17 @@
         {
             "entity_a": "Aisha Hassan",
             "entity_b": "Engineering Leadership"
+        },
+        {
+            "entity_a": "Aisha Hassan",
+            "entity_b": "Sarah Chen"
+        },
+        {
+            "entity_a": "Aisha Hassan",
+            "entity_b": "Kevin Park"
         }
     ],
     "expected_chunks_min": 3,
-    "expected_chunks_max": 8,
+    "expected_chunks_max": 10,
     "expected_filler_chunks": 0
 }

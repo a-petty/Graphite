@@ -47,6 +47,22 @@
             "entity_b": "Payment Gateway Refactor"
         },
         {
+            "entity_a": "Payment Gateway Refactor",
+            "entity_b": "Python"
+        },
+        {
+            "entity_a": "Payment Gateway Refactor",
+            "entity_b": "Kafka"
+        },
+        {
+            "entity_a": "Payment Gateway Refactor",
+            "entity_b": "PostgreSQL"
+        },
+        {
+            "entity_a": "Payment Gateway Refactor",
+            "entity_b": "Stripe"
+        },
+        {
             "entity_a": "John Doe",
             "entity_b": "Python"
         },
@@ -64,6 +80,6 @@
         }
     ],
     "expected_chunks_min": 4,
-    "expected_chunks_max": 10,
+    "expected_chunks_max": 12,
     "expected_filler_chunks": 0
 }

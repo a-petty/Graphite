@@ -9,37 +9,65 @@
             "type": "person"
         },
         {
-            "name": "Emily Zhang",
+            "name": "Daniel Reeves",
             "type": "person"
         },
         {
-            "name": "Snowflake",
+            "name": "Maria Santos",
+            "type": "person"
+        },
+        {
+            "name": "Spark",
             "type": "technology"
+        },
+        {
+            "name": "Data Lake Migration",
+            "type": "project"
         },
         {
             "name": "Storybook",
             "type": "technology"
         },
         {
-            "name": "Python",
+            "name": "API Migration",
+            "type": "project"
+        },
+        {
+            "name": "Go",
+            "type": "technology"
+        },
+        {
+            "name": "Tailwind CSS",
             "type": "technology"
         }
     ],
     "cooccurrences": [
         {
             "entity_a": "James Liu",
-            "entity_b": "Snowflake"
+            "entity_b": "Spark"
+        },
+        {
+            "entity_a": "James Liu",
+            "entity_b": "Data Lake Migration"
         },
         {
             "entity_a": "Marcus Johnson",
             "entity_b": "Storybook"
         },
         {
-            "entity_a": "Emily Zhang",
-            "entity_b": "Python"
+            "entity_a": "Marcus Johnson",
+            "entity_b": "API Migration"
+        },
+        {
+            "entity_a": "Daniel Reeves",
+            "entity_b": "Go"
+        },
+        {
+            "entity_a": "Maria Santos",
+            "entity_b": "Tailwind CSS"
         }
     ],
-    "expected_chunks_min": 3,
-    "expected_chunks_max": 6,
+    "expected_chunks_min": 4,
+    "expected_chunks_max": 9,
     "expected_filler_chunks_min": 1
 }

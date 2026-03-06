@@ -9,7 +9,11 @@
             "type": "person"
         },
         {
-            "name": "dbt",
+            "name": "Airflow",
+            "type": "technology"
+        },
+        {
+            "name": "PyTorch",
             "type": "technology"
         },
         {
@@ -17,42 +21,26 @@
             "type": "technology"
         },
         {
-            "name": "MLflow",
-            "type": "technology"
-        },
-        {
-            "name": "Spark",
-            "type": "technology"
-        },
-        {
             "name": "Data Lake Migration",
-            "type": "project"
-        },
-        {
-            "name": "ML Recommendation Engine",
             "type": "project"
         }
     ],
     "cooccurrences": [
         {
+            "entity_a": "James Liu",
+            "entity_b": "Airflow"
+        },
+        {
+            "entity_a": "Emily Zhang",
+            "entity_b": "PyTorch"
+        },
+        {
             "entity_a": "Emily Zhang",
             "entity_b": "Python"
         },
         {
-            "entity_a": "Emily Zhang",
-            "entity_b": "MLflow"
-        },
-        {
             "entity_a": "James Liu",
-            "entity_b": "dbt"
-        },
-        {
-            "entity_a": "James Liu",
-            "entity_b": "Spark"
-        },
-        {
-            "entity_a": "James Liu",
-            "entity_b": "ML Recommendation Engine"
+            "entity_b": "Python"
         },
         {
             "entity_a": "James Liu",

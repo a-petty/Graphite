@@ -1,11 +1,7 @@
 {
     "entities": [
         {
-            "name": "Priya Patel",
-            "type": "person"
-        },
-        {
-            "name": "Ryan O'Brien",
+            "name": "Rachel Torres",
             "type": "person"
         },
         {
@@ -13,25 +9,57 @@
             "type": "person"
         },
         {
-            "name": "WebSocket",
+            "name": "Tom Brennan",
+            "type": "person"
+        },
+        {
+            "name": "Marcus Johnson",
+            "type": "person"
+        },
+        {
+            "name": "Playwright",
             "type": "technology"
         },
         {
-            "name": "Istio",
+            "name": "Python",
             "type": "technology"
+        },
+        {
+            "name": "Payment Gateway Refactor",
+            "type": "project"
+        },
+        {
+            "name": "Shadcn UI",
+            "type": "technology"
+        },
+        {
+            "name": "Dashboard Redesign",
+            "type": "project"
         }
     ],
     "cooccurrences": [
         {
-            "entity_a": "Priya Patel",
-            "entity_b": "WebSocket"
+            "entity_a": "Rachel Torres",
+            "entity_b": "Playwright"
         },
         {
-            "entity_a": "Ryan O'Brien",
-            "entity_b": "Istio"
+            "entity_a": "Tom Brennan",
+            "entity_b": "Python"
+        },
+        {
+            "entity_a": "Tom Brennan",
+            "entity_b": "Payment Gateway Refactor"
+        },
+        {
+            "entity_a": "Marcus Johnson",
+            "entity_b": "Shadcn UI"
+        },
+        {
+            "entity_a": "Marcus Johnson",
+            "entity_b": "Dashboard Redesign"
         }
     ],
-    "expected_chunks_min": 3,
-    "expected_chunks_max": 6,
+    "expected_chunks_min": 4,
+    "expected_chunks_max": 9,
     "expected_filler_chunks_min": 1
 }

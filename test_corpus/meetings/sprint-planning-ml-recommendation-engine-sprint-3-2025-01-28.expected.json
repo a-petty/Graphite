@@ -1,0 +1,77 @@
+{
+    "entities": [
+        {
+            "name": "ML Recommendation Engine",
+            "type": "project"
+        },
+        {
+            "name": "Emily Zhang",
+            "type": "person"
+        },
+        {
+            "name": "James Liu",
+            "type": "person"
+        },
+        {
+            "name": "Priya Patel",
+            "type": "person"
+        },
+        {
+            "name": "PyTorch",
+            "type": "technology"
+        },
+        {
+            "name": "MLflow",
+            "type": "technology"
+        },
+        {
+            "name": "Airflow",
+            "type": "technology"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Emily Zhang",
+            "entity_b": "ML Recommendation Engine"
+        },
+        {
+            "entity_a": "James Liu",
+            "entity_b": "ML Recommendation Engine"
+        },
+        {
+            "entity_a": "Priya Patel",
+            "entity_b": "ML Recommendation Engine"
+        },
+        {
+            "entity_a": "ML Recommendation Engine",
+            "entity_b": "PyTorch"
+        },
+        {
+            "entity_a": "ML Recommendation Engine",
+            "entity_b": "MLflow"
+        },
+        {
+            "entity_a": "ML Recommendation Engine",
+            "entity_b": "Airflow"
+        },
+        {
+            "entity_a": "Emily Zhang",
+            "entity_b": "PyTorch"
+        },
+        {
+            "entity_a": "James Liu",
+            "entity_b": "MLflow"
+        },
+        {
+            "entity_a": "Priya Patel",
+            "entity_b": "Airflow"
+        },
+        {
+            "entity_a": "Emily Zhang",
+            "entity_b": "FastAPI"
+        }
+    ],
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 10,
+    "expected_filler_chunks": 0
+}

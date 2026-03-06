@@ -1,0 +1,65 @@
+{
+    "entities": [
+        {
+            "name": "John Doe",
+            "type": "person"
+        },
+        {
+            "name": "Lisa Wang",
+            "type": "person"
+        },
+        {
+            "name": "Derek Washington",
+            "type": "person"
+        },
+        {
+            "name": "Python",
+            "type": "technology"
+        },
+        {
+            "name": "Kafka",
+            "type": "technology"
+        },
+        {
+            "name": "Prometheus",
+            "type": "technology"
+        },
+        {
+            "name": "Observability Initiative",
+            "type": "project"
+        },
+        {
+            "name": "Payment Gateway Refactor",
+            "type": "project"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "John Doe",
+            "entity_b": "Python"
+        },
+        {
+            "entity_a": "Lisa Wang",
+            "entity_b": "Python"
+        },
+        {
+            "entity_a": "John Doe",
+            "entity_b": "Kafka"
+        },
+        {
+            "entity_a": "Derek Washington",
+            "entity_b": "Prometheus"
+        },
+        {
+            "entity_a": "John Doe",
+            "entity_b": "Payment Gateway Refactor"
+        },
+        {
+            "entity_a": "Derek Washington",
+            "entity_b": "Observability Initiative"
+        }
+    ],
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 9,
+    "expected_filler_chunks": 0
+}

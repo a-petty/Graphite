@@ -1,0 +1,37 @@
+{
+    "entities": [
+        {
+            "name": "Marcus Johnson",
+            "type": "person"
+        },
+        {
+            "name": "Olivia Foster",
+            "type": "person"
+        },
+        {
+            "name": "Internal Tools Consolidation",
+            "type": "project"
+        },
+        {
+            "name": "Next.js",
+            "type": "technology"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Marcus Johnson",
+            "entity_b": "Olivia Foster"
+        },
+        {
+            "entity_a": "Olivia Foster",
+            "entity_b": "Internal Tools Consolidation"
+        },
+        {
+            "entity_a": "Olivia Foster",
+            "entity_b": "Next.js"
+        }
+    ],
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 8,
+    "expected_filler_chunks": 0
+}

@@ -45,15 +45,19 @@
             "type": "project"
         },
         {
+            "name": "Internal Tools Consolidation",
+            "type": "project"
+        },
+        {
+            "name": "Angela Rivera",
+            "type": "person"
+        },
+        {
             "name": "Priya Patel",
             "type": "person"
         },
         {
-            "name": "Sarah Chen",
-            "type": "person"
-        },
-        {
-            "name": "Carlos Mendez",
+            "name": "Olivia Foster",
             "type": "person"
         }
     ],
@@ -100,18 +104,22 @@
         },
         {
             "entity_a": "Marcus Johnson",
+            "entity_b": "Internal Tools Consolidation"
+        },
+        {
+            "entity_a": "Marcus Johnson",
+            "entity_b": "Angela Rivera"
+        },
+        {
+            "entity_a": "Marcus Johnson",
             "entity_b": "Priya Patel"
         },
         {
             "entity_a": "Marcus Johnson",
-            "entity_b": "Sarah Chen"
-        },
-        {
-            "entity_a": "Marcus Johnson",
-            "entity_b": "Carlos Mendez"
+            "entity_b": "Olivia Foster"
         }
     ],
     "expected_chunks_min": 3,
-    "expected_chunks_max": 8,
+    "expected_chunks_max": 10,
     "expected_filler_chunks": 0
 }

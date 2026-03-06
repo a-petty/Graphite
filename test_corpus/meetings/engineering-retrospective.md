@@ -1,31 +1,27 @@
-# Engineering Retrospective — 2024-10-18
+# Engineering Retrospective — 2024-10-05
 
 ## Attendees
-Sarah Chen, Marcus Johnson, Priya Patel, David Kim
 
+Sarah Chen, Marcus Johnson, Priya Patel, David Kim
 
 ## Discussion
 
-**Sarah Chen:** I spoke with the GraphQL team and they're willing to provide support during the rollout.
+**Sarah Chen:** I want to make sure we're systematic about this. Our ArgoCD setup needs attention. The GitOps sync is completing within 90 seconds of merge.
 
-**Marcus Johnson:** I've been looking into Storybook and I think it could solve our Engineering retrospective challenges. The performance benchmarks look promising.
+**Marcus Johnson:** Sarah Chen raises a good point. this is going to be a big win for us. Our GitHub Actions setup needs attention. The CI pipeline runs in about 8 minutes end to end.
 
-**Marcus Johnson:** This also affects the Dashboard Redesign project timeline.
+**Marcus Johnson:** This connects to our earlier decision to selected react over vue for dashboard redesign back in August 2024.
 
-**Priya Patel:** I spoke with the WebSocket team and they're willing to provide support during the rollout.
+**Priya Patel:** Building on what Marcus Johnson said, what's our fallback if this doesn't work? Our Helm setup needs attention. The chart templating is correctly parameterizing per-environment configs.
 
-**Priya Patel:** This also affects the Mobile App V2 project timeline.
+**David Kim:** I agree with Priya Patel. the trade-off we need to evaluate is straightforward. We should discuss our Playwright configuration. We're making good progress on the implementation.
 
-**David Kim:** I ran some tests with Terraform last week. The results were positive — about 40% improvement in throughput.
+## Related Projects
 
-
-## Decisions
-
-**Sarah Chen:** Based on this discussion, we'll proceed with WebSocket for the next phase.
-
+The Dashboard Redesign project (completed) is relevant to this discussion.
 
 ## Action Items
 
-- Sarah Chen will follow up on Storybook integration by end of week
-- Marcus Johnson will follow up on Playwright integration by end of week
-- Priya Patel will follow up on Terraform integration by end of week
+- Sarah Chen will investigate Playwright configuration and report findings by end of week
+- Marcus Johnson will investigate ArgoCD configuration and report findings by end of week
+- Priya Patel will investigate GitHub Actions configuration and report findings by end of week

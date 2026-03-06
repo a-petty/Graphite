@@ -47,15 +47,31 @@
             "entity_b": "API Migration"
         },
         {
+            "entity_a": "API Migration",
+            "entity_b": "GraphQL"
+        },
+        {
+            "entity_a": "API Migration",
+            "entity_b": "Apollo Server"
+        },
+        {
+            "entity_a": "API Migration",
+            "entity_b": "REST"
+        },
+        {
+            "entity_a": "API Migration",
+            "entity_b": "Swagger"
+        },
+        {
             "entity_a": "Priya Patel",
             "entity_b": "GraphQL"
         },
         {
-            "entity_a": "Priya Patel",
+            "entity_a": "Marcus Johnson",
             "entity_b": "Apollo Server"
         },
         {
-            "entity_a": "Priya Patel",
+            "entity_a": "Alex Petrov",
             "entity_b": "REST"
         },
         {
@@ -64,6 +80,6 @@
         }
     ],
     "expected_chunks_min": 4,
-    "expected_chunks_max": 10,
+    "expected_chunks_max": 12,
     "expected_filler_chunks": 0
 }

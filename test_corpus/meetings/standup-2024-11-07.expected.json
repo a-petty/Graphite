@@ -1,7 +1,7 @@
 {
     "entities": [
         {
-            "name": "Carlos Mendez",
+            "name": "Ryan O'Brien",
             "type": "person"
         },
         {
@@ -9,41 +9,53 @@
             "type": "person"
         },
         {
-            "name": "John Doe",
+            "name": "Rachel Torres",
             "type": "person"
         },
         {
-            "name": "Sarah Chen",
-            "type": "person"
-        },
-        {
-            "name": "React Native",
+            "name": "Istio",
             "type": "technology"
         },
         {
-            "name": "OAuth",
+            "name": "Service Mesh Rollout",
+            "type": "project"
+        },
+        {
+            "name": "Vault",
             "type": "technology"
         },
         {
-            "name": "AWS EKS",
+            "name": "Payment Gateway Refactor",
+            "type": "project"
+        },
+        {
+            "name": "Cypress",
             "type": "technology"
         }
     ],
     "cooccurrences": [
         {
-            "entity_a": "Carlos Mendez",
-            "entity_b": "React Native"
+            "entity_a": "Ryan O'Brien",
+            "entity_b": "Istio"
+        },
+        {
+            "entity_a": "Ryan O'Brien",
+            "entity_b": "Service Mesh Rollout"
         },
         {
             "entity_a": "Kevin Park",
-            "entity_b": "OAuth"
+            "entity_b": "Vault"
         },
         {
-            "entity_a": "John Doe",
-            "entity_b": "AWS EKS"
+            "entity_a": "Kevin Park",
+            "entity_b": "Payment Gateway Refactor"
+        },
+        {
+            "entity_a": "Rachel Torres",
+            "entity_b": "Cypress"
         }
     ],
-    "expected_chunks_min": 4,
-    "expected_chunks_max": 8,
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 7,
     "expected_filler_chunks_min": 1
 }

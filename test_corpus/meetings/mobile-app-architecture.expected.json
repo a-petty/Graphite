@@ -13,10 +13,6 @@
             "type": "person"
         },
         {
-            "name": "React",
-            "type": "technology"
-        },
-        {
             "name": "Storybook",
             "type": "technology"
         },
@@ -25,34 +21,34 @@
             "type": "technology"
         },
         {
-            "name": "Developer Portal",
-            "type": "project"
-        },
-        {
-            "name": "API Migration",
-            "type": "project"
+            "name": "Swift",
+            "type": "technology"
         },
         {
             "name": "Mobile App V2",
+            "type": "project"
+        },
+        {
+            "name": "Developer Portal",
             "type": "project"
         }
     ],
     "cooccurrences": [
         {
-            "entity_a": "Carlos Mendez",
-            "entity_b": "React Native"
-        },
-        {
             "entity_a": "Marcus Johnson",
             "entity_b": "Storybook"
         },
         {
-            "entity_a": "Marcus Johnson",
-            "entity_b": "React"
+            "entity_a": "Carlos Mendez",
+            "entity_b": "React Native"
         },
         {
-            "entity_a": "Marcus Johnson",
-            "entity_b": "API Migration"
+            "entity_a": "Carlos Mendez",
+            "entity_b": "Swift"
+        },
+        {
+            "entity_a": "Carlos Mendez",
+            "entity_b": "Mobile App V2"
         },
         {
             "entity_a": "Marcus Johnson",

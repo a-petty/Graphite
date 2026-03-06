@@ -17,40 +17,20 @@
             "type": "person"
         },
         {
-            "name": "GraphQL",
-            "type": "technology"
-        },
-        {
-            "name": "Storybook",
-            "type": "technology"
-        },
-        {
-            "name": "WebSocket",
-            "type": "technology"
-        },
-        {
-            "name": "Terraform",
-            "type": "technology"
-        },
-        {
-            "name": "React",
-            "type": "technology"
-        },
-        {
             "name": "Playwright",
             "type": "technology"
         },
         {
-            "name": "ML Recommendation Engine",
-            "type": "project"
+            "name": "ArgoCD",
+            "type": "technology"
         },
         {
-            "name": "API Migration",
-            "type": "project"
+            "name": "GitHub Actions",
+            "type": "technology"
         },
         {
-            "name": "Mobile App V2",
-            "type": "project"
+            "name": "Helm",
+            "type": "technology"
         },
         {
             "name": "Dashboard Redesign",
@@ -59,28 +39,20 @@
     ],
     "cooccurrences": [
         {
-            "entity_a": "Marcus Johnson",
-            "entity_b": "Storybook"
-        },
-        {
-            "entity_a": "Marcus Johnson",
-            "entity_b": "React"
-        },
-        {
             "entity_a": "Priya Patel",
             "entity_b": "Playwright"
         },
         {
-            "entity_a": "Priya Patel",
-            "entity_b": "GraphQL"
-        },
-        {
-            "entity_a": "Priya Patel",
-            "entity_b": "WebSocket"
+            "entity_a": "David Kim",
+            "entity_b": "ArgoCD"
         },
         {
             "entity_a": "David Kim",
-            "entity_b": "Terraform"
+            "entity_b": "GitHub Actions"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "Helm"
         },
         {
             "entity_a": "Sarah Chen",
@@ -88,19 +60,7 @@
         },
         {
             "entity_a": "Marcus Johnson",
-            "entity_b": "Mobile App V2"
-        },
-        {
-            "entity_a": "Priya Patel",
             "entity_b": "Dashboard Redesign"
-        },
-        {
-            "entity_a": "Priya Patel",
-            "entity_b": "API Migration"
-        },
-        {
-            "entity_a": "Priya Patel",
-            "entity_b": "ML Recommendation Engine"
         }
     ],
     "expected_chunks_min": 4,

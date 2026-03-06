@@ -4,26 +4,23 @@
 
 Carlos Mendez is a Mobile Engineer at TechCorp who joined in 2023-03. They work on the Mobile team.
 
-
 ## Skills & Expertise
 
-Carlos Mendez specializes in React Native, Swift, Kotlin. 
-They also have experience with Firebase. 
-
-
+Carlos Mendez specializes in React Native, Swift, Kotlin. They also have experience with Firebase.
 
 ## Current Projects
 
-Carlos Mendez is currently leading the Mobile App V2 project
-, which uses React Native, Firebase, TypeScript
-.
+Carlos Mendez is currently leading the Mobile App V2 project, which uses React Native, Firebase, TypeScript.
 
+## Notable Contributions
+
+- Shipped Mobile App V1 with 4.7-star rating on App Store
+- Implemented offline-first sync reducing mobile data usage by 60%
 
 ## Key Collaborators
 
 Carlos Mendez works closely with Marcus Johnson, Angela Rivera, Nina Kowalski.
 
-
 ## Working Style
 
-Carlos Mendez favors iterative development with frequent check-ins.
+Carlos Mendez brings high energy to projects and is often the first to experiment with new tools and approaches.

@@ -1,0 +1,101 @@
+{
+    "entities": [
+        {
+            "name": "Derek Washington",
+            "type": "person"
+        },
+        {
+            "name": "John Doe",
+            "type": "person"
+        },
+        {
+            "name": "Lisa Wang",
+            "type": "person"
+        },
+        {
+            "name": "Priya Patel",
+            "type": "person"
+        },
+        {
+            "name": "Alex Petrov",
+            "type": "person"
+        },
+        {
+            "name": "Grafana",
+            "type": "technology"
+        },
+        {
+            "name": "Observability Initiative",
+            "type": "project"
+        },
+        {
+            "name": "PostgreSQL",
+            "type": "technology"
+        },
+        {
+            "name": "Payment Gateway Refactor",
+            "type": "project"
+        },
+        {
+            "name": "Redis",
+            "type": "technology"
+        },
+        {
+            "name": "ML Recommendation Engine",
+            "type": "project"
+        },
+        {
+            "name": "MongoDB",
+            "type": "technology"
+        },
+        {
+            "name": "API Migration",
+            "type": "project"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Derek Washington",
+            "entity_b": "Grafana"
+        },
+        {
+            "entity_a": "Derek Washington",
+            "entity_b": "Observability Initiative"
+        },
+        {
+            "entity_a": "John Doe",
+            "entity_b": "PostgreSQL"
+        },
+        {
+            "entity_a": "John Doe",
+            "entity_b": "Observability Initiative"
+        },
+        {
+            "entity_a": "Lisa Wang",
+            "entity_b": "PostgreSQL"
+        },
+        {
+            "entity_a": "Lisa Wang",
+            "entity_b": "Payment Gateway Refactor"
+        },
+        {
+            "entity_a": "Priya Patel",
+            "entity_b": "Redis"
+        },
+        {
+            "entity_a": "Priya Patel",
+            "entity_b": "ML Recommendation Engine"
+        },
+        {
+            "entity_a": "Alex Petrov",
+            "entity_b": "MongoDB"
+        },
+        {
+            "entity_a": "Alex Petrov",
+            "entity_b": "API Migration"
+        }
+    ],
+    "expected_chunks_min": 5,
+    "expected_chunks_max": 11,
+    "expected_filler_chunks_min": 1
+}

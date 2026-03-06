@@ -1,7 +1,19 @@
 {
     "entities": [
         {
-            "name": "Marcus Johnson",
+            "name": "Derek Washington",
+            "type": "person"
+        },
+        {
+            "name": "Ryan O'Brien",
+            "type": "person"
+        },
+        {
+            "name": "Daniel Reeves",
+            "type": "person"
+        },
+        {
+            "name": "David Kim",
             "type": "person"
         },
         {
@@ -9,61 +21,73 @@
             "type": "person"
         },
         {
-            "name": "Maria Santos",
-            "type": "person"
-        },
-        {
-            "name": "Derek Washington",
-            "type": "person"
-        },
-        {
-            "name": "Kevin Park",
-            "type": "person"
-        },
-        {
-            "name": "Figma",
+            "name": "Datadog",
             "type": "technology"
         },
         {
-            "name": "Redis",
+            "name": "Observability Initiative",
+            "type": "project"
+        },
+        {
+            "name": "gRPC",
             "type": "technology"
         },
         {
-            "name": "Tailwind CSS",
+            "name": "PostgreSQL",
             "type": "technology"
         },
         {
-            "name": "PagerDuty",
+            "name": "ArgoCD",
             "type": "technology"
         },
         {
-            "name": "Vault",
+            "name": "GraphQL",
             "type": "technology"
+        },
+        {
+            "name": "Dashboard Redesign",
+            "type": "project"
         }
     ],
     "cooccurrences": [
         {
-            "entity_a": "Marcus Johnson",
-            "entity_b": "Figma"
-        },
-        {
-            "entity_a": "Priya Patel",
-            "entity_b": "Redis"
-        },
-        {
-            "entity_a": "Maria Santos",
-            "entity_b": "Tailwind CSS"
+            "entity_a": "Derek Washington",
+            "entity_b": "Datadog"
         },
         {
             "entity_a": "Derek Washington",
-            "entity_b": "PagerDuty"
+            "entity_b": "Observability Initiative"
         },
         {
-            "entity_a": "Kevin Park",
-            "entity_b": "Vault"
+            "entity_a": "Ryan O'Brien",
+            "entity_b": "gRPC"
+        },
+        {
+            "entity_a": "Ryan O'Brien",
+            "entity_b": "Observability Initiative"
+        },
+        {
+            "entity_a": "Daniel Reeves",
+            "entity_b": "PostgreSQL"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "ArgoCD"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "Observability Initiative"
+        },
+        {
+            "entity_a": "Priya Patel",
+            "entity_b": "GraphQL"
+        },
+        {
+            "entity_a": "Priya Patel",
+            "entity_b": "Dashboard Redesign"
         }
     ],
     "expected_chunks_min": 5,
-    "expected_chunks_max": 10,
+    "expected_chunks_max": 11,
     "expected_filler_chunks_min": 1
 }

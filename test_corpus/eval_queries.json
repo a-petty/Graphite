@@ -1,6 +1,6 @@
 [
     {
-        "id": "retrieval_01",
+        "id": "retrieval_001",
         "type": "retrieval",
         "question": "What technologies does Marcus Johnson work with?",
         "expected_entities": [
@@ -15,6 +15,7 @@
             "Figma"
         ],
         "expected_source_documents": [
+            "associates/marcus-johnson.md",
             "work/dashboard-redesign.md",
             "work/api-migration.md"
         ],
@@ -23,7 +24,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_02",
+        "id": "retrieval_002",
         "type": "retrieval",
         "question": "What technologies does Priya Patel work with?",
         "expected_entities": [
@@ -38,6 +39,7 @@
             "GraphQL"
         ],
         "expected_source_documents": [
+            "associates/priya-patel.md",
             "work/dashboard-redesign.md",
             "work/api-migration.md"
         ],
@@ -46,7 +48,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_03",
+        "id": "retrieval_003",
         "type": "retrieval",
         "question": "What technologies does David Kim work with?",
         "expected_entities": [
@@ -61,6 +63,7 @@
             "AWS"
         ],
         "expected_source_documents": [
+            "associates/david-kim.md",
             "work/observability-initiative.md",
             "work/data-lake-migration.md"
         ],
@@ -69,7 +72,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_04",
+        "id": "retrieval_004",
         "type": "retrieval",
         "question": "What technologies does John Doe work with?",
         "expected_entities": [
@@ -84,6 +87,7 @@
             "PostgreSQL"
         ],
         "expected_source_documents": [
+            "associates/john-doe.md",
             "work/payment-gateway-refactor.md",
             "work/observability-initiative.md"
         ],
@@ -92,7 +96,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_05",
+        "id": "retrieval_005",
         "type": "retrieval",
         "question": "What technologies does Lisa Wang work with?",
         "expected_entities": [
@@ -107,15 +111,16 @@
             "PostgreSQL"
         ],
         "expected_source_documents": [
+            "associates/lisa-wang.md",
             "work/payment-gateway-refactor.md",
-            "associates/lisa-wang.md"
+            "work/event-sourcing-migration.md"
         ],
         "min_relevant_chunks": 2,
         "time_context": null,
         "hops_required": 1
     },
     {
-        "id": "retrieval_06",
+        "id": "retrieval_006",
         "type": "retrieval",
         "question": "What technologies does Tom Brennan work with?",
         "expected_entities": [
@@ -130,15 +135,15 @@
             "Redis"
         ],
         "expected_source_documents": [
-            "work/payment-gateway-refactor.md",
-            "associates/tom-brennan.md"
+            "associates/tom-brennan.md",
+            "work/payment-gateway-refactor.md"
         ],
         "min_relevant_chunks": 2,
         "time_context": null,
         "hops_required": 1
     },
     {
-        "id": "retrieval_07",
+        "id": "retrieval_007",
         "type": "retrieval",
         "question": "What technologies does James Liu work with?",
         "expected_entities": [
@@ -153,6 +158,7 @@
             "Snowflake"
         ],
         "expected_source_documents": [
+            "associates/james-liu.md",
             "work/ml-recommendation-engine.md",
             "work/data-lake-migration.md"
         ],
@@ -161,7 +167,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_08",
+        "id": "retrieval_008",
         "type": "retrieval",
         "question": "What technologies does Rachel Torres work with?",
         "expected_entities": [
@@ -183,7 +189,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_09",
+        "id": "retrieval_009",
         "type": "retrieval",
         "question": "What technologies does Kevin Park work with?",
         "expected_entities": [
@@ -196,6 +202,7 @@
             "Vault"
         ],
         "expected_source_documents": [
+            "associates/kevin-park.md",
             "work/payment-gateway-refactor.md",
             "work/auth-service-modernization.md"
         ],
@@ -204,7 +211,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_10",
+        "id": "retrieval_010",
         "type": "retrieval",
         "question": "What technologies does Nina Kowalski work with?",
         "expected_entities": [
@@ -215,6 +222,7 @@
             "Figma"
         ],
         "expected_source_documents": [
+            "associates/nina-kowalski.md",
             "work/dashboard-redesign.md",
             "work/mobile-app-v2.md"
         ],
@@ -223,7 +231,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_11",
+        "id": "retrieval_011",
         "type": "retrieval",
         "question": "What technologies does Carlos Mendez work with?",
         "expected_entities": [
@@ -238,15 +246,15 @@
             "Kotlin"
         ],
         "expected_source_documents": [
-            "work/mobile-app-v2.md",
-            "associates/carlos-mendez.md"
+            "associates/carlos-mendez.md",
+            "work/mobile-app-v2.md"
         ],
         "min_relevant_chunks": 2,
         "time_context": null,
         "hops_required": 1
     },
     {
-        "id": "retrieval_12",
+        "id": "retrieval_012",
         "type": "retrieval",
         "question": "What technologies does Emily Zhang work with?",
         "expected_entities": [
@@ -261,6 +269,7 @@
             "Python"
         ],
         "expected_source_documents": [
+            "associates/emily-zhang.md",
             "work/ml-recommendation-engine.md",
             "work/data-lake-migration.md"
         ],
@@ -269,7 +278,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_13",
+        "id": "retrieval_013",
         "type": "retrieval",
         "question": "What technologies does Derek Washington work with?",
         "expected_entities": [
@@ -284,6 +293,7 @@
             "Prometheus"
         ],
         "expected_source_documents": [
+            "associates/derek-washington.md",
             "work/observability-initiative.md",
             "work/service-mesh-rollout.md"
         ],
@@ -292,7 +302,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_14",
+        "id": "retrieval_014",
         "type": "retrieval",
         "question": "What technologies does Sophie Martin work with?",
         "expected_entities": [
@@ -303,6 +313,7 @@
             "Swagger"
         ],
         "expected_source_documents": [
+            "associates/sophie-martin.md",
             "work/api-migration.md",
             "work/developer-portal.md"
         ],
@@ -311,7 +322,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_15",
+        "id": "retrieval_015",
         "type": "retrieval",
         "question": "What technologies does Alex Petrov work with?",
         "expected_entities": [
@@ -326,6 +337,7 @@
             "RabbitMQ"
         ],
         "expected_source_documents": [
+            "associates/alex-petrov.md",
             "work/api-migration.md",
             "work/auth-service-modernization.md"
         ],
@@ -334,7 +346,101 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_16",
+        "id": "retrieval_016",
+        "type": "retrieval",
+        "question": "What technologies does Maria Santos work with?",
+        "expected_entities": [
+            "Maria Santos",
+            "React",
+            "Next.js",
+            "Tailwind CSS"
+        ],
+        "expected_answer_keywords": [
+            "React",
+            "Next.js",
+            "Tailwind CSS"
+        ],
+        "expected_source_documents": [
+            "associates/maria-santos.md",
+            "work/developer-portal.md",
+            "work/internal-tools-consolidation.md"
+        ],
+        "min_relevant_chunks": 2,
+        "time_context": null,
+        "hops_required": 1
+    },
+    {
+        "id": "retrieval_017",
+        "type": "retrieval",
+        "question": "What technologies does Ryan O'Brien work with?",
+        "expected_entities": [
+            "Ryan O'Brien",
+            "Go",
+            "gRPC",
+            "Kubernetes"
+        ],
+        "expected_answer_keywords": [
+            "Go",
+            "gRPC",
+            "Kubernetes"
+        ],
+        "expected_source_documents": [
+            "associates/ryan-obrien.md",
+            "work/observability-initiative.md",
+            "work/auth-service-modernization.md"
+        ],
+        "min_relevant_chunks": 2,
+        "time_context": null,
+        "hops_required": 1
+    },
+    {
+        "id": "retrieval_018",
+        "type": "retrieval",
+        "question": "What technologies does Olivia Foster work with?",
+        "expected_entities": [
+            "Olivia Foster",
+            "React",
+            "TypeScript",
+            "Storybook"
+        ],
+        "expected_answer_keywords": [
+            "React",
+            "TypeScript",
+            "Storybook"
+        ],
+        "expected_source_documents": [
+            "associates/olivia-foster.md",
+            "work/internal-tools-consolidation.md"
+        ],
+        "min_relevant_chunks": 2,
+        "time_context": null,
+        "hops_required": 1
+    },
+    {
+        "id": "retrieval_019",
+        "type": "retrieval",
+        "question": "What technologies does Daniel Reeves work with?",
+        "expected_entities": [
+            "Daniel Reeves",
+            "Python",
+            "Go",
+            "Kafka"
+        ],
+        "expected_answer_keywords": [
+            "Python",
+            "Go",
+            "Kafka"
+        ],
+        "expected_source_documents": [
+            "associates/daniel-reeves.md",
+            "work/event-sourcing-migration.md"
+        ],
+        "min_relevant_chunks": 2,
+        "time_context": null,
+        "hops_required": 1
+    },
+    {
+        "id": "retrieval_020",
         "type": "retrieval",
         "question": "Who is working on the Dashboard Redesign project?",
         "expected_entities": [
@@ -356,7 +462,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_17",
+        "id": "retrieval_021",
         "type": "retrieval",
         "question": "Who is working on the API Migration project?",
         "expected_entities": [
@@ -378,7 +484,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_18",
+        "id": "retrieval_022",
         "type": "retrieval",
         "question": "Who is working on the Payment Gateway Refactor project?",
         "expected_entities": [
@@ -400,7 +506,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_19",
+        "id": "retrieval_023",
         "type": "retrieval",
         "question": "Who is working on the Observability Initiative project?",
         "expected_entities": [
@@ -422,7 +528,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_20",
+        "id": "retrieval_024",
         "type": "retrieval",
         "question": "Who is working on the Mobile App V2 project?",
         "expected_entities": [
@@ -444,7 +550,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_21",
+        "id": "retrieval_025",
         "type": "retrieval",
         "question": "Who is working on the ML Recommendation Engine project?",
         "expected_entities": [
@@ -466,7 +572,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_22",
+        "id": "retrieval_026",
         "type": "retrieval",
         "question": "Who is working on the Data Lake Migration project?",
         "expected_entities": [
@@ -488,7 +594,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_23",
+        "id": "retrieval_027",
         "type": "retrieval",
         "question": "Who is working on the Auth Service Modernization project?",
         "expected_entities": [
@@ -510,7 +616,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_24",
+        "id": "retrieval_028",
         "type": "retrieval",
         "question": "Who is working on the Developer Portal project?",
         "expected_entities": [
@@ -532,7 +638,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_25",
+        "id": "retrieval_029",
         "type": "retrieval",
         "question": "Who is working on the Service Mesh Rollout project?",
         "expected_entities": [
@@ -554,7 +660,51 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_26",
+        "id": "retrieval_030",
+        "type": "retrieval",
+        "question": "Who is working on the Internal Tools Consolidation project?",
+        "expected_entities": [
+            "Internal Tools Consolidation",
+            "Maria Santos",
+            "Marcus Johnson",
+            "Olivia Foster"
+        ],
+        "expected_answer_keywords": [
+            "Maria Santos",
+            "Marcus Johnson",
+            "Olivia Foster"
+        ],
+        "expected_source_documents": [
+            "work/internal-tools-consolidation.md"
+        ],
+        "min_relevant_chunks": 1,
+        "time_context": null,
+        "hops_required": 1
+    },
+    {
+        "id": "retrieval_031",
+        "type": "retrieval",
+        "question": "Who is working on the Event Sourcing Migration project?",
+        "expected_entities": [
+            "Event Sourcing Migration",
+            "John Doe",
+            "Daniel Reeves",
+            "Lisa Wang"
+        ],
+        "expected_answer_keywords": [
+            "John Doe",
+            "Daniel Reeves",
+            "Lisa Wang"
+        ],
+        "expected_source_documents": [
+            "work/event-sourcing-migration.md"
+        ],
+        "min_relevant_chunks": 1,
+        "time_context": null,
+        "hops_required": 1
+    },
+    {
+        "id": "retrieval_032",
         "type": "retrieval",
         "question": "What technology stack is used in the Dashboard Redesign project?",
         "expected_entities": [
@@ -576,7 +726,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_27",
+        "id": "retrieval_033",
         "type": "retrieval",
         "question": "What technology stack is used in the API Migration project?",
         "expected_entities": [
@@ -598,7 +748,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_28",
+        "id": "retrieval_034",
         "type": "retrieval",
         "question": "What technology stack is used in the Payment Gateway Refactor project?",
         "expected_entities": [
@@ -620,7 +770,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_29",
+        "id": "retrieval_035",
         "type": "retrieval",
         "question": "What technology stack is used in the Observability Initiative project?",
         "expected_entities": [
@@ -642,7 +792,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_30",
+        "id": "retrieval_036",
         "type": "retrieval",
         "question": "What technology stack is used in the Mobile App V2 project?",
         "expected_entities": [
@@ -664,7 +814,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_31",
+        "id": "retrieval_037",
         "type": "retrieval",
         "question": "What technology stack is used in the ML Recommendation Engine project?",
         "expected_entities": [
@@ -686,7 +836,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_32",
+        "id": "retrieval_038",
         "type": "retrieval",
         "question": "What technology stack is used in the Data Lake Migration project?",
         "expected_entities": [
@@ -708,7 +858,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_33",
+        "id": "retrieval_039",
         "type": "retrieval",
         "question": "What technology stack is used in the Auth Service Modernization project?",
         "expected_entities": [
@@ -730,7 +880,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_34",
+        "id": "retrieval_040",
         "type": "retrieval",
         "question": "What technology stack is used in the Developer Portal project?",
         "expected_entities": [
@@ -752,7 +902,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_35",
+        "id": "retrieval_041",
         "type": "retrieval",
         "question": "What technology stack is used in the Service Mesh Rollout project?",
         "expected_entities": [
@@ -774,7 +924,29 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_36",
+        "id": "retrieval_042",
+        "type": "retrieval",
+        "question": "What technology stack is used in the Event Sourcing Migration project?",
+        "expected_entities": [
+            "Event Sourcing Migration",
+            "Kafka",
+            "PostgreSQL",
+            "Go"
+        ],
+        "expected_answer_keywords": [
+            "Kafka",
+            "PostgreSQL",
+            "Go"
+        ],
+        "expected_source_documents": [
+            "work/event-sourcing-migration.md"
+        ],
+        "min_relevant_chunks": 1,
+        "time_context": null,
+        "hops_required": 1
+    },
+    {
+        "id": "retrieval_043",
         "type": "retrieval",
         "question": "What is Sarah Chen's role and team?",
         "expected_entities": [
@@ -792,7 +964,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_37",
+        "id": "retrieval_044",
         "type": "retrieval",
         "question": "What is Marcus Johnson's role and team?",
         "expected_entities": [
@@ -810,7 +982,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_38",
+        "id": "retrieval_045",
         "type": "retrieval",
         "question": "What is Priya Patel's role and team?",
         "expected_entities": [
@@ -828,7 +1000,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_39",
+        "id": "retrieval_046",
         "type": "retrieval",
         "question": "What is David Kim's role and team?",
         "expected_entities": [
@@ -846,7 +1018,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_40",
+        "id": "retrieval_047",
         "type": "retrieval",
         "question": "What is John Doe's role and team?",
         "expected_entities": [
@@ -864,7 +1036,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_41",
+        "id": "retrieval_048",
         "type": "retrieval",
         "question": "What is Lisa Wang's role and team?",
         "expected_entities": [
@@ -882,7 +1054,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_42",
+        "id": "retrieval_049",
         "type": "retrieval",
         "question": "What is Tom Brennan's role and team?",
         "expected_entities": [
@@ -900,7 +1072,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_43",
+        "id": "retrieval_050",
         "type": "retrieval",
         "question": "What is Angela Rivera's role and team?",
         "expected_entities": [
@@ -918,7 +1090,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_44",
+        "id": "retrieval_051",
         "type": "retrieval",
         "question": "What is James Liu's role and team?",
         "expected_entities": [
@@ -936,7 +1108,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_45",
+        "id": "retrieval_052",
         "type": "retrieval",
         "question": "What is Rachel Torres's role and team?",
         "expected_entities": [
@@ -954,7 +1126,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_46",
+        "id": "retrieval_053",
         "type": "retrieval",
         "question": "What is Kevin Park's role and team?",
         "expected_entities": [
@@ -972,7 +1144,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_47",
+        "id": "retrieval_054",
         "type": "retrieval",
         "question": "What is Nina Kowalski's role and team?",
         "expected_entities": [
@@ -990,7 +1162,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_48",
+        "id": "retrieval_055",
         "type": "retrieval",
         "question": "What is Carlos Mendez's role and team?",
         "expected_entities": [
@@ -1008,7 +1180,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_49",
+        "id": "retrieval_056",
         "type": "retrieval",
         "question": "What is Emily Zhang's role and team?",
         "expected_entities": [
@@ -1026,7 +1198,7 @@
         "hops_required": 1
     },
     {
-        "id": "retrieval_50",
+        "id": "retrieval_057",
         "type": "retrieval",
         "question": "What is Derek Washington's role and team?",
         "expected_entities": [
@@ -1044,7 +1216,61 @@
         "hops_required": 1
     },
     {
-        "id": "temporal_01",
+        "id": "retrieval_058",
+        "type": "retrieval",
+        "question": "What is Sophie Martin's role and team?",
+        "expected_entities": [
+            "Sophie Martin"
+        ],
+        "expected_answer_keywords": [
+            "Technical Writer",
+            "Developer Experience"
+        ],
+        "expected_source_documents": [
+            "associates/sophie-martin.md"
+        ],
+        "min_relevant_chunks": 1,
+        "time_context": null,
+        "hops_required": 1
+    },
+    {
+        "id": "retrieval_059",
+        "type": "retrieval",
+        "question": "What is Alex Petrov's role and team?",
+        "expected_entities": [
+            "Alex Petrov"
+        ],
+        "expected_answer_keywords": [
+            "Backend Engineer",
+            "Backend Services"
+        ],
+        "expected_source_documents": [
+            "associates/alex-petrov.md"
+        ],
+        "min_relevant_chunks": 1,
+        "time_context": null,
+        "hops_required": 1
+    },
+    {
+        "id": "retrieval_060",
+        "type": "retrieval",
+        "question": "What is Maria Santos's role and team?",
+        "expected_entities": [
+            "Maria Santos"
+        ],
+        "expected_answer_keywords": [
+            "Frontend Engineer",
+            "Frontend"
+        ],
+        "expected_source_documents": [
+            "associates/maria-santos.md"
+        ],
+        "min_relevant_chunks": 1,
+        "time_context": null,
+        "hops_required": 1
+    },
+    {
+        "id": "temporal_001",
         "type": "temporal",
         "question": "What happened with Payment Gateway Refactor in June 2024?",
         "expected_entities": [
@@ -1066,7 +1292,7 @@
         "hops_required": 1
     },
     {
-        "id": "temporal_02",
+        "id": "temporal_002",
         "type": "temporal",
         "question": "What happened with Data Lake Migration in June 2024?",
         "expected_entities": [
@@ -1088,7 +1314,7 @@
         "hops_required": 1
     },
     {
-        "id": "temporal_03",
+        "id": "temporal_003",
         "type": "temporal",
         "question": "What happened with Phase 1 \u2014 OAuth provider swap completed in June 2024?",
         "expected_entities": [
@@ -1106,9 +1332,9 @@
         "hops_required": 1
     },
     {
-        "id": "temporal_04",
+        "id": "temporal_004",
         "type": "temporal",
-        "question": "What happened with Adopted Snowflake as primary data warehouse in June 2024?",
+        "question": "What was decided regarding adopted snowflake as primary data warehouse in June 2024?",
         "expected_entities": [
             "James Liu",
             "Aisha Hassan"
@@ -1127,7 +1353,7 @@
         "hops_required": 1
     },
     {
-        "id": "temporal_05",
+        "id": "temporal_005",
         "type": "temporal",
         "question": "What happened with API Migration in July 2024?",
         "expected_entities": [
@@ -1149,7 +1375,7 @@
         "hops_required": 1
     },
     {
-        "id": "temporal_06",
+        "id": "temporal_006",
         "type": "temporal",
         "question": "What happened with Observability Initiative in July 2024?",
         "expected_entities": [
@@ -1171,9 +1397,9 @@
         "hops_required": 1
     },
     {
-        "id": "temporal_07",
+        "id": "temporal_007",
         "type": "temporal",
-        "question": "What happened with Chose Apollo Server over Hasura for GraphQL in July 2024?",
+        "question": "What was decided regarding chose apollo server over hasura for graphql in July 2024?",
         "expected_entities": [
             "Priya Patel",
             "Marcus Johnson"
@@ -1192,7 +1418,28 @@
         "hops_required": 1
     },
     {
-        "id": "temporal_08",
+        "id": "temporal_008",
+        "type": "temporal",
+        "question": "What caused the payment service outage incident in July 2024?",
+        "expected_entities": [
+            "John Doe",
+            "Derek Washington",
+            "Kafka",
+            "Python"
+        ],
+        "expected_answer_keywords": [
+            "Kafka consumer group rebalance during deployment caused message processing to st"
+        ],
+        "expected_source_documents": [],
+        "min_relevant_chunks": 1,
+        "time_context": {
+            "start": 1719766800,
+            "end": 1722358800
+        },
+        "hops_required": 1
+    },
+    {
+        "id": "temporal_009",
         "type": "temporal",
         "question": "What happened with Dashboard Redesign in August 2024?",
         "expected_entities": [
@@ -1214,7 +1461,7 @@
         "hops_required": 1
     },
     {
-        "id": "temporal_09",
+        "id": "temporal_010",
         "type": "temporal",
         "question": "What happened with Developer Portal in August 2024?",
         "expected_entities": [
@@ -1236,9 +1483,9 @@
         "hops_required": 1
     },
     {
-        "id": "temporal_10",
+        "id": "temporal_011",
         "type": "temporal",
-        "question": "What happened with Selected React over Vue for Dashboard Redesign in August 2024?",
+        "question": "What was decided regarding selected react over vue for dashboard redesign in August 2024?",
         "expected_entities": [
             "Marcus Johnson",
             "Sarah Chen"
@@ -1257,7 +1504,7 @@
         "hops_required": 1
     },
     {
-        "id": "temporal_11",
+        "id": "temporal_012",
         "type": "temporal",
         "question": "What happened with Mobile App V2 in September 2024?",
         "expected_entities": [
@@ -1279,7 +1526,7 @@
         "hops_required": 1
     },
     {
-        "id": "temporal_12",
+        "id": "temporal_013",
         "type": "temporal",
         "question": "What happened with Full rollout complete, OAuth2 + JWT in production in September 2024?",
         "expected_entities": [
@@ -1297,9 +1544,9 @@
         "hops_required": 1
     },
     {
-        "id": "temporal_13",
+        "id": "temporal_014",
         "type": "temporal",
-        "question": "What happened with Adopted trunk-based development in September 2024?",
+        "question": "What was decided regarding adopted trunk-based development in September 2024?",
         "expected_entities": [
             "Sarah Chen",
             "David Kim"
@@ -1318,7 +1565,7 @@
         "hops_required": 1
     },
     {
-        "id": "temporal_14",
+        "id": "temporal_015",
         "type": "temporal",
         "question": "What happened with ML Recommendation Engine in October 2024?",
         "expected_entities": [
@@ -1340,9 +1587,30 @@
         "hops_required": 1
     },
     {
-        "id": "temporal_15",
+        "id": "temporal_016",
         "type": "temporal",
-        "question": "What happened with Approved Istio for service mesh in October 2024?",
+        "question": "What caused the redis cluster failover incident in October 2024?",
+        "expected_entities": [
+            "Derek Washington",
+            "Priya Patel",
+            "Redis",
+            "Datadog"
+        ],
+        "expected_answer_keywords": [
+            "Primary Redis node ran out of memory due to unbounded cache growth in the recomm"
+        ],
+        "expected_source_documents": [],
+        "min_relevant_chunks": 1,
+        "time_context": {
+            "start": 1727715600,
+            "end": 1730307600
+        },
+        "hops_required": 1
+    },
+    {
+        "id": "temporal_017",
+        "type": "temporal",
+        "question": "What was decided regarding approved istio for service mesh in October 2024?",
         "expected_entities": [
             "Ryan O'Brien",
             "Aisha Hassan"
@@ -1361,7 +1629,7 @@
         "hops_required": 1
     },
     {
-        "id": "temporal_16",
+        "id": "temporal_018",
         "type": "temporal",
         "question": "What happened with Staged rollout to production, 35% engagement improvement in November 2024?",
         "expected_entities": [
@@ -1379,7 +1647,7 @@
         "hops_required": 1
     },
     {
-        "id": "temporal_17",
+        "id": "temporal_019",
         "type": "temporal",
         "question": "What happened with Service Mesh Rollout in November 2024?",
         "expected_entities": [
@@ -1401,9 +1669,9 @@
         "hops_required": 1
     },
     {
-        "id": "temporal_18",
+        "id": "temporal_020",
         "type": "temporal",
-        "question": "What happened with Scheduled CockroachDB migration for Q1 2025 in November 2024?",
+        "question": "What was decided regarding scheduled cockroachdb migration for q1 2025 in November 2024?",
         "expected_entities": [
             "John Doe",
             "Aisha Hassan"
@@ -1422,9 +1690,9 @@
         "hops_required": 1
     },
     {
-        "id": "temporal_19",
+        "id": "temporal_021",
         "type": "temporal",
-        "question": "What happened with Adopted PagerDuty for on-call rotation in November 2024?",
+        "question": "What was decided regarding adopted pagerduty for on-call rotation in November 2024?",
         "expected_entities": [
             "Derek Washington",
             "Aisha Hassan"
@@ -1443,7 +1711,89 @@
         "hops_required": 1
     },
     {
-        "id": "multihop_01",
+        "id": "temporal_022",
+        "type": "temporal",
+        "question": "What happened with Internal Tools Consolidation in January 2025?",
+        "expected_entities": [
+            "Maria Santos",
+            "Marcus Johnson",
+            "Olivia Foster"
+        ],
+        "expected_answer_keywords": [
+            "Internal Tools Consolidation",
+            "Maria Santos",
+            "Marcus Johnson"
+        ],
+        "expected_source_documents": [],
+        "min_relevant_chunks": 1,
+        "time_context": {
+            "start": 1735668000,
+            "end": 1738260000
+        },
+        "hops_required": 1
+    },
+    {
+        "id": "temporal_023",
+        "type": "temporal",
+        "question": "What happened with Launched to all external partners, onboarding time reduced from 2 weeks to 3 days in January 2025?",
+        "expected_entities": [
+            "Launched to all external partners, onboarding time reduced from 2 weeks to 3 days"
+        ],
+        "expected_answer_keywords": [
+            "Launched to all external partners, onboarding time reduced from 2 weeks to 3 days"
+        ],
+        "expected_source_documents": [],
+        "min_relevant_chunks": 1,
+        "time_context": {
+            "start": 1735668000,
+            "end": 1738260000
+        },
+        "hops_required": 1
+    },
+    {
+        "id": "temporal_024",
+        "type": "temporal",
+        "question": "What caused the graphql gateway timeout incident in January 2025?",
+        "expected_entities": [
+            "Priya Patel",
+            "Alex Petrov",
+            "GraphQL",
+            "Apollo Server"
+        ],
+        "expected_answer_keywords": [
+            "N+1 query in new Apollo Server resolver caused database connection pool exhausti"
+        ],
+        "expected_source_documents": [],
+        "min_relevant_chunks": 1,
+        "time_context": {
+            "start": 1735668000,
+            "end": 1738260000
+        },
+        "hops_required": 1
+    },
+    {
+        "id": "temporal_025",
+        "type": "temporal",
+        "question": "What was decided regarding standardized on dbt for data transformations in January 2025?",
+        "expected_entities": [
+            "James Liu",
+            "Emily Zhang"
+        ],
+        "expected_answer_keywords": [
+            "Standardized on dbt for data transformations",
+            "James Liu",
+            "Emily Zhang"
+        ],
+        "expected_source_documents": [],
+        "min_relevant_chunks": 1,
+        "time_context": {
+            "start": 1735668000,
+            "end": 1738260000
+        },
+        "hops_required": 1
+    },
+    {
+        "id": "multihop_001",
         "type": "multi_hop",
         "question": "What technologies is Sarah Chen exposed to through their projects?",
         "expected_entities": [
@@ -1466,7 +1816,7 @@
         "hops_required": 2
     },
     {
-        "id": "multihop_02",
+        "id": "multihop_002",
         "type": "multi_hop",
         "question": "What technologies is Marcus Johnson exposed to through their projects?",
         "expected_entities": [
@@ -1489,7 +1839,7 @@
         "hops_required": 2
     },
     {
-        "id": "multihop_03",
+        "id": "multihop_003",
         "type": "multi_hop",
         "question": "What technologies is Priya Patel exposed to through their projects?",
         "expected_entities": [
@@ -1512,7 +1862,7 @@
         "hops_required": 2
     },
     {
-        "id": "multihop_04",
+        "id": "multihop_004",
         "type": "multi_hop",
         "question": "What technologies is David Kim exposed to through their projects?",
         "expected_entities": [
@@ -1535,7 +1885,7 @@
         "hops_required": 2
     },
     {
-        "id": "multihop_05",
+        "id": "multihop_005",
         "type": "multi_hop",
         "question": "What technologies is John Doe exposed to through their projects?",
         "expected_entities": [
@@ -1558,7 +1908,7 @@
         "hops_required": 2
     },
     {
-        "id": "multihop_06",
+        "id": "multihop_006",
         "type": "multi_hop",
         "question": "What technologies is Lisa Wang exposed to through their projects?",
         "expected_entities": [
@@ -1581,7 +1931,7 @@
         "hops_required": 2
     },
     {
-        "id": "multihop_07",
+        "id": "multihop_007",
         "type": "multi_hop",
         "question": "What technologies is Tom Brennan exposed to through their projects?",
         "expected_entities": [
@@ -1604,7 +1954,7 @@
         "hops_required": 2
     },
     {
-        "id": "multihop_08",
+        "id": "multihop_008",
         "type": "multi_hop",
         "question": "What technologies is Angela Rivera exposed to through their projects?",
         "expected_entities": [
@@ -1627,7 +1977,7 @@
         "hops_required": 2
     },
     {
-        "id": "multihop_09",
+        "id": "multihop_009",
         "type": "multi_hop",
         "question": "What technologies is James Liu exposed to through their projects?",
         "expected_entities": [
@@ -1650,7 +2000,7 @@
         "hops_required": 2
     },
     {
-        "id": "multihop_10",
+        "id": "multihop_010",
         "type": "multi_hop",
         "question": "What technologies is Kevin Park exposed to through their projects?",
         "expected_entities": [
@@ -1673,7 +2023,53 @@
         "hops_required": 2
     },
     {
-        "id": "multihop_11",
+        "id": "multihop_011",
+        "type": "multi_hop",
+        "question": "What technologies is Nina Kowalski exposed to through their projects?",
+        "expected_entities": [
+            "Nina Kowalski",
+            "Dashboard Redesign",
+            "React",
+            "TypeScript"
+        ],
+        "expected_answer_keywords": [
+            "React",
+            "TypeScript",
+            "Shadcn UI"
+        ],
+        "expected_source_documents": [
+            "associates/nina-kowalski.md",
+            "work/dashboard-redesign.md"
+        ],
+        "min_relevant_chunks": 2,
+        "time_context": null,
+        "hops_required": 2
+    },
+    {
+        "id": "multihop_012",
+        "type": "multi_hop",
+        "question": "What technologies is Carlos Mendez exposed to through their projects?",
+        "expected_entities": [
+            "Carlos Mendez",
+            "Mobile App V2",
+            "React Native",
+            "Firebase"
+        ],
+        "expected_answer_keywords": [
+            "React Native",
+            "Firebase",
+            "TypeScript"
+        ],
+        "expected_source_documents": [
+            "associates/carlos-mendez.md",
+            "work/mobile-app-v2.md"
+        ],
+        "min_relevant_chunks": 2,
+        "time_context": null,
+        "hops_required": 2
+    },
+    {
+        "id": "multihop_013",
         "type": "multi_hop",
         "question": "What skills does Sarah Chen's collaborator Marcus Johnson bring to Dashboard Redesign?",
         "expected_entities": [
@@ -1698,7 +2094,7 @@
         "hops_required": 2
     },
     {
-        "id": "multihop_12",
+        "id": "multihop_014",
         "type": "multi_hop",
         "question": "What skills does Priya Patel's collaborator Marcus Johnson bring to API Migration?",
         "expected_entities": [
@@ -1723,7 +2119,7 @@
         "hops_required": 2
     },
     {
-        "id": "multihop_13",
+        "id": "multihop_015",
         "type": "multi_hop",
         "question": "What skills does John Doe's collaborator Lisa Wang bring to Payment Gateway Refactor?",
         "expected_entities": [
@@ -1748,7 +2144,7 @@
         "hops_required": 2
     },
     {
-        "id": "multihop_14",
+        "id": "multihop_016",
         "type": "multi_hop",
         "question": "What skills does Derek Washington's collaborator John Doe bring to Observability Initiative?",
         "expected_entities": [
@@ -1773,7 +2169,7 @@
         "hops_required": 2
     },
     {
-        "id": "multihop_15",
+        "id": "multihop_017",
         "type": "multi_hop",
         "question": "What skills does Carlos Mendez's collaborator Marcus Johnson bring to Mobile App V2?",
         "expected_entities": [
@@ -1798,7 +2194,7 @@
         "hops_required": 2
     },
     {
-        "id": "multihop_16",
+        "id": "multihop_018",
         "type": "multi_hop",
         "question": "What skills does Emily Zhang's collaborator James Liu bring to ML Recommendation Engine?",
         "expected_entities": [
@@ -1823,7 +2219,7 @@
         "hops_required": 2
     },
     {
-        "id": "multihop_17",
+        "id": "multihop_019",
         "type": "multi_hop",
         "question": "What skills does James Liu's collaborator Emily Zhang bring to Data Lake Migration?",
         "expected_entities": [
@@ -1848,7 +2244,7 @@
         "hops_required": 2
     },
     {
-        "id": "multihop_18",
+        "id": "multihop_020",
         "type": "multi_hop",
         "question": "What skills does Kevin Park's collaborator Ryan O'Brien bring to Auth Service Modernization?",
         "expected_entities": [
@@ -1873,7 +2269,7 @@
         "hops_required": 2
     },
     {
-        "id": "multihop_19",
+        "id": "multihop_021",
         "type": "multi_hop",
         "question": "What skills does Sophie Martin's collaborator Maria Santos bring to Developer Portal?",
         "expected_entities": [
@@ -1898,7 +2294,7 @@
         "hops_required": 2
     },
     {
-        "id": "multihop_20",
+        "id": "multihop_022",
         "type": "multi_hop",
         "question": "What skills does Ryan O'Brien's collaborator David Kim bring to Service Mesh Rollout?",
         "expected_entities": [
@@ -1916,6 +2312,379 @@
         ],
         "expected_source_documents": [
             "work/service-mesh-rollout.md",
+            "associates/david-kim.md"
+        ],
+        "min_relevant_chunks": 2,
+        "time_context": null,
+        "hops_required": 2
+    },
+    {
+        "id": "multihop_023",
+        "type": "multi_hop",
+        "question": "What skills does Maria Santos's collaborator Marcus Johnson bring to Internal Tools Consolidation?",
+        "expected_entities": [
+            "Maria Santos",
+            "Marcus Johnson",
+            "Internal Tools Consolidation",
+            "React",
+            "TypeScript"
+        ],
+        "expected_answer_keywords": [
+            "React",
+            "TypeScript",
+            "Figma",
+            "Marcus Johnson"
+        ],
+        "expected_source_documents": [
+            "work/internal-tools-consolidation.md",
+            "associates/marcus-johnson.md"
+        ],
+        "min_relevant_chunks": 2,
+        "time_context": null,
+        "hops_required": 2
+    },
+    {
+        "id": "multihop_024",
+        "type": "multi_hop",
+        "question": "What skills does John Doe's collaborator Daniel Reeves bring to Event Sourcing Migration?",
+        "expected_entities": [
+            "John Doe",
+            "Daniel Reeves",
+            "Event Sourcing Migration",
+            "Python",
+            "Go"
+        ],
+        "expected_answer_keywords": [
+            "Python",
+            "Go",
+            "Kafka",
+            "Daniel Reeves"
+        ],
+        "expected_source_documents": [
+            "work/event-sourcing-migration.md",
+            "associates/daniel-reeves.md"
+        ],
+        "min_relevant_chunks": 2,
+        "time_context": null,
+        "hops_required": 2
+    },
+    {
+        "id": "filler_rejection_001",
+        "type": "filler_rejection",
+        "question": "What technical decisions were made at the team lunch?",
+        "expected_entities": [],
+        "expected_answer_keywords": [],
+        "expected_source_documents": [],
+        "min_relevant_chunks": 0,
+        "time_context": null,
+        "hops_required": 0
+    },
+    {
+        "id": "filler_rejection_002",
+        "type": "filler_rejection",
+        "question": "What architecture changes were discussed at the holiday party?",
+        "expected_entities": [],
+        "expected_answer_keywords": [],
+        "expected_source_documents": [],
+        "min_relevant_chunks": 0,
+        "time_context": null,
+        "hops_required": 0
+    },
+    {
+        "id": "filler_rejection_003",
+        "type": "filler_rejection",
+        "question": "What deployment issues came up during office hours?",
+        "expected_entities": [],
+        "expected_answer_keywords": [],
+        "expected_source_documents": [],
+        "min_relevant_chunks": 0,
+        "time_context": null,
+        "hops_required": 0
+    },
+    {
+        "id": "filler_rejection_004",
+        "type": "filler_rejection",
+        "question": "What database problems were discussed at the book club?",
+        "expected_entities": [],
+        "expected_answer_keywords": [],
+        "expected_source_documents": [],
+        "min_relevant_chunks": 0,
+        "time_context": null,
+        "hops_required": 0
+    },
+    {
+        "id": "filler_rejection_005",
+        "type": "filler_rejection",
+        "question": "What security vulnerabilities were found at the hackathon?",
+        "expected_entities": [],
+        "expected_answer_keywords": [],
+        "expected_source_documents": [],
+        "min_relevant_chunks": 0,
+        "time_context": null,
+        "hops_required": 0
+    },
+    {
+        "id": "filler_rejection_006",
+        "type": "filler_rejection",
+        "question": "What production incidents happened during the team offsite planning?",
+        "expected_entities": [],
+        "expected_answer_keywords": [],
+        "expected_source_documents": [],
+        "min_relevant_chunks": 0,
+        "time_context": null,
+        "hops_required": 0
+    },
+    {
+        "id": "filler_rejection_007",
+        "type": "filler_rejection",
+        "question": "What API changes were decided at the new year kickoff?",
+        "expected_entities": [],
+        "expected_answer_keywords": [],
+        "expected_source_documents": [],
+        "min_relevant_chunks": 0,
+        "time_context": null,
+        "hops_required": 0
+    },
+    {
+        "id": "filler_rejection_008",
+        "type": "filler_rejection",
+        "question": "What infrastructure problems were discussed at the intern welcome?",
+        "expected_entities": [],
+        "expected_answer_keywords": [],
+        "expected_source_documents": [],
+        "min_relevant_chunks": 0,
+        "time_context": null,
+        "hops_required": 0
+    },
+    {
+        "id": "filler_rejection_009",
+        "type": "filler_rejection",
+        "question": "What code reviews happened at the design review social?",
+        "expected_entities": [],
+        "expected_answer_keywords": [],
+        "expected_source_documents": [],
+        "min_relevant_chunks": 0,
+        "time_context": null,
+        "hops_required": 0
+    },
+    {
+        "id": "filler_rejection_010",
+        "type": "filler_rejection",
+        "question": "What testing strategy was discussed at the team lunch in March?",
+        "expected_entities": [],
+        "expected_answer_keywords": [],
+        "expected_source_documents": [],
+        "min_relevant_chunks": 0,
+        "time_context": null,
+        "hops_required": 0
+    },
+    {
+        "id": "filler_rejection_011",
+        "type": "filler_rejection",
+        "question": "What CI/CD changes were planned at the frontend office hours?",
+        "expected_entities": [],
+        "expected_answer_keywords": [],
+        "expected_source_documents": [],
+        "min_relevant_chunks": 0,
+        "time_context": null,
+        "hops_required": 0
+    },
+    {
+        "id": "filler_rejection_012",
+        "type": "filler_rejection",
+        "question": "What monitoring alerts were discussed at the backend office hours?",
+        "expected_entities": [],
+        "expected_answer_keywords": [],
+        "expected_source_documents": [],
+        "min_relevant_chunks": 0,
+        "time_context": null,
+        "hops_required": 0
+    },
+    {
+        "id": "filler_rejection_013",
+        "type": "filler_rejection",
+        "question": "What service mesh issues were raised at the data platform office hours?",
+        "expected_entities": [],
+        "expected_answer_keywords": [],
+        "expected_source_documents": [],
+        "min_relevant_chunks": 0,
+        "time_context": null,
+        "hops_required": 0
+    },
+    {
+        "id": "filler_rejection_014",
+        "type": "filler_rejection",
+        "question": "What payment bugs were found during the spring hackathon?",
+        "expected_entities": [],
+        "expected_answer_keywords": [],
+        "expected_source_documents": [],
+        "min_relevant_chunks": 0,
+        "time_context": null,
+        "hops_required": 0
+    },
+    {
+        "id": "filler_rejection_015",
+        "type": "filler_rejection",
+        "question": "What scaling issues were discussed at the infrastructure office hours?",
+        "expected_entities": [],
+        "expected_answer_keywords": [],
+        "expected_source_documents": [],
+        "min_relevant_chunks": 0,
+        "time_context": null,
+        "hops_required": 0
+    },
+    {
+        "id": "cross_document_chain_001",
+        "type": "cross_document_chain",
+        "question": "How did the payment service outage incident lead to architectural changes?",
+        "expected_entities": [
+            "John Doe",
+            "Kafka",
+            "Python"
+        ],
+        "expected_answer_keywords": [
+            "Use Kafka for payment event streaming",
+            "Payment service outage"
+        ],
+        "expected_source_documents": [
+            "meetings/payment-service-outage-postmortem.md",
+            "work/adr-001-use-kafka-for-payment-event-streaming.md"
+        ],
+        "min_relevant_chunks": 2,
+        "time_context": null,
+        "hops_required": 2
+    },
+    {
+        "id": "cross_document_chain_002",
+        "type": "cross_document_chain",
+        "question": "How did the graphql gateway timeout incident lead to architectural changes?",
+        "expected_entities": [
+            "Priya Patel",
+            "GraphQL",
+            "Apollo Server"
+        ],
+        "expected_answer_keywords": [
+            "Use DataLoader pattern for GraphQL N+1 prevention",
+            "GraphQL gateway timeout"
+        ],
+        "expected_source_documents": [
+            "meetings/graphql-gateway-timeout-postmortem.md",
+            "work/adr-004-use-dataloader-pattern-for-graphql-n+1-prevention.md"
+        ],
+        "min_relevant_chunks": 2,
+        "time_context": null,
+        "hops_required": 2
+    },
+    {
+        "id": "cross_document_chain_003",
+        "type": "cross_document_chain",
+        "question": "What was the formal rationale behind approved istio for service mesh?",
+        "expected_entities": [
+            "Ryan O'Brien",
+            "Ryan O'Brien"
+        ],
+        "expected_answer_keywords": [
+            "Adopt Istio service mesh over Linkerd",
+            "Approved Istio for service mesh"
+        ],
+        "expected_source_documents": [
+            "work/adr-002-adopt-istio-service-mesh-over-linkerd.md"
+        ],
+        "min_relevant_chunks": 1,
+        "time_context": null,
+        "hops_required": 2
+    },
+    {
+        "id": "cross_document_chain_004",
+        "type": "cross_document_chain",
+        "question": "What was the formal rationale behind adopted pagerduty for on-call rotation?",
+        "expected_entities": [
+            "Derek Washington",
+            "Derek Washington"
+        ],
+        "expected_answer_keywords": [
+            "Standardize on PagerDuty for incident management",
+            "Adopted PagerDuty for on-call rotation"
+        ],
+        "expected_source_documents": [
+            "work/adr-003-standardize-on-pagerduty-for-incident-management.md"
+        ],
+        "min_relevant_chunks": 1,
+        "time_context": null,
+        "hops_required": 2
+    },
+    {
+        "id": "cross_document_chain_005",
+        "type": "cross_document_chain",
+        "question": "What was the formal rationale behind selected mlflow over weights & biases for experiment tracking?",
+        "expected_entities": [
+            "Emily Zhang",
+            "Emily Zhang"
+        ],
+        "expected_answer_keywords": [
+            "Select MLflow over Weights & Biases for experiment tracking",
+            "Selected MLflow over Weights & Biases for experiment tracking"
+        ],
+        "expected_source_documents": [
+            "work/adr-005-select-mlflow-over-weights-&-biases-for-experiment-tracking.md"
+        ],
+        "min_relevant_chunks": 1,
+        "time_context": null,
+        "hops_required": 2
+    },
+    {
+        "id": "cross_document_chain_006",
+        "type": "cross_document_chain",
+        "question": "What was the formal rationale behind chose event sourcing over cqrs-only for core domain services?",
+        "expected_entities": [
+            "John Doe",
+            "John Doe"
+        ],
+        "expected_answer_keywords": [
+            "Adopt event sourcing for payment domain",
+            "Chose event sourcing over CQRS-only for core domain services"
+        ],
+        "expected_source_documents": [
+            "work/adr-006-adopt-event-sourcing-for-payment-domain.md"
+        ],
+        "min_relevant_chunks": 1,
+        "time_context": null,
+        "hops_required": 2
+    },
+    {
+        "id": "cross_document_chain_007",
+        "type": "cross_document_chain",
+        "question": "How has John Doe's mentorship of Lisa Wang been reflected across meetings and profiles?",
+        "expected_entities": [
+            "John Doe",
+            "Lisa Wang"
+        ],
+        "expected_answer_keywords": [
+            "John Doe",
+            "Lisa Wang"
+        ],
+        "expected_source_documents": [
+            "associates/lisa-wang.md",
+            "associates/john-doe.md"
+        ],
+        "min_relevant_chunks": 2,
+        "time_context": null,
+        "hops_required": 2
+    },
+    {
+        "id": "cross_document_chain_008",
+        "type": "cross_document_chain",
+        "question": "How has David Kim's mentorship of Tom Brennan been reflected across meetings and profiles?",
+        "expected_entities": [
+            "David Kim",
+            "Tom Brennan"
+        ],
+        "expected_answer_keywords": [
+            "David Kim",
+            "Tom Brennan"
+        ],
+        "expected_source_documents": [
+            "associates/tom-brennan.md",
             "associates/david-kim.md"
         ],
         "min_relevant_chunks": 2,

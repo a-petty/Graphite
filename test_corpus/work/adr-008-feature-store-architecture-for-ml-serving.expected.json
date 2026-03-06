@@ -1,0 +1,29 @@
+{
+    "entities": [
+        {
+            "name": "Emily Zhang",
+            "type": "person"
+        },
+        {
+            "name": "Redis",
+            "type": "technology"
+        },
+        {
+            "name": "Snowflake",
+            "type": "technology"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Emily Zhang",
+            "entity_b": "Redis"
+        },
+        {
+            "entity_a": "Emily Zhang",
+            "entity_b": "Snowflake"
+        }
+    ],
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 8,
+    "expected_filler_chunks": 0
+}

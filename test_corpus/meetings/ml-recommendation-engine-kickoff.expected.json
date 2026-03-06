@@ -31,6 +31,10 @@
         {
             "name": "FastAPI",
             "type": "technology"
+        },
+        {
+            "name": "Redis",
+            "type": "technology"
         }
     ],
     "cooccurrences": [
@@ -47,6 +51,26 @@
             "entity_b": "ML Recommendation Engine"
         },
         {
+            "entity_a": "ML Recommendation Engine",
+            "entity_b": "PyTorch"
+        },
+        {
+            "entity_a": "ML Recommendation Engine",
+            "entity_b": "MLflow"
+        },
+        {
+            "entity_a": "ML Recommendation Engine",
+            "entity_b": "Airflow"
+        },
+        {
+            "entity_a": "ML Recommendation Engine",
+            "entity_b": "FastAPI"
+        },
+        {
+            "entity_a": "ML Recommendation Engine",
+            "entity_b": "Redis"
+        },
+        {
             "entity_a": "Emily Zhang",
             "entity_b": "PyTorch"
         },
@@ -55,15 +79,19 @@
             "entity_b": "MLflow"
         },
         {
-            "entity_a": "Emily Zhang",
+            "entity_a": "James Liu",
             "entity_b": "Airflow"
         },
         {
             "entity_a": "Emily Zhang",
             "entity_b": "FastAPI"
+        },
+        {
+            "entity_a": "Priya Patel",
+            "entity_b": "Redis"
         }
     ],
     "expected_chunks_min": 4,
-    "expected_chunks_max": 10,
+    "expected_chunks_max": 12,
     "expected_filler_chunks": 0
 }

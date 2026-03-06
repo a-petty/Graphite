@@ -1,0 +1,89 @@
+{
+    "entities": [
+        {
+            "name": "Maria Santos",
+            "type": "person"
+        },
+        {
+            "name": "Marcus Johnson",
+            "type": "person"
+        },
+        {
+            "name": "Olivia Foster",
+            "type": "person"
+        },
+        {
+            "name": "Sarah Chen",
+            "type": "person"
+        },
+        {
+            "name": "Storybook",
+            "type": "technology"
+        },
+        {
+            "name": "Shadcn UI",
+            "type": "technology"
+        },
+        {
+            "name": "Next.js",
+            "type": "technology"
+        },
+        {
+            "name": "Tailwind CSS",
+            "type": "technology"
+        },
+        {
+            "name": "Mobile App V2",
+            "type": "project"
+        },
+        {
+            "name": "API Migration",
+            "type": "project"
+        },
+        {
+            "name": "Internal Tools Consolidation",
+            "type": "project"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Marcus Johnson",
+            "entity_b": "Storybook"
+        },
+        {
+            "entity_a": "Olivia Foster",
+            "entity_b": "Storybook"
+        },
+        {
+            "entity_a": "Marcus Johnson",
+            "entity_b": "Shadcn UI"
+        },
+        {
+            "entity_a": "Maria Santos",
+            "entity_b": "Next.js"
+        },
+        {
+            "entity_a": "Olivia Foster",
+            "entity_b": "Next.js"
+        },
+        {
+            "entity_a": "Maria Santos",
+            "entity_b": "Tailwind CSS"
+        },
+        {
+            "entity_a": "Marcus Johnson",
+            "entity_b": "API Migration"
+        },
+        {
+            "entity_a": "Marcus Johnson",
+            "entity_b": "Mobile App V2"
+        },
+        {
+            "entity_a": "Olivia Foster",
+            "entity_b": "Internal Tools Consolidation"
+        }
+    ],
+    "expected_chunks_min": 4,
+    "expected_chunks_max": 12,
+    "expected_filler_chunks": 0
+}

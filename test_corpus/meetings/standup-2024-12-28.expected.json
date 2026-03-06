@@ -1,0 +1,81 @@
+{
+    "entities": [
+        {
+            "name": "Emily Zhang",
+            "type": "person"
+        },
+        {
+            "name": "Rachel Torres",
+            "type": "person"
+        },
+        {
+            "name": "Derek Washington",
+            "type": "person"
+        },
+        {
+            "name": "Alex Petrov",
+            "type": "person"
+        },
+        {
+            "name": "PyTorch",
+            "type": "technology"
+        },
+        {
+            "name": "Data Lake Migration",
+            "type": "project"
+        },
+        {
+            "name": "Cypress",
+            "type": "technology"
+        },
+        {
+            "name": "Grafana",
+            "type": "technology"
+        },
+        {
+            "name": "Observability Initiative",
+            "type": "project"
+        },
+        {
+            "name": "TypeScript",
+            "type": "technology"
+        },
+        {
+            "name": "API Migration",
+            "type": "project"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Emily Zhang",
+            "entity_b": "PyTorch"
+        },
+        {
+            "entity_a": "Emily Zhang",
+            "entity_b": "Data Lake Migration"
+        },
+        {
+            "entity_a": "Rachel Torres",
+            "entity_b": "Cypress"
+        },
+        {
+            "entity_a": "Derek Washington",
+            "entity_b": "Grafana"
+        },
+        {
+            "entity_a": "Derek Washington",
+            "entity_b": "Observability Initiative"
+        },
+        {
+            "entity_a": "Alex Petrov",
+            "entity_b": "TypeScript"
+        },
+        {
+            "entity_a": "Alex Petrov",
+            "entity_b": "API Migration"
+        }
+    ],
+    "expected_chunks_min": 4,
+    "expected_chunks_max": 9,
+    "expected_filler_chunks_min": 1
+}

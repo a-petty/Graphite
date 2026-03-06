@@ -1,0 +1,97 @@
+{
+    "entities": [
+        {
+            "name": "Daniel Reeves",
+            "type": "person"
+        },
+        {
+            "name": "Rachel Torres",
+            "type": "person"
+        },
+        {
+            "name": "John Doe",
+            "type": "person"
+        },
+        {
+            "name": "Carlos Mendez",
+            "type": "person"
+        },
+        {
+            "name": "Ryan O'Brien",
+            "type": "person"
+        },
+        {
+            "name": "Go",
+            "type": "technology"
+        },
+        {
+            "name": "Event Sourcing Migration",
+            "type": "project"
+        },
+        {
+            "name": "Selenium",
+            "type": "technology"
+        },
+        {
+            "name": "Python",
+            "type": "technology"
+        },
+        {
+            "name": "Payment Gateway Refactor",
+            "type": "project"
+        },
+        {
+            "name": "React Native",
+            "type": "technology"
+        },
+        {
+            "name": "Mobile App V2",
+            "type": "project"
+        },
+        {
+            "name": "Observability Initiative",
+            "type": "project"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Daniel Reeves",
+            "entity_b": "Go"
+        },
+        {
+            "entity_a": "Daniel Reeves",
+            "entity_b": "Event Sourcing Migration"
+        },
+        {
+            "entity_a": "Rachel Torres",
+            "entity_b": "Selenium"
+        },
+        {
+            "entity_a": "John Doe",
+            "entity_b": "Python"
+        },
+        {
+            "entity_a": "John Doe",
+            "entity_b": "Payment Gateway Refactor"
+        },
+        {
+            "entity_a": "Carlos Mendez",
+            "entity_b": "React Native"
+        },
+        {
+            "entity_a": "Carlos Mendez",
+            "entity_b": "Mobile App V2"
+        },
+        {
+            "entity_a": "Ryan O'Brien",
+            "entity_b": "Go"
+        },
+        {
+            "entity_a": "Ryan O'Brien",
+            "entity_b": "Observability Initiative"
+        }
+    ],
+    "expected_chunks_min": 5,
+    "expected_chunks_max": 11,
+    "expected_filler_chunks_min": 1
+}

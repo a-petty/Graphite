@@ -1,15 +1,7 @@
 {
     "entities": [
         {
-            "name": "Derek Washington",
-            "type": "person"
-        },
-        {
-            "name": "Lisa Wang",
-            "type": "person"
-        },
-        {
-            "name": "Sarah Chen",
+            "name": "Olivia Foster",
             "type": "person"
         },
         {
@@ -17,45 +9,45 @@
             "type": "person"
         },
         {
-            "name": "Maria Santos",
+            "name": "Rachel Torres",
             "type": "person"
         },
         {
-            "name": "PagerDuty",
-            "type": "technology"
-        },
-        {
-            "name": "Python",
-            "type": "technology"
-        },
-        {
-            "name": "Snowflake",
-            "type": "technology"
-        },
-        {
             "name": "Next.js",
+            "type": "technology"
+        },
+        {
+            "name": "Airflow",
+            "type": "technology"
+        },
+        {
+            "name": "Data Lake Migration",
+            "type": "project"
+        },
+        {
+            "name": "Selenium",
             "type": "technology"
         }
     ],
     "cooccurrences": [
         {
-            "entity_a": "Derek Washington",
-            "entity_b": "PagerDuty"
-        },
-        {
-            "entity_a": "Lisa Wang",
-            "entity_b": "Python"
+            "entity_a": "Olivia Foster",
+            "entity_b": "Next.js"
         },
         {
             "entity_a": "James Liu",
-            "entity_b": "Snowflake"
+            "entity_b": "Airflow"
         },
         {
-            "entity_a": "Maria Santos",
-            "entity_b": "Next.js"
+            "entity_a": "James Liu",
+            "entity_b": "Data Lake Migration"
+        },
+        {
+            "entity_a": "Rachel Torres",
+            "entity_b": "Selenium"
         }
     ],
-    "expected_chunks_min": 5,
-    "expected_chunks_max": 10,
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 7,
     "expected_filler_chunks_min": 1
 }

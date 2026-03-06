@@ -1,45 +1,73 @@
 {
     "entities": [
         {
-            "name": "James Liu",
+            "name": "Sarah Chen",
             "type": "person"
         },
         {
-            "name": "John Doe",
+            "name": "Priya Patel",
             "type": "person"
         },
         {
-            "name": "Emily Zhang",
+            "name": "Kevin Park",
             "type": "person"
         },
         {
-            "name": "Snowflake",
+            "name": "David Kim",
+            "type": "person"
+        },
+        {
+            "name": "GraphQL",
             "type": "technology"
         },
         {
-            "name": "Python",
+            "name": "API Migration",
+            "type": "project"
+        },
+        {
+            "name": "Vault",
             "type": "technology"
         },
         {
-            "name": "Python",
+            "name": "Payment Gateway Refactor",
+            "type": "project"
+        },
+        {
+            "name": "Helm",
             "type": "technology"
+        },
+        {
+            "name": "Data Lake Migration",
+            "type": "project"
         }
     ],
     "cooccurrences": [
         {
-            "entity_a": "James Liu",
-            "entity_b": "Snowflake"
+            "entity_a": "Priya Patel",
+            "entity_b": "GraphQL"
         },
         {
-            "entity_a": "John Doe",
-            "entity_b": "Python"
+            "entity_a": "Priya Patel",
+            "entity_b": "API Migration"
         },
         {
-            "entity_a": "Emily Zhang",
-            "entity_b": "Python"
+            "entity_a": "Kevin Park",
+            "entity_b": "Vault"
+        },
+        {
+            "entity_a": "Kevin Park",
+            "entity_b": "Payment Gateway Refactor"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "Helm"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "Data Lake Migration"
         }
     ],
-    "expected_chunks_min": 3,
-    "expected_chunks_max": 6,
+    "expected_chunks_min": 4,
+    "expected_chunks_max": 9,
     "expected_filler_chunks_min": 1
 }

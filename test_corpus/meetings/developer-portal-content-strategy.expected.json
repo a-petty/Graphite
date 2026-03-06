@@ -13,15 +13,23 @@
             "type": "person"
         },
         {
-            "name": "Tailwind CSS",
-            "type": "technology"
-        },
-        {
             "name": "Swagger",
             "type": "technology"
         },
         {
+            "name": "Next.js",
+            "type": "technology"
+        },
+        {
+            "name": "React",
+            "type": "technology"
+        },
+        {
             "name": "Mobile App V2",
+            "type": "project"
+        },
+        {
+            "name": "Developer Portal",
             "type": "project"
         }
     ],
@@ -32,11 +40,19 @@
         },
         {
             "entity_a": "Maria Santos",
-            "entity_b": "Tailwind CSS"
+            "entity_b": "Next.js"
+        },
+        {
+            "entity_a": "Maria Santos",
+            "entity_b": "React"
         },
         {
             "entity_a": "Angela Rivera",
             "entity_b": "Mobile App V2"
+        },
+        {
+            "entity_a": "Maria Santos",
+            "entity_b": "Developer Portal"
         }
     ],
     "expected_chunks_min": 3,

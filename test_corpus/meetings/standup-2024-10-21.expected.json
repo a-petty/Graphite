@@ -1,7 +1,7 @@
 {
     "entities": [
         {
-            "name": "David Kim",
+            "name": "Maria Santos",
             "type": "person"
         },
         {
@@ -9,49 +9,73 @@
             "type": "person"
         },
         {
-            "name": "Ryan O'Brien",
+            "name": "Kevin Park",
             "type": "person"
         },
         {
-            "name": "Carlos Mendez",
+            "name": "John Doe",
             "type": "person"
         },
         {
-            "name": "Terraform",
+            "name": "Next.js",
             "type": "technology"
         },
         {
-            "name": "Playwright",
+            "name": "Developer Portal",
+            "type": "project"
+        },
+        {
+            "name": "Cypress",
             "type": "technology"
         },
         {
-            "name": "Go",
+            "name": "OAuth",
             "type": "technology"
         },
         {
-            "name": "Kotlin",
+            "name": "Payment Gateway Refactor",
+            "type": "project"
+        },
+        {
+            "name": "PostgreSQL",
             "type": "technology"
+        },
+        {
+            "name": "Observability Initiative",
+            "type": "project"
         }
     ],
     "cooccurrences": [
         {
-            "entity_a": "David Kim",
-            "entity_b": "Terraform"
+            "entity_a": "Maria Santos",
+            "entity_b": "Next.js"
+        },
+        {
+            "entity_a": "Maria Santos",
+            "entity_b": "Developer Portal"
         },
         {
             "entity_a": "Rachel Torres",
-            "entity_b": "Playwright"
+            "entity_b": "Cypress"
         },
         {
-            "entity_a": "Ryan O'Brien",
-            "entity_b": "Go"
+            "entity_a": "Kevin Park",
+            "entity_b": "OAuth"
         },
         {
-            "entity_a": "Carlos Mendez",
-            "entity_b": "Kotlin"
+            "entity_a": "Kevin Park",
+            "entity_b": "Payment Gateway Refactor"
+        },
+        {
+            "entity_a": "John Doe",
+            "entity_b": "PostgreSQL"
+        },
+        {
+            "entity_a": "John Doe",
+            "entity_b": "Observability Initiative"
         }
     ],
     "expected_chunks_min": 4,
-    "expected_chunks_max": 8,
+    "expected_chunks_max": 9,
     "expected_filler_chunks_min": 1
 }

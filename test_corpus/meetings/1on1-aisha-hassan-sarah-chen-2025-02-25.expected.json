@@ -1,0 +1,21 @@
+{
+    "entities": [
+        {
+            "name": "Aisha Hassan",
+            "type": "person"
+        },
+        {
+            "name": "Sarah Chen",
+            "type": "person"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Aisha Hassan",
+            "entity_b": "Sarah Chen"
+        }
+    ],
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 8,
+    "expected_filler_chunks": 0
+}

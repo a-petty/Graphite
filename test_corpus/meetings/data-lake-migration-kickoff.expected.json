@@ -31,6 +31,10 @@
         {
             "name": "Spark",
             "type": "technology"
+        },
+        {
+            "name": "S3",
+            "type": "technology"
         }
     ],
     "cooccurrences": [
@@ -47,6 +51,26 @@
             "entity_b": "Data Lake Migration"
         },
         {
+            "entity_a": "Data Lake Migration",
+            "entity_b": "Snowflake"
+        },
+        {
+            "entity_a": "Data Lake Migration",
+            "entity_b": "dbt"
+        },
+        {
+            "entity_a": "Data Lake Migration",
+            "entity_b": "Airflow"
+        },
+        {
+            "entity_a": "Data Lake Migration",
+            "entity_b": "Spark"
+        },
+        {
+            "entity_a": "Data Lake Migration",
+            "entity_b": "S3"
+        },
+        {
             "entity_a": "James Liu",
             "entity_b": "Snowflake"
         },
@@ -61,9 +85,13 @@
         {
             "entity_a": "James Liu",
             "entity_b": "Spark"
+        },
+        {
+            "entity_a": "Emily Zhang",
+            "entity_b": "S3"
         }
     ],
     "expected_chunks_min": 4,
-    "expected_chunks_max": 10,
+    "expected_chunks_max": 12,
     "expected_filler_chunks": 0
 }

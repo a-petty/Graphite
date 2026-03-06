@@ -35,6 +35,10 @@
         {
             "name": "Django Channels",
             "type": "technology"
+        },
+        {
+            "name": "GraphQL",
+            "type": "technology"
         }
     ],
     "cooccurrences": [
@@ -55,23 +59,47 @@
             "entity_b": "Dashboard Redesign"
         },
         {
-            "entity_a": "Sarah Chen",
+            "entity_a": "Dashboard Redesign",
             "entity_b": "React"
         },
         {
-            "entity_a": "Sarah Chen",
+            "entity_a": "Dashboard Redesign",
             "entity_b": "TypeScript"
         },
         {
-            "entity_a": "Sarah Chen",
+            "entity_a": "Dashboard Redesign",
             "entity_b": "Shadcn UI"
         },
         {
-            "entity_a": "Sarah Chen",
+            "entity_a": "Dashboard Redesign",
             "entity_b": "Django Channels"
+        },
+        {
+            "entity_a": "Dashboard Redesign",
+            "entity_b": "GraphQL"
+        },
+        {
+            "entity_a": "Marcus Johnson",
+            "entity_b": "React"
+        },
+        {
+            "entity_a": "Marcus Johnson",
+            "entity_b": "TypeScript"
+        },
+        {
+            "entity_a": "Marcus Johnson",
+            "entity_b": "Shadcn UI"
+        },
+        {
+            "entity_a": "Nina Kowalski",
+            "entity_b": "Django Channels"
+        },
+        {
+            "entity_a": "Priya Patel",
+            "entity_b": "GraphQL"
         }
     ],
     "expected_chunks_min": 4,
-    "expected_chunks_max": 10,
+    "expected_chunks_max": 12,
     "expected_filler_chunks": 0
 }

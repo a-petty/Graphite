@@ -55,6 +55,22 @@
             "entity_b": "Mobile App V2"
         },
         {
+            "entity_a": "Mobile App V2",
+            "entity_b": "React Native"
+        },
+        {
+            "entity_a": "Mobile App V2",
+            "entity_b": "Firebase"
+        },
+        {
+            "entity_a": "Mobile App V2",
+            "entity_b": "TypeScript"
+        },
+        {
+            "entity_a": "Mobile App V2",
+            "entity_b": "Expo"
+        },
+        {
             "entity_a": "Carlos Mendez",
             "entity_b": "React Native"
         },
@@ -63,15 +79,15 @@
             "entity_b": "Firebase"
         },
         {
-            "entity_a": "Carlos Mendez",
+            "entity_a": "Marcus Johnson",
             "entity_b": "TypeScript"
         },
         {
-            "entity_a": "Carlos Mendez",
+            "entity_a": "Angela Rivera",
             "entity_b": "Expo"
         }
     ],
     "expected_chunks_min": 4,
-    "expected_chunks_max": 10,
+    "expected_chunks_max": 12,
     "expected_filler_chunks": 0
 }

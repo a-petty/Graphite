@@ -1,27 +1,27 @@
-# Mobile App Architecture — 2024-09-15
+# Mobile App Architecture — 2024-09-01
 
 ## Attendees
-Carlos Mendez, Marcus Johnson, Angela Rivera
 
+Carlos Mendez, Marcus Johnson, Angela Rivera
 
 ## Discussion
 
-**Carlos Mendez:** I have concerns about React compatibility with our existing infrastructure. We should run a proof of concept first.
+**Carlos Mendez:** I think this could transform our workflow. The Storybook integration is coming along well. We're making good progress on the implementation.
 
-**Marcus Johnson:** We need to consider the trade-offs here. Storybook has a steeper learning curve but better long-term maintainability.
+**Carlos Mendez:** We should keep in mind the payment service outage incident from July 2024.
 
-**Angela Rivera:** I've been looking into React Native and I think it could solve our Mobile app architecture challenges. The performance benchmarks look promising.
+**Marcus Johnson:** Building on what Carlos Mendez said, i'm really excited about this direction. Our React Native setup needs attention. The shared component library is working across iOS and Android.
 
-**Angela Rivera:** This also affects the Developer Portal project timeline.
+**Angela Rivera:** Marcus Johnson raises a good point. let's focus on what we can ship this quarter. I ran benchmarks on Swift last week. We're making good progress on the implementation.
 
+## Related Projects
 
-## Decisions
+The Mobile App V2 project (in_progress) is relevant to this discussion.
 
-**Carlos Mendez:** Based on this discussion, we'll proceed with Storybook for the next phase.
-
+The Developer Portal project (completed) is relevant to this discussion.
 
 ## Action Items
 
-- Carlos Mendez will follow up on Storybook integration by end of week
-- Marcus Johnson will follow up on Storybook integration by end of week
-- Angela Rivera will follow up on Storybook integration by end of week
+- Carlos Mendez will investigate Storybook configuration and report findings by end of week
+- Marcus Johnson will investigate React Native configuration and report findings by end of week
+- Angela Rivera will investigate Swift configuration and report findings by end of week

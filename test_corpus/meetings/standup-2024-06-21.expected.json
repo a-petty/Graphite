@@ -1,69 +1,73 @@
 {
     "entities": [
         {
-            "name": "John Doe",
+            "name": "Emily Zhang",
             "type": "person"
         },
         {
-            "name": "David Kim",
+            "name": "Tom Brennan",
             "type": "person"
         },
         {
-            "name": "Priya Patel",
+            "name": "Rachel Torres",
             "type": "person"
         },
         {
-            "name": "James Liu",
+            "name": "Daniel Reeves",
             "type": "person"
         },
         {
-            "name": "Carlos Mendez",
-            "type": "person"
+            "name": "MLflow",
+            "type": "technology"
+        },
+        {
+            "name": "Data Lake Migration",
+            "type": "project"
         },
         {
             "name": "Python",
             "type": "technology"
         },
         {
-            "name": "Helm",
+            "name": "Payment Gateway Refactor",
+            "type": "project"
+        },
+        {
+            "name": "Cypress",
             "type": "technology"
         },
         {
-            "name": "GraphQL",
-            "type": "technology"
-        },
-        {
-            "name": "Python",
-            "type": "technology"
-        },
-        {
-            "name": "Swift",
+            "name": "Go",
             "type": "technology"
         }
     ],
     "cooccurrences": [
         {
-            "entity_a": "John Doe",
+            "entity_a": "Emily Zhang",
+            "entity_b": "MLflow"
+        },
+        {
+            "entity_a": "Emily Zhang",
+            "entity_b": "Data Lake Migration"
+        },
+        {
+            "entity_a": "Tom Brennan",
             "entity_b": "Python"
         },
         {
-            "entity_a": "David Kim",
-            "entity_b": "Helm"
+            "entity_a": "Tom Brennan",
+            "entity_b": "Payment Gateway Refactor"
         },
         {
-            "entity_a": "Priya Patel",
-            "entity_b": "GraphQL"
+            "entity_a": "Rachel Torres",
+            "entity_b": "Cypress"
         },
         {
-            "entity_a": "James Liu",
-            "entity_b": "Python"
-        },
-        {
-            "entity_a": "Carlos Mendez",
-            "entity_b": "Swift"
+            "entity_a": "Daniel Reeves",
+            "entity_b": "Go"
         }
     ],
-    "expected_chunks_min": 5,
-    "expected_chunks_max": 10,
+    "expected_chunks_min": 4,
+    "expected_chunks_max": 9,
     "expected_filler_chunks_min": 1
 }

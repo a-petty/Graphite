@@ -1,24 +1,24 @@
-# Ml Model Training Pipeline Design — 2024-08-22
+# Ml Model Training Pipeline Design — 2024-08-24
 
 ## Attendees
-Emily Zhang, James Liu
 
+Emily Zhang, James Liu
 
 ## Discussion
 
-**Emily Zhang:** The documentation for dbt is solid. I've drafted an RFC that outlines the migration path.
+**Emily Zhang:** Let me walk through the data on this. I've been working with Airflow and the performance characteristics are solid — The DAG execution times are consistent at about 12 minutes per run.
 
-**James Liu:** From my perspective, we should prioritize Python integration. The current approach has scalability concerns.
+**James Liu:** I want to make sure we're systematic about this. We should discuss our PyTorch configuration. The model training is converging in about 45 epochs on the current dataset.
 
-**James Liu:** This also affects the Data Lake Migration project timeline.
+**James Liu:** This connects to our earlier decision to adopted snowflake as primary data warehouse back in June 2024.
 
+**Emily Zhang:** Let me walk through the data on this. Our Python setup needs attention. We're making good progress on the implementation.
 
-## Decisions
+## Related Projects
 
-**Emily Zhang:** Based on this discussion, we'll proceed with Spark for the next phase.
-
+The Data Lake Migration project (completed) is relevant to this discussion.
 
 ## Action Items
 
-- Emily Zhang will follow up on Python integration by end of week
-- James Liu will follow up on Spark integration by end of week
+- Emily Zhang will investigate Airflow configuration and report findings by end of week
+- James Liu will investigate PyTorch configuration and report findings by end of week

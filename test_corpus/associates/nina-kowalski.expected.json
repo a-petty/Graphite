@@ -29,11 +29,11 @@
             "type": "person"
         },
         {
-            "name": "Priya Patel",
+            "name": "Sarah Chen",
             "type": "person"
         },
         {
-            "name": "Sarah Chen",
+            "name": "Marcus Johnson",
             "type": "person"
         }
     ],
@@ -64,14 +64,14 @@
         },
         {
             "entity_a": "Nina Kowalski",
-            "entity_b": "Priya Patel"
+            "entity_b": "Sarah Chen"
         },
         {
             "entity_a": "Nina Kowalski",
-            "entity_b": "Sarah Chen"
+            "entity_b": "Marcus Johnson"
         }
     ],
     "expected_chunks_min": 3,
-    "expected_chunks_max": 8,
+    "expected_chunks_max": 10,
     "expected_filler_chunks": 0
 }

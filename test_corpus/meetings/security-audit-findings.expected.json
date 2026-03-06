@@ -17,35 +17,19 @@
             "type": "technology"
         },
         {
-            "name": "Vault",
-            "type": "technology"
-        },
-        {
             "name": "gRPC",
             "type": "technology"
         },
         {
-            "name": "Istio",
+            "name": "Vault",
             "type": "technology"
         },
         {
-            "name": "Service Mesh Rollout",
-            "type": "project"
-        },
-        {
-            "name": "Payment Gateway Refactor",
+            "name": "Auth Service Modernization",
             "type": "project"
         }
     ],
     "cooccurrences": [
-        {
-            "entity_a": "Kevin Park",
-            "entity_b": "Vault"
-        },
-        {
-            "entity_a": "Ryan O'Brien",
-            "entity_b": "Istio"
-        },
         {
             "entity_a": "Ryan O'Brien",
             "entity_b": "Go"
@@ -56,11 +40,11 @@
         },
         {
             "entity_a": "Kevin Park",
-            "entity_b": "Payment Gateway Refactor"
+            "entity_b": "Vault"
         },
         {
-            "entity_a": "Ryan O'Brien",
-            "entity_b": "Service Mesh Rollout"
+            "entity_a": "Kevin Park",
+            "entity_b": "Auth Service Modernization"
         }
     ],
     "expected_chunks_min": 3,

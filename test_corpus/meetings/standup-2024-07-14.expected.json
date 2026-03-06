@@ -1,11 +1,7 @@
 {
     "entities": [
         {
-            "name": "Emily Zhang",
-            "type": "person"
-        },
-        {
-            "name": "Marcus Johnson",
+            "name": "Lisa Wang",
             "type": "person"
         },
         {
@@ -13,57 +9,85 @@
             "type": "person"
         },
         {
-            "name": "Carlos Mendez",
+            "name": "Alex Petrov",
             "type": "person"
         },
         {
-            "name": "Lisa Wang",
+            "name": "David Kim",
             "type": "person"
         },
         {
-            "name": "PyTorch",
+            "name": "Olivia Foster",
+            "type": "person"
+        },
+        {
+            "name": "PostgreSQL",
             "type": "technology"
         },
         {
-            "name": "Shadcn UI",
+            "name": "Payment Gateway Refactor",
+            "type": "project"
+        },
+        {
+            "name": "Selenium",
             "type": "technology"
         },
         {
-            "name": "Cypress",
+            "name": "MongoDB",
             "type": "technology"
         },
         {
-            "name": "Firebase",
+            "name": "Auth Service Modernization",
+            "type": "project"
+        },
+        {
+            "name": "Kubernetes",
             "type": "technology"
         },
         {
-            "name": "FastAPI",
+            "name": "Data Lake Migration",
+            "type": "project"
+        },
+        {
+            "name": "React",
             "type": "technology"
         }
     ],
     "cooccurrences": [
         {
-            "entity_a": "Emily Zhang",
-            "entity_b": "PyTorch"
-        },
-        {
-            "entity_a": "Marcus Johnson",
-            "entity_b": "Shadcn UI"
-        },
-        {
-            "entity_a": "Rachel Torres",
-            "entity_b": "Cypress"
-        },
-        {
-            "entity_a": "Carlos Mendez",
-            "entity_b": "Firebase"
+            "entity_a": "Lisa Wang",
+            "entity_b": "PostgreSQL"
         },
         {
             "entity_a": "Lisa Wang",
-            "entity_b": "FastAPI"
+            "entity_b": "Payment Gateway Refactor"
+        },
+        {
+            "entity_a": "Rachel Torres",
+            "entity_b": "Selenium"
+        },
+        {
+            "entity_a": "Alex Petrov",
+            "entity_b": "MongoDB"
+        },
+        {
+            "entity_a": "Alex Petrov",
+            "entity_b": "Auth Service Modernization"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "Kubernetes"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "Data Lake Migration"
+        },
+        {
+            "entity_a": "Olivia Foster",
+            "entity_b": "React"
         }
     ],
     "expected_chunks_min": 5,
-    "expected_chunks_max": 10,
+    "expected_chunks_max": 11,
     "expected_filler_chunks_min": 1
 }

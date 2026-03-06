@@ -1,0 +1,97 @@
+{
+    "entities": [
+        {
+            "name": "Daniel Reeves",
+            "type": "person"
+        },
+        {
+            "name": "TechCorp",
+            "type": "organization"
+        },
+        {
+            "name": "Platform Services",
+            "type": "organization"
+        },
+        {
+            "name": "Python",
+            "type": "technology"
+        },
+        {
+            "name": "Go",
+            "type": "technology"
+        },
+        {
+            "name": "Kafka",
+            "type": "technology"
+        },
+        {
+            "name": "PostgreSQL",
+            "type": "technology"
+        },
+        {
+            "name": "Event Sourcing Migration",
+            "type": "project"
+        },
+        {
+            "name": "Ryan O'Brien",
+            "type": "person"
+        },
+        {
+            "name": "John Doe",
+            "type": "person"
+        },
+        {
+            "name": "Lisa Wang",
+            "type": "person"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Daniel Reeves",
+            "entity_b": "TechCorp"
+        },
+        {
+            "entity_a": "Daniel Reeves",
+            "entity_b": "Platform Services"
+        },
+        {
+            "entity_a": "Daniel Reeves",
+            "entity_b": "Python"
+        },
+        {
+            "entity_a": "Daniel Reeves",
+            "entity_b": "Go"
+        },
+        {
+            "entity_a": "Daniel Reeves",
+            "entity_b": "Kafka"
+        },
+        {
+            "entity_a": "Daniel Reeves",
+            "entity_b": "PostgreSQL"
+        },
+        {
+            "entity_a": "Daniel Reeves",
+            "entity_b": "Event Sourcing Migration"
+        },
+        {
+            "entity_a": "Daniel Reeves",
+            "entity_b": "Ryan O'Brien"
+        },
+        {
+            "entity_a": "Daniel Reeves",
+            "entity_b": "John Doe"
+        },
+        {
+            "entity_a": "Daniel Reeves",
+            "entity_b": "Lisa Wang"
+        },
+        {
+            "entity_a": "Daniel Reeves",
+            "entity_b": "John Doe"
+        }
+    ],
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 10,
+    "expected_filler_chunks": 0
+}
