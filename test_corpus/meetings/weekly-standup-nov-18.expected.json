@@ -1,0 +1,105 @@
+{
+    "entities": [
+        {
+            "name": "Sarah Chen",
+            "type": "person"
+        },
+        {
+            "name": "Marcus Johnson",
+            "type": "person"
+        },
+        {
+            "name": "Priya Patel",
+            "type": "person"
+        },
+        {
+            "name": "David Kim",
+            "type": "person"
+        },
+        {
+            "name": "Helm",
+            "type": "technology"
+        },
+        {
+            "name": "Storybook",
+            "type": "technology"
+        },
+        {
+            "name": "Figma",
+            "type": "technology"
+        },
+        {
+            "name": "WebSocket",
+            "type": "technology"
+        },
+        {
+            "name": "Terraform",
+            "type": "technology"
+        },
+        {
+            "name": "ArgoCD",
+            "type": "technology"
+        },
+        {
+            "name": "Playwright",
+            "type": "technology"
+        },
+        {
+            "name": "Service Mesh Rollout",
+            "type": "project"
+        },
+        {
+            "name": "Dashboard Redesign",
+            "type": "project"
+        },
+        {
+            "name": "Observability Initiative",
+            "type": "project"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Marcus Johnson",
+            "entity_b": "Storybook"
+        },
+        {
+            "entity_a": "Marcus Johnson",
+            "entity_b": "Figma"
+        },
+        {
+            "entity_a": "Priya Patel",
+            "entity_b": "WebSocket"
+        },
+        {
+            "entity_a": "Priya Patel",
+            "entity_b": "Playwright"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "Terraform"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "ArgoCD"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "Helm"
+        },
+        {
+            "entity_a": "Priya Patel",
+            "entity_b": "Dashboard Redesign"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "Observability Initiative"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "Service Mesh Rollout"
+        }
+    ],
+    "expected_chunks_min": 4,
+    "expected_chunks_max": 12,
+    "expected_filler_chunks": 0
+}

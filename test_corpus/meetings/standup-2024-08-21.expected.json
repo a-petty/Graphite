@@ -1,0 +1,57 @@
+{
+    "entities": [
+        {
+            "name": "Carlos Mendez",
+            "type": "person"
+        },
+        {
+            "name": "Lisa Wang",
+            "type": "person"
+        },
+        {
+            "name": "Emily Zhang",
+            "type": "person"
+        },
+        {
+            "name": "James Liu",
+            "type": "person"
+        },
+        {
+            "name": "Kotlin",
+            "type": "technology"
+        },
+        {
+            "name": "FastAPI",
+            "type": "technology"
+        },
+        {
+            "name": "PyTorch",
+            "type": "technology"
+        },
+        {
+            "name": "Snowflake",
+            "type": "technology"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Carlos Mendez",
+            "entity_b": "Kotlin"
+        },
+        {
+            "entity_a": "Lisa Wang",
+            "entity_b": "FastAPI"
+        },
+        {
+            "entity_a": "Emily Zhang",
+            "entity_b": "PyTorch"
+        },
+        {
+            "entity_a": "James Liu",
+            "entity_b": "Snowflake"
+        }
+    ],
+    "expected_chunks_min": 4,
+    "expected_chunks_max": 8,
+    "expected_filler_chunks_min": 1
+}

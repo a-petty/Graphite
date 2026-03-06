@@ -1,0 +1,57 @@
+{
+    "entities": [
+        {
+            "name": "David Kim",
+            "type": "person"
+        },
+        {
+            "name": "Rachel Torres",
+            "type": "person"
+        },
+        {
+            "name": "Ryan O'Brien",
+            "type": "person"
+        },
+        {
+            "name": "Carlos Mendez",
+            "type": "person"
+        },
+        {
+            "name": "Terraform",
+            "type": "technology"
+        },
+        {
+            "name": "Playwright",
+            "type": "technology"
+        },
+        {
+            "name": "Go",
+            "type": "technology"
+        },
+        {
+            "name": "Kotlin",
+            "type": "technology"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "David Kim",
+            "entity_b": "Terraform"
+        },
+        {
+            "entity_a": "Rachel Torres",
+            "entity_b": "Playwright"
+        },
+        {
+            "entity_a": "Ryan O'Brien",
+            "entity_b": "Go"
+        },
+        {
+            "entity_a": "Carlos Mendez",
+            "entity_b": "Kotlin"
+        }
+    ],
+    "expected_chunks_min": 4,
+    "expected_chunks_max": 8,
+    "expected_filler_chunks_min": 1
+}

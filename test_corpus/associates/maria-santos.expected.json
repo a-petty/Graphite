@@ -1,0 +1,77 @@
+{
+    "entities": [
+        {
+            "name": "Maria Santos",
+            "type": "person"
+        },
+        {
+            "name": "TechCorp",
+            "type": "organization"
+        },
+        {
+            "name": "Frontend",
+            "type": "organization"
+        },
+        {
+            "name": "React",
+            "type": "technology"
+        },
+        {
+            "name": "Next.js",
+            "type": "technology"
+        },
+        {
+            "name": "Tailwind CSS",
+            "type": "technology"
+        },
+        {
+            "name": "Developer Portal",
+            "type": "project"
+        },
+        {
+            "name": "Sophie Martin",
+            "type": "person"
+        },
+        {
+            "name": "Angela Rivera",
+            "type": "person"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Maria Santos",
+            "entity_b": "TechCorp"
+        },
+        {
+            "entity_a": "Maria Santos",
+            "entity_b": "Frontend"
+        },
+        {
+            "entity_a": "Maria Santos",
+            "entity_b": "React"
+        },
+        {
+            "entity_a": "Maria Santos",
+            "entity_b": "Next.js"
+        },
+        {
+            "entity_a": "Maria Santos",
+            "entity_b": "Tailwind CSS"
+        },
+        {
+            "entity_a": "Maria Santos",
+            "entity_b": "Developer Portal"
+        },
+        {
+            "entity_a": "Maria Santos",
+            "entity_b": "Sophie Martin"
+        },
+        {
+            "entity_a": "Maria Santos",
+            "entity_b": "Angela Rivera"
+        }
+    ],
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 8,
+    "expected_filler_chunks": 0
+}

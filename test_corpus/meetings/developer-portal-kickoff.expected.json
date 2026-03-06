@@ -1,0 +1,69 @@
+{
+    "entities": [
+        {
+            "name": "Developer Portal",
+            "type": "project"
+        },
+        {
+            "name": "Sophie Martin",
+            "type": "person"
+        },
+        {
+            "name": "Maria Santos",
+            "type": "person"
+        },
+        {
+            "name": "Angela Rivera",
+            "type": "person"
+        },
+        {
+            "name": "Next.js",
+            "type": "technology"
+        },
+        {
+            "name": "Tailwind CSS",
+            "type": "technology"
+        },
+        {
+            "name": "MDX",
+            "type": "technology"
+        },
+        {
+            "name": "Swagger",
+            "type": "technology"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Sophie Martin",
+            "entity_b": "Developer Portal"
+        },
+        {
+            "entity_a": "Maria Santos",
+            "entity_b": "Developer Portal"
+        },
+        {
+            "entity_a": "Angela Rivera",
+            "entity_b": "Developer Portal"
+        },
+        {
+            "entity_a": "Sophie Martin",
+            "entity_b": "Next.js"
+        },
+        {
+            "entity_a": "Sophie Martin",
+            "entity_b": "Tailwind CSS"
+        },
+        {
+            "entity_a": "Sophie Martin",
+            "entity_b": "MDX"
+        },
+        {
+            "entity_a": "Sophie Martin",
+            "entity_b": "Swagger"
+        }
+    ],
+    "expected_chunks_min": 4,
+    "expected_chunks_max": 10,
+    "expected_filler_chunks": 0
+}

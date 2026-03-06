@@ -1,0 +1,85 @@
+{
+    "entities": [
+        {
+            "name": "Kevin Park",
+            "type": "person"
+        },
+        {
+            "name": "TechCorp",
+            "type": "organization"
+        },
+        {
+            "name": "Security",
+            "type": "organization"
+        },
+        {
+            "name": "OAuth",
+            "type": "technology"
+        },
+        {
+            "name": "Vault",
+            "type": "technology"
+        },
+        {
+            "name": "Payment Gateway Refactor",
+            "type": "project"
+        },
+        {
+            "name": "Auth Service Modernization",
+            "type": "project"
+        },
+        {
+            "name": "Lisa Wang",
+            "type": "person"
+        },
+        {
+            "name": "Alex Petrov",
+            "type": "person"
+        },
+        {
+            "name": "Tom Brennan",
+            "type": "person"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Kevin Park",
+            "entity_b": "TechCorp"
+        },
+        {
+            "entity_a": "Kevin Park",
+            "entity_b": "Security"
+        },
+        {
+            "entity_a": "Kevin Park",
+            "entity_b": "OAuth"
+        },
+        {
+            "entity_a": "Kevin Park",
+            "entity_b": "Vault"
+        },
+        {
+            "entity_a": "Kevin Park",
+            "entity_b": "Payment Gateway Refactor"
+        },
+        {
+            "entity_a": "Kevin Park",
+            "entity_b": "Auth Service Modernization"
+        },
+        {
+            "entity_a": "Kevin Park",
+            "entity_b": "Lisa Wang"
+        },
+        {
+            "entity_a": "Kevin Park",
+            "entity_b": "Alex Petrov"
+        },
+        {
+            "entity_a": "Kevin Park",
+            "entity_b": "Tom Brennan"
+        }
+    ],
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 8,
+    "expected_filler_chunks": 0
+}

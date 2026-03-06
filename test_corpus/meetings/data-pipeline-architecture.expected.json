@@ -1,0 +1,105 @@
+{
+    "entities": [
+        {
+            "name": "James Liu",
+            "type": "person"
+        },
+        {
+            "name": "Emily Zhang",
+            "type": "person"
+        },
+        {
+            "name": "Priya Patel",
+            "type": "person"
+        },
+        {
+            "name": "Python",
+            "type": "technology"
+        },
+        {
+            "name": "GraphQL",
+            "type": "technology"
+        },
+        {
+            "name": "scikit-learn",
+            "type": "technology"
+        },
+        {
+            "name": "WebSocket",
+            "type": "technology"
+        },
+        {
+            "name": "PyTorch",
+            "type": "technology"
+        },
+        {
+            "name": "Snowflake",
+            "type": "technology"
+        },
+        {
+            "name": "Playwright",
+            "type": "technology"
+        },
+        {
+            "name": "Data Lake Migration",
+            "type": "project"
+        },
+        {
+            "name": "ML Recommendation Engine",
+            "type": "project"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "James Liu",
+            "entity_b": "Python"
+        },
+        {
+            "entity_a": "James Liu",
+            "entity_b": "Snowflake"
+        },
+        {
+            "entity_a": "Emily Zhang",
+            "entity_b": "PyTorch"
+        },
+        {
+            "entity_a": "Emily Zhang",
+            "entity_b": "Python"
+        },
+        {
+            "entity_a": "Emily Zhang",
+            "entity_b": "scikit-learn"
+        },
+        {
+            "entity_a": "Priya Patel",
+            "entity_b": "Playwright"
+        },
+        {
+            "entity_a": "Priya Patel",
+            "entity_b": "GraphQL"
+        },
+        {
+            "entity_a": "Priya Patel",
+            "entity_b": "WebSocket"
+        },
+        {
+            "entity_a": "James Liu",
+            "entity_b": "ML Recommendation Engine"
+        },
+        {
+            "entity_a": "James Liu",
+            "entity_b": "Data Lake Migration"
+        },
+        {
+            "entity_a": "Emily Zhang",
+            "entity_b": "ML Recommendation Engine"
+        },
+        {
+            "entity_a": "Emily Zhang",
+            "entity_b": "Data Lake Migration"
+        }
+    ],
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 9,
+    "expected_filler_chunks": 0
+}

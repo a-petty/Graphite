@@ -1,0 +1,69 @@
+{
+    "entities": [
+        {
+            "name": "Marcus Johnson",
+            "type": "person"
+        },
+        {
+            "name": "Priya Patel",
+            "type": "person"
+        },
+        {
+            "name": "Maria Santos",
+            "type": "person"
+        },
+        {
+            "name": "Derek Washington",
+            "type": "person"
+        },
+        {
+            "name": "Kevin Park",
+            "type": "person"
+        },
+        {
+            "name": "Figma",
+            "type": "technology"
+        },
+        {
+            "name": "Redis",
+            "type": "technology"
+        },
+        {
+            "name": "Tailwind CSS",
+            "type": "technology"
+        },
+        {
+            "name": "PagerDuty",
+            "type": "technology"
+        },
+        {
+            "name": "Vault",
+            "type": "technology"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Marcus Johnson",
+            "entity_b": "Figma"
+        },
+        {
+            "entity_a": "Priya Patel",
+            "entity_b": "Redis"
+        },
+        {
+            "entity_a": "Maria Santos",
+            "entity_b": "Tailwind CSS"
+        },
+        {
+            "entity_a": "Derek Washington",
+            "entity_b": "PagerDuty"
+        },
+        {
+            "entity_a": "Kevin Park",
+            "entity_b": "Vault"
+        }
+    ],
+    "expected_chunks_min": 5,
+    "expected_chunks_max": 10,
+    "expected_filler_chunks_min": 1
+}

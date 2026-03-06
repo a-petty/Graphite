@@ -1,0 +1,77 @@
+{
+    "entities": [
+        {
+            "name": "Payment Gateway Refactor",
+            "type": "project"
+        },
+        {
+            "name": "John Doe",
+            "type": "person"
+        },
+        {
+            "name": "Lisa Wang",
+            "type": "person"
+        },
+        {
+            "name": "Tom Brennan",
+            "type": "person"
+        },
+        {
+            "name": "Kevin Park",
+            "type": "person"
+        },
+        {
+            "name": "Python",
+            "type": "technology"
+        },
+        {
+            "name": "Kafka",
+            "type": "technology"
+        },
+        {
+            "name": "PostgreSQL",
+            "type": "technology"
+        },
+        {
+            "name": "Stripe",
+            "type": "technology"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Payment Gateway Refactor",
+            "entity_b": "John Doe"
+        },
+        {
+            "entity_a": "Payment Gateway Refactor",
+            "entity_b": "Lisa Wang"
+        },
+        {
+            "entity_a": "Payment Gateway Refactor",
+            "entity_b": "Tom Brennan"
+        },
+        {
+            "entity_a": "Payment Gateway Refactor",
+            "entity_b": "Kevin Park"
+        },
+        {
+            "entity_a": "Payment Gateway Refactor",
+            "entity_b": "Python"
+        },
+        {
+            "entity_a": "Payment Gateway Refactor",
+            "entity_b": "Kafka"
+        },
+        {
+            "entity_a": "Payment Gateway Refactor",
+            "entity_b": "PostgreSQL"
+        },
+        {
+            "entity_a": "Payment Gateway Refactor",
+            "entity_b": "Stripe"
+        }
+    ],
+    "expected_chunks_min": 4,
+    "expected_chunks_max": 10,
+    "expected_filler_chunks": 0
+}

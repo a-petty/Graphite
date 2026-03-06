@@ -1,0 +1,69 @@
+{
+    "entities": [
+        {
+            "name": "Lisa Wang",
+            "type": "person"
+        },
+        {
+            "name": "David Kim",
+            "type": "person"
+        },
+        {
+            "name": "Maria Santos",
+            "type": "person"
+        },
+        {
+            "name": "Emily Zhang",
+            "type": "person"
+        },
+        {
+            "name": "James Liu",
+            "type": "person"
+        },
+        {
+            "name": "FastAPI",
+            "type": "technology"
+        },
+        {
+            "name": "Kubernetes",
+            "type": "technology"
+        },
+        {
+            "name": "Next.js",
+            "type": "technology"
+        },
+        {
+            "name": "Python",
+            "type": "technology"
+        },
+        {
+            "name": "Snowflake",
+            "type": "technology"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Lisa Wang",
+            "entity_b": "FastAPI"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "Kubernetes"
+        },
+        {
+            "entity_a": "Maria Santos",
+            "entity_b": "Next.js"
+        },
+        {
+            "entity_a": "Emily Zhang",
+            "entity_b": "Python"
+        },
+        {
+            "entity_a": "James Liu",
+            "entity_b": "Snowflake"
+        }
+    ],
+    "expected_chunks_min": 5,
+    "expected_chunks_max": 10,
+    "expected_filler_chunks_min": 1
+}

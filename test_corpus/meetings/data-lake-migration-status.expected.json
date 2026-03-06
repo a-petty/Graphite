@@ -1,0 +1,45 @@
+{
+    "entities": [
+        {
+            "name": "James Liu",
+            "type": "person"
+        },
+        {
+            "name": "David Kim",
+            "type": "person"
+        },
+        {
+            "name": "Aisha Hassan",
+            "type": "person"
+        },
+        {
+            "name": "dbt",
+            "type": "technology"
+        },
+        {
+            "name": "Python",
+            "type": "technology"
+        },
+        {
+            "name": "Terraform",
+            "type": "technology"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "James Liu",
+            "entity_b": "dbt"
+        },
+        {
+            "entity_a": "James Liu",
+            "entity_b": "Python"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "Terraform"
+        }
+    ],
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 9,
+    "expected_filler_chunks": 0
+}

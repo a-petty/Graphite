@@ -1,0 +1,61 @@
+{
+    "entities": [
+        {
+            "name": "Sarah Chen",
+            "type": "person"
+        },
+        {
+            "name": "TechCorp",
+            "type": "organization"
+        },
+        {
+            "name": "Platform Engineering",
+            "type": "organization"
+        },
+        {
+            "name": "Dashboard Redesign",
+            "type": "project"
+        },
+        {
+            "name": "Nina Kowalski",
+            "type": "person"
+        },
+        {
+            "name": "Priya Patel",
+            "type": "person"
+        },
+        {
+            "name": "Marcus Johnson",
+            "type": "person"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Sarah Chen",
+            "entity_b": "TechCorp"
+        },
+        {
+            "entity_a": "Sarah Chen",
+            "entity_b": "Platform Engineering"
+        },
+        {
+            "entity_a": "Sarah Chen",
+            "entity_b": "Dashboard Redesign"
+        },
+        {
+            "entity_a": "Sarah Chen",
+            "entity_b": "Nina Kowalski"
+        },
+        {
+            "entity_a": "Sarah Chen",
+            "entity_b": "Priya Patel"
+        },
+        {
+            "entity_a": "Sarah Chen",
+            "entity_b": "Marcus Johnson"
+        }
+    ],
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 8,
+    "expected_filler_chunks": 0
+}

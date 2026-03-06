@@ -1,0 +1,101 @@
+{
+    "entities": [
+        {
+            "name": "Emily Zhang",
+            "type": "person"
+        },
+        {
+            "name": "James Liu",
+            "type": "person"
+        },
+        {
+            "name": "John Doe",
+            "type": "person"
+        },
+        {
+            "name": "AWS EKS",
+            "type": "technology"
+        },
+        {
+            "name": "Python",
+            "type": "technology"
+        },
+        {
+            "name": "scikit-learn",
+            "type": "technology"
+        },
+        {
+            "name": "Kafka",
+            "type": "technology"
+        },
+        {
+            "name": "MLflow",
+            "type": "technology"
+        },
+        {
+            "name": "Spark",
+            "type": "technology"
+        },
+        {
+            "name": "Snowflake",
+            "type": "technology"
+        },
+        {
+            "name": "Data Lake Migration",
+            "type": "project"
+        },
+        {
+            "name": "ML Recommendation Engine",
+            "type": "project"
+        },
+        {
+            "name": "Observability Initiative",
+            "type": "project"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Emily Zhang",
+            "entity_b": "MLflow"
+        },
+        {
+            "entity_a": "Emily Zhang",
+            "entity_b": "scikit-learn"
+        },
+        {
+            "entity_a": "Emily Zhang",
+            "entity_b": "Python"
+        },
+        {
+            "entity_a": "James Liu",
+            "entity_b": "Spark"
+        },
+        {
+            "entity_a": "James Liu",
+            "entity_b": "Snowflake"
+        },
+        {
+            "entity_a": "John Doe",
+            "entity_b": "AWS EKS"
+        },
+        {
+            "entity_a": "John Doe",
+            "entity_b": "Kafka"
+        },
+        {
+            "entity_a": "James Liu",
+            "entity_b": "ML Recommendation Engine"
+        },
+        {
+            "entity_a": "James Liu",
+            "entity_b": "Data Lake Migration"
+        },
+        {
+            "entity_a": "John Doe",
+            "entity_b": "Observability Initiative"
+        }
+    ],
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 9,
+    "expected_filler_chunks": 0
+}

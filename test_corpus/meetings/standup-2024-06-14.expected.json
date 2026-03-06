@@ -1,0 +1,45 @@
+{
+    "entities": [
+        {
+            "name": "Marcus Johnson",
+            "type": "person"
+        },
+        {
+            "name": "Lisa Wang",
+            "type": "person"
+        },
+        {
+            "name": "David Kim",
+            "type": "person"
+        },
+        {
+            "name": "React",
+            "type": "technology"
+        },
+        {
+            "name": "Python",
+            "type": "technology"
+        },
+        {
+            "name": "Terraform",
+            "type": "technology"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Marcus Johnson",
+            "entity_b": "React"
+        },
+        {
+            "entity_a": "Lisa Wang",
+            "entity_b": "Python"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "Terraform"
+        }
+    ],
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 6,
+    "expected_filler_chunks_min": 1
+}

@@ -1,0 +1,65 @@
+{
+    "entities": [
+        {
+            "name": "Emily Zhang",
+            "type": "person"
+        },
+        {
+            "name": "James Liu",
+            "type": "person"
+        },
+        {
+            "name": "dbt",
+            "type": "technology"
+        },
+        {
+            "name": "Python",
+            "type": "technology"
+        },
+        {
+            "name": "MLflow",
+            "type": "technology"
+        },
+        {
+            "name": "Spark",
+            "type": "technology"
+        },
+        {
+            "name": "Data Lake Migration",
+            "type": "project"
+        },
+        {
+            "name": "ML Recommendation Engine",
+            "type": "project"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Emily Zhang",
+            "entity_b": "Python"
+        },
+        {
+            "entity_a": "Emily Zhang",
+            "entity_b": "MLflow"
+        },
+        {
+            "entity_a": "James Liu",
+            "entity_b": "dbt"
+        },
+        {
+            "entity_a": "James Liu",
+            "entity_b": "Spark"
+        },
+        {
+            "entity_a": "James Liu",
+            "entity_b": "ML Recommendation Engine"
+        },
+        {
+            "entity_a": "James Liu",
+            "entity_b": "Data Lake Migration"
+        }
+    ],
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 8,
+    "expected_filler_chunks": 0
+}

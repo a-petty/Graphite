@@ -1,0 +1,57 @@
+{
+    "entities": [
+        {
+            "name": "David Kim",
+            "type": "person"
+        },
+        {
+            "name": "James Liu",
+            "type": "person"
+        },
+        {
+            "name": "Emily Zhang",
+            "type": "person"
+        },
+        {
+            "name": "John Doe",
+            "type": "person"
+        },
+        {
+            "name": "GitHub Actions",
+            "type": "technology"
+        },
+        {
+            "name": "Snowflake",
+            "type": "technology"
+        },
+        {
+            "name": "scikit-learn",
+            "type": "technology"
+        },
+        {
+            "name": "AWS EKS",
+            "type": "technology"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "David Kim",
+            "entity_b": "GitHub Actions"
+        },
+        {
+            "entity_a": "James Liu",
+            "entity_b": "Snowflake"
+        },
+        {
+            "entity_a": "Emily Zhang",
+            "entity_b": "scikit-learn"
+        },
+        {
+            "entity_a": "John Doe",
+            "entity_b": "AWS EKS"
+        }
+    ],
+    "expected_chunks_min": 4,
+    "expected_chunks_max": 8,
+    "expected_filler_chunks_min": 1
+}

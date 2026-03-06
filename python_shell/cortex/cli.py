@@ -94,6 +94,38 @@ def create_parser() -> argparse.ArgumentParser:
         help="Model name for extraction (default: llama3.3:70b)."
     )
 
+    # --- Eval Command ---
+    eval_parser = subparsers.add_parser("eval", help="Run evaluation benchmarks against the knowledge graph.")
+    eval_parser.add_argument(
+        "corpus_dir", type=Path,
+        help="Directory containing test corpus with eval_queries.json"
+    )
+    eval_parser.add_argument(
+        "-p", "--project-root", type=Path, default=".",
+        help="Project root for graph storage (default: current directory)"
+    )
+    eval_parser.add_argument(
+        "--full", action="store_true",
+        help="Run full pipeline mode (includes LLM-dependent metrics)"
+    )
+    eval_parser.add_argument(
+        "--provider", type=str, default="ollama",
+        choices=["ollama", "mlx"],
+        help="LLM provider for full mode (default: ollama)."
+    )
+    eval_parser.add_argument(
+        "--model", type=str, default="llama3.3:70b",
+        help="Model name for full mode (default: llama3.3:70b)."
+    )
+    eval_parser.add_argument(
+        "-o", "--output", type=Path, default=None,
+        help="Save JSON report to this path (default: .cortex/eval_report.json)"
+    )
+    eval_parser.add_argument(
+        "-k", type=int, default=5,
+        help="Top-k for retrieval precision metric (default: 5)"
+    )
+
     # --- Chat Command ---
     chat_parser = subparsers.add_parser("chat", help="Start an interactive multi-turn conversation with the agent.")
     chat_parser.add_argument(
@@ -259,6 +291,63 @@ def handle_ingest_command(args: argparse.Namespace):
     console.print(f"\n[green]Graph saved to {graph_path}[/green]")
 
 
+def handle_eval_command(args: argparse.Namespace):
+    """Run evaluation benchmarks against the knowledge graph."""
+    from cortex.config import CortexConfig
+    from cortex.evaluation.runner import EvalRunner
+    from cortex.evaluation.report import ReportFormatter
+
+    project_root = Path(args.project_root).resolve()
+    corpus_dir = Path(args.corpus_dir).resolve()
+
+    if not corpus_dir.exists():
+        console.print(f"[bold red]Error:[/bold red] Corpus directory '{corpus_dir}' does not exist.")
+        sys.exit(1)
+
+    mode = "full_pipeline" if args.full else "graph_only"
+
+    llm_client = None
+    if args.full:
+        if args.provider == "ollama":
+            from cortex.llm import OllamaClient
+            llm_client = OllamaClient(model=args.model)
+        else:
+            from cortex.llm import MLXClient
+            llm_client = MLXClient(model=args.model)
+
+    config = CortexConfig(
+        llm_model=args.model,
+        llm_provider=args.provider,
+        memory_root=project_root / "memory",
+    )
+
+    console.print(Panel(
+        f"[bold white]Cortex Evaluation[/bold white]\n"
+        f"[dim]Corpus: {corpus_dir}\n"
+        f"Mode: {mode}\n"
+        f"K: {args.k}[/dim]",
+        border_style="blue",
+        expand=False,
+    ))
+
+    runner = EvalRunner(
+        corpus_dir=corpus_dir,
+        project_root=project_root,
+        config=config,
+        mode=mode,
+        llm_client=llm_client,
+        k=args.k,
+    )
+
+    report = runner.run()
+
+    ReportFormatter.print_console(report, console)
+
+    output_path = args.output or (project_root / ".cortex" / "eval_report.json")
+    ReportFormatter.save_json(report, output_path)
+    console.print(f"\n[green]Report saved to {output_path}[/green]")
+
+
 def handle_chat_command(args: argparse.Namespace):
     """Start an interactive multi-turn chat session."""
     from rich.prompt import Prompt
@@ -322,6 +411,8 @@ def main():
             handle_query_command(args)
         elif args.command == "ingest":
             handle_ingest_command(args)
+        elif args.command == "eval":
+            handle_eval_command(args)
         elif args.command == "chat":
             handle_chat_command(args)
 

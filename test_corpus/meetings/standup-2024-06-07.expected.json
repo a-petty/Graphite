@@ -1,0 +1,57 @@
+{
+    "entities": [
+        {
+            "name": "Derek Washington",
+            "type": "person"
+        },
+        {
+            "name": "Lisa Wang",
+            "type": "person"
+        },
+        {
+            "name": "David Kim",
+            "type": "person"
+        },
+        {
+            "name": "James Liu",
+            "type": "person"
+        },
+        {
+            "name": "Prometheus",
+            "type": "technology"
+        },
+        {
+            "name": "FastAPI",
+            "type": "technology"
+        },
+        {
+            "name": "Helm",
+            "type": "technology"
+        },
+        {
+            "name": "Spark",
+            "type": "technology"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Derek Washington",
+            "entity_b": "Prometheus"
+        },
+        {
+            "entity_a": "Lisa Wang",
+            "entity_b": "FastAPI"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "Helm"
+        },
+        {
+            "entity_a": "James Liu",
+            "entity_b": "Spark"
+        }
+    ],
+    "expected_chunks_min": 4,
+    "expected_chunks_max": 8,
+    "expected_filler_chunks_min": 1
+}

@@ -1,0 +1,89 @@
+{
+    "entities": [
+        {
+            "name": "Priya Patel",
+            "type": "person"
+        },
+        {
+            "name": "Marcus Johnson",
+            "type": "person"
+        },
+        {
+            "name": "Sophie Martin",
+            "type": "person"
+        },
+        {
+            "name": "Swagger",
+            "type": "technology"
+        },
+        {
+            "name": "Redis",
+            "type": "technology"
+        },
+        {
+            "name": "GraphQL",
+            "type": "technology"
+        },
+        {
+            "name": "Figma",
+            "type": "technology"
+        },
+        {
+            "name": "WebSocket",
+            "type": "technology"
+        },
+        {
+            "name": "TypeScript",
+            "type": "technology"
+        },
+        {
+            "name": "API Migration",
+            "type": "project"
+        },
+        {
+            "name": "Dashboard Redesign",
+            "type": "project"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Priya Patel",
+            "entity_b": "GraphQL"
+        },
+        {
+            "entity_a": "Priya Patel",
+            "entity_b": "Redis"
+        },
+        {
+            "entity_a": "Priya Patel",
+            "entity_b": "WebSocket"
+        },
+        {
+            "entity_a": "Marcus Johnson",
+            "entity_b": "TypeScript"
+        },
+        {
+            "entity_a": "Marcus Johnson",
+            "entity_b": "Figma"
+        },
+        {
+            "entity_a": "Sophie Martin",
+            "entity_b": "Swagger"
+        },
+        {
+            "entity_a": "Priya Patel",
+            "entity_b": "API Migration"
+        },
+        {
+            "entity_a": "Marcus Johnson",
+            "entity_b": "Dashboard Redesign"
+        },
+        {
+            "entity_a": "Marcus Johnson",
+            "entity_b": "API Migration"
+        }
+    ],
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 9,
+    "expected_filler_chunks": 0
+}

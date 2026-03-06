@@ -1,0 +1,45 @@
+{
+    "entities": [
+        {
+            "name": "Sophie Martin",
+            "type": "person"
+        },
+        {
+            "name": "Angela Rivera",
+            "type": "person"
+        },
+        {
+            "name": "Maria Santos",
+            "type": "person"
+        },
+        {
+            "name": "Tailwind CSS",
+            "type": "technology"
+        },
+        {
+            "name": "Swagger",
+            "type": "technology"
+        },
+        {
+            "name": "Mobile App V2",
+            "type": "project"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Sophie Martin",
+            "entity_b": "Swagger"
+        },
+        {
+            "entity_a": "Maria Santos",
+            "entity_b": "Tailwind CSS"
+        },
+        {
+            "entity_a": "Angela Rivera",
+            "entity_b": "Mobile App V2"
+        }
+    ],
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 9,
+    "expected_filler_chunks": 0
+}

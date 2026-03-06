@@ -1,0 +1,97 @@
+{
+    "entities": [
+        {
+            "name": "Ryan O'Brien",
+            "type": "person"
+        },
+        {
+            "name": "David Kim",
+            "type": "person"
+        },
+        {
+            "name": "Derek Washington",
+            "type": "person"
+        },
+        {
+            "name": "PagerDuty",
+            "type": "technology"
+        },
+        {
+            "name": "Prometheus",
+            "type": "technology"
+        },
+        {
+            "name": "Kubernetes",
+            "type": "technology"
+        },
+        {
+            "name": "Go",
+            "type": "technology"
+        },
+        {
+            "name": "Datadog",
+            "type": "technology"
+        },
+        {
+            "name": "Istio",
+            "type": "technology"
+        },
+        {
+            "name": "Service Mesh Rollout",
+            "type": "project"
+        },
+        {
+            "name": "Data Lake Migration",
+            "type": "project"
+        },
+        {
+            "name": "Observability Initiative",
+            "type": "project"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Ryan O'Brien",
+            "entity_b": "Istio"
+        },
+        {
+            "entity_a": "Ryan O'Brien",
+            "entity_b": "Kubernetes"
+        },
+        {
+            "entity_a": "Ryan O'Brien",
+            "entity_b": "Go"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "Kubernetes"
+        },
+        {
+            "entity_a": "Derek Washington",
+            "entity_b": "PagerDuty"
+        },
+        {
+            "entity_a": "Derek Washington",
+            "entity_b": "Prometheus"
+        },
+        {
+            "entity_a": "Derek Washington",
+            "entity_b": "Datadog"
+        },
+        {
+            "entity_a": "Ryan O'Brien",
+            "entity_b": "Service Mesh Rollout"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "Observability Initiative"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "Data Lake Migration"
+        }
+    ],
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 9,
+    "expected_filler_chunks": 0
+}

@@ -1,0 +1,342 @@
+{
+    "people": [
+        {
+            "name": "Sarah Chen",
+            "role": "Engineering Manager",
+            "team": "Platform Engineering",
+            "skills": ["project management", "architecture", "mentoring"],
+            "joined": "2021-01"
+        },
+        {
+            "name": "Marcus Johnson",
+            "role": "Senior Frontend Engineer",
+            "team": "Frontend",
+            "skills": ["React", "TypeScript", "Figma", "Shadcn UI", "Storybook"],
+            "joined": "2022-03"
+        },
+        {
+            "name": "Priya Patel",
+            "role": "Senior Backend Engineer",
+            "team": "Backend Services",
+            "skills": ["Django", "Redis", "GraphQL", "WebSocket", "Playwright"],
+            "joined": "2021-06"
+        },
+        {
+            "name": "David Kim",
+            "role": "DevOps Lead",
+            "team": "Infrastructure",
+            "skills": ["Kubernetes", "Terraform", "AWS", "Helm", "ArgoCD", "GitHub Actions"],
+            "joined": "2020-09"
+        },
+        {
+            "name": "John Doe",
+            "role": "Senior Backend Engineer",
+            "team": "Platform Services",
+            "skills": ["Python", "Go", "PostgreSQL", "Kafka", "AWS EKS"],
+            "joined": "2022-03"
+        },
+        {
+            "name": "Lisa Wang",
+            "role": "Junior Backend Engineer",
+            "team": "Platform Services",
+            "skills": ["Python", "FastAPI", "PostgreSQL"],
+            "joined": "2024-01"
+        },
+        {
+            "name": "Tom Brennan",
+            "role": "Junior Backend Engineer",
+            "team": "Platform Services",
+            "skills": ["Python", "Docker", "Redis"],
+            "joined": "2024-02"
+        },
+        {
+            "name": "Angela Rivera",
+            "role": "Product Manager",
+            "team": "Product",
+            "skills": ["product strategy", "user research", "roadmapping"],
+            "joined": "2021-04"
+        },
+        {
+            "name": "James Liu",
+            "role": "Data Engineer",
+            "team": "Data Platform",
+            "skills": ["Spark", "Airflow", "Snowflake", "dbt", "Python"],
+            "joined": "2022-06"
+        },
+        {
+            "name": "Rachel Torres",
+            "role": "QA Lead",
+            "team": "Quality Engineering",
+            "skills": ["Playwright", "Cypress", "test automation", "Selenium"],
+            "joined": "2021-09"
+        },
+        {
+            "name": "Kevin Park",
+            "role": "Security Engineer",
+            "team": "Security",
+            "skills": ["OAuth", "OWASP", "Vault", "penetration testing"],
+            "joined": "2023-01"
+        },
+        {
+            "name": "Nina Kowalski",
+            "role": "UX Designer",
+            "team": "Design",
+            "skills": ["Figma", "user research", "accessibility", "design systems"],
+            "joined": "2022-08"
+        },
+        {
+            "name": "Carlos Mendez",
+            "role": "Mobile Engineer",
+            "team": "Mobile",
+            "skills": ["React Native", "Swift", "Kotlin", "Firebase"],
+            "joined": "2023-03"
+        },
+        {
+            "name": "Emily Zhang",
+            "role": "ML Engineer",
+            "team": "Data Platform",
+            "skills": ["PyTorch", "MLflow", "Python", "scikit-learn", "feature stores"],
+            "joined": "2023-05"
+        },
+        {
+            "name": "Derek Washington",
+            "role": "SRE",
+            "team": "Infrastructure",
+            "skills": ["Datadog", "PagerDuty", "Prometheus", "Grafana", "incident response"],
+            "joined": "2022-11"
+        },
+        {
+            "name": "Sophie Martin",
+            "role": "Technical Writer",
+            "team": "Developer Experience",
+            "skills": ["API documentation", "Swagger", "developer guides"],
+            "joined": "2023-07"
+        },
+        {
+            "name": "Alex Petrov",
+            "role": "Backend Engineer",
+            "team": "Backend Services",
+            "skills": ["Node.js", "TypeScript", "RabbitMQ", "MongoDB"],
+            "joined": "2023-02"
+        },
+        {
+            "name": "Maria Santos",
+            "role": "Frontend Engineer",
+            "team": "Frontend",
+            "skills": ["React", "Next.js", "Tailwind CSS", "accessibility"],
+            "joined": "2023-06"
+        },
+        {
+            "name": "Ryan O'Brien",
+            "role": "Platform Engineer",
+            "team": "Platform Services",
+            "skills": ["Go", "gRPC", "Kubernetes", "service mesh", "Istio"],
+            "joined": "2022-10"
+        },
+        {
+            "name": "Aisha Hassan",
+            "role": "Engineering Director",
+            "team": "Engineering Leadership",
+            "skills": ["strategy", "hiring", "budget planning", "architecture review"],
+            "joined": "2020-03"
+        }
+    ],
+    "projects": [
+        {
+            "name": "Dashboard Redesign",
+            "lead": "Sarah Chen",
+            "team": ["Marcus Johnson", "Priya Patel", "Nina Kowalski"],
+            "technologies": ["React", "TypeScript", "Shadcn UI", "Django Channels", "GraphQL"],
+            "status": "completed",
+            "start_month": "2024-08",
+            "end_month": "2024-11"
+        },
+        {
+            "name": "API Migration",
+            "lead": "Priya Patel",
+            "team": ["Marcus Johnson", "Alex Petrov", "Sophie Martin"],
+            "technologies": ["GraphQL", "Apollo Server", "REST", "Swagger"],
+            "status": "in_progress",
+            "start_month": "2024-07",
+            "end_month": null
+        },
+        {
+            "name": "Payment Gateway Refactor",
+            "lead": "John Doe",
+            "team": ["Lisa Wang", "Tom Brennan", "Kevin Park"],
+            "technologies": ["Python", "Kafka", "PostgreSQL", "Stripe"],
+            "status": "in_progress",
+            "start_month": "2024-06",
+            "end_month": null
+        },
+        {
+            "name": "Observability Initiative",
+            "lead": "Derek Washington",
+            "team": ["John Doe", "David Kim", "Ryan O'Brien"],
+            "technologies": ["Jaeger", "OpenTelemetry", "Datadog", "Prometheus", "Grafana"],
+            "status": "in_progress",
+            "start_month": "2024-07",
+            "end_month": null
+        },
+        {
+            "name": "Mobile App V2",
+            "lead": "Carlos Mendez",
+            "team": ["Marcus Johnson", "Nina Kowalski", "Angela Rivera"],
+            "technologies": ["React Native", "Firebase", "TypeScript", "Expo"],
+            "status": "in_progress",
+            "start_month": "2024-09",
+            "end_month": null
+        },
+        {
+            "name": "ML Recommendation Engine",
+            "lead": "Emily Zhang",
+            "team": ["James Liu", "Priya Patel"],
+            "technologies": ["PyTorch", "MLflow", "Airflow", "FastAPI", "Redis"],
+            "status": "planning",
+            "start_month": "2024-10",
+            "end_month": null
+        },
+        {
+            "name": "Data Lake Migration",
+            "lead": "James Liu",
+            "team": ["Emily Zhang", "David Kim"],
+            "technologies": ["Snowflake", "dbt", "Airflow", "Spark", "S3"],
+            "status": "in_progress",
+            "start_month": "2024-06",
+            "end_month": null
+        },
+        {
+            "name": "Auth Service Modernization",
+            "lead": "Kevin Park",
+            "team": ["Ryan O'Brien", "Alex Petrov"],
+            "technologies": ["OAuth", "Vault", "Go", "gRPC", "JWT"],
+            "status": "completed",
+            "start_month": "2024-06",
+            "end_month": "2024-09"
+        },
+        {
+            "name": "Developer Portal",
+            "lead": "Sophie Martin",
+            "team": ["Maria Santos", "Angela Rivera"],
+            "technologies": ["Next.js", "Tailwind CSS", "MDX", "Swagger"],
+            "status": "in_progress",
+            "start_month": "2024-08",
+            "end_month": null
+        },
+        {
+            "name": "Service Mesh Rollout",
+            "lead": "Ryan O'Brien",
+            "team": ["David Kim", "Derek Washington"],
+            "technologies": ["Istio", "Kubernetes", "Envoy", "Prometheus"],
+            "status": "planning",
+            "start_month": "2024-11",
+            "end_month": null
+        }
+    ],
+    "technologies": [
+        "React", "TypeScript", "Vue", "Next.js", "Tailwind CSS", "Shadcn UI", "Storybook",
+        "Python", "Go", "Node.js", "FastAPI", "Django", "Django REST Framework", "Django Channels",
+        "GraphQL", "Apollo Server", "Strawberry GraphQL", "gRPC", "REST",
+        "PostgreSQL", "Redis", "MongoDB", "CockroachDB", "Snowflake",
+        "Kafka", "RabbitMQ",
+        "Docker", "Kubernetes", "Helm", "ArgoCD", "Terraform", "AWS", "AWS EKS", "S3",
+        "Istio", "Envoy",
+        "GitHub Actions", "Datadog", "Prometheus", "Grafana", "PagerDuty", "Jaeger", "OpenTelemetry",
+        "Figma", "Swagger", "Playwright", "Cypress", "Selenium",
+        "PyTorch", "MLflow", "scikit-learn", "Spark", "Airflow", "dbt",
+        "React Native", "Swift", "Kotlin", "Firebase", "Expo",
+        "OAuth", "Vault", "JWT", "Stripe",
+        "Zustand", "Redux", "WebSocket", "MDX", "Slack"
+    ],
+    "organizations": [
+        "TechCorp",
+        "Acme Corp",
+        "Platform Services",
+        "Frontend",
+        "Backend Services",
+        "Infrastructure",
+        "Data Platform",
+        "Design",
+        "Security",
+        "Mobile",
+        "Quality Engineering",
+        "Developer Experience",
+        "Engineering Leadership"
+    ],
+    "timeline": [
+        {
+            "month": "2024-06",
+            "events": [
+                {"type": "project_kickoff", "project": "Payment Gateway Refactor", "participants": ["John Doe", "Lisa Wang", "Kevin Park"]},
+                {"type": "project_kickoff", "project": "Data Lake Migration", "participants": ["James Liu", "Emily Zhang", "David Kim"]},
+                {"type": "project_completed", "project": "Auth Service Modernization", "detail": "Phase 1 — OAuth provider swap completed"},
+                {"type": "meeting", "topic": "Q2 retrospective", "participants": ["Sarah Chen", "Aisha Hassan", "Angela Rivera", "David Kim"]},
+                {"type": "meeting", "topic": "Kafka cluster scaling", "participants": ["John Doe", "David Kim", "Derek Washington"]},
+                {"type": "decision", "detail": "Adopted Snowflake as primary data warehouse", "participants": ["James Liu", "Aisha Hassan"]}
+            ]
+        },
+        {
+            "month": "2024-07",
+            "events": [
+                {"type": "project_kickoff", "project": "API Migration", "participants": ["Priya Patel", "Marcus Johnson", "Alex Petrov"]},
+                {"type": "project_kickoff", "project": "Observability Initiative", "participants": ["Derek Washington", "John Doe", "David Kim"]},
+                {"type": "meeting", "topic": "GraphQL schema design review", "participants": ["Priya Patel", "Marcus Johnson", "Sophie Martin"]},
+                {"type": "meeting", "topic": "Security audit findings", "participants": ["Kevin Park", "Aisha Hassan", "Ryan O'Brien"]},
+                {"type": "meeting", "topic": "Data pipeline architecture", "participants": ["James Liu", "Emily Zhang", "Priya Patel"]},
+                {"type": "decision", "detail": "Chose Apollo Server over Hasura for GraphQL", "participants": ["Priya Patel", "Marcus Johnson"]},
+                {"type": "incident", "detail": "Payment service outage — 45 min downtime", "participants": ["John Doe", "Derek Washington", "David Kim"]}
+            ]
+        },
+        {
+            "month": "2024-08",
+            "events": [
+                {"type": "project_kickoff", "project": "Dashboard Redesign", "participants": ["Sarah Chen", "Marcus Johnson", "Priya Patel", "Nina Kowalski"]},
+                {"type": "project_kickoff", "project": "Developer Portal", "participants": ["Sophie Martin", "Maria Santos", "Angela Rivera"]},
+                {"type": "meeting", "topic": "Frontend framework comparison", "participants": ["Marcus Johnson", "Maria Santos", "Nina Kowalski"]},
+                {"type": "meeting", "topic": "Payment gateway architecture review", "participants": ["John Doe", "Kevin Park", "Lisa Wang", "Aisha Hassan"]},
+                {"type": "meeting", "topic": "ML model training pipeline design", "participants": ["Emily Zhang", "James Liu"]},
+                {"type": "decision", "detail": "Selected React over Vue for Dashboard Redesign", "participants": ["Marcus Johnson", "Sarah Chen"]},
+                {"type": "hiring", "detail": "Opened headcount for 2 senior backend engineers", "participants": ["Aisha Hassan", "Sarah Chen"]}
+            ]
+        },
+        {
+            "month": "2024-09",
+            "events": [
+                {"type": "project_kickoff", "project": "Mobile App V2", "participants": ["Carlos Mendez", "Marcus Johnson", "Nina Kowalski", "Angela Rivera"]},
+                {"type": "project_completed", "project": "Auth Service Modernization", "detail": "Full rollout complete, OAuth2 + JWT in production"},
+                {"type": "meeting", "topic": "Q3 design review", "participants": ["Sarah Chen", "Marcus Johnson", "Priya Patel", "David Kim"]},
+                {"type": "meeting", "topic": "Mobile app architecture", "participants": ["Carlos Mendez", "Marcus Johnson", "Angela Rivera"]},
+                {"type": "meeting", "topic": "Database performance review", "participants": ["John Doe", "Priya Patel", "James Liu"]},
+                {"type": "meeting", "topic": "Observability stack evaluation", "participants": ["Derek Washington", "David Kim", "Ryan O'Brien"]},
+                {"type": "decision", "detail": "Adopted trunk-based development", "participants": ["Sarah Chen", "David Kim"]}
+            ]
+        },
+        {
+            "month": "2024-10",
+            "events": [
+                {"type": "project_kickoff", "project": "ML Recommendation Engine", "participants": ["Emily Zhang", "James Liu", "Priya Patel"]},
+                {"type": "meeting", "topic": "Engineering retrospective", "participants": ["Sarah Chen", "Marcus Johnson", "Priya Patel", "David Kim"]},
+                {"type": "meeting", "topic": "Service mesh planning", "participants": ["Ryan O'Brien", "David Kim", "Derek Washington"]},
+                {"type": "meeting", "topic": "Developer portal content strategy", "participants": ["Sophie Martin", "Angela Rivera", "Maria Santos"]},
+                {"type": "meeting", "topic": "Feature store design", "participants": ["Emily Zhang", "James Liu", "John Doe"]},
+                {"type": "meeting", "topic": "Mobile app UX review", "participants": ["Nina Kowalski", "Carlos Mendez", "Angela Rivera"]},
+                {"type": "incident", "detail": "Redis cluster failover — 15 min elevated latency", "participants": ["Derek Washington", "Priya Patel", "David Kim"]},
+                {"type": "decision", "detail": "Approved Istio for service mesh", "participants": ["Ryan O'Brien", "Aisha Hassan"]}
+            ]
+        },
+        {
+            "month": "2024-11",
+            "events": [
+                {"type": "project_completed", "project": "Dashboard Redesign", "detail": "Staged rollout to production, 35% engagement improvement"},
+                {"type": "project_kickoff", "project": "Service Mesh Rollout", "participants": ["Ryan O'Brien", "David Kim", "Derek Washington"]},
+                {"type": "meeting", "topic": "Weekly standup Nov 18", "participants": ["Sarah Chen", "Marcus Johnson", "Priya Patel", "David Kim"]},
+                {"type": "meeting", "topic": "Data lake migration status", "participants": ["James Liu", "David Kim", "Aisha Hassan"]},
+                {"type": "meeting", "topic": "Payment gateway security review", "participants": ["Kevin Park", "John Doe", "Tom Brennan"]},
+                {"type": "meeting", "topic": "ML model evaluation results", "participants": ["Emily Zhang", "James Liu", "Angela Rivera"]},
+                {"type": "meeting", "topic": "Q4 planning", "participants": ["Aisha Hassan", "Sarah Chen", "Angela Rivera", "Derek Washington"]},
+                {"type": "decision", "detail": "Scheduled CockroachDB migration for Q1 2025", "participants": ["John Doe", "Aisha Hassan"]},
+                {"type": "decision", "detail": "Adopted PagerDuty for on-call rotation", "participants": ["Derek Washington", "Aisha Hassan"]}
+            ]
+        }
+    ]
+}

@@ -1,0 +1,37 @@
+{
+    "entities": [
+        {
+            "name": "Priya Patel",
+            "type": "person"
+        },
+        {
+            "name": "Ryan O'Brien",
+            "type": "person"
+        },
+        {
+            "name": "Sarah Chen",
+            "type": "person"
+        },
+        {
+            "name": "WebSocket",
+            "type": "technology"
+        },
+        {
+            "name": "Istio",
+            "type": "technology"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Priya Patel",
+            "entity_b": "WebSocket"
+        },
+        {
+            "entity_a": "Ryan O'Brien",
+            "entity_b": "Istio"
+        }
+    ],
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 6,
+    "expected_filler_chunks_min": 1
+}

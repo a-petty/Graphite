@@ -1,0 +1,73 @@
+{
+    "entities": [
+        {
+            "name": "Aisha Hassan",
+            "type": "person"
+        },
+        {
+            "name": "Sarah Chen",
+            "type": "person"
+        },
+        {
+            "name": "Angela Rivera",
+            "type": "person"
+        },
+        {
+            "name": "Derek Washington",
+            "type": "person"
+        },
+        {
+            "name": "PagerDuty",
+            "type": "technology"
+        },
+        {
+            "name": "Datadog",
+            "type": "technology"
+        },
+        {
+            "name": "Grafana",
+            "type": "technology"
+        },
+        {
+            "name": "Developer Portal",
+            "type": "project"
+        },
+        {
+            "name": "Mobile App V2",
+            "type": "project"
+        },
+        {
+            "name": "Dashboard Redesign",
+            "type": "project"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Derek Washington",
+            "entity_b": "PagerDuty"
+        },
+        {
+            "entity_a": "Derek Washington",
+            "entity_b": "Grafana"
+        },
+        {
+            "entity_a": "Derek Washington",
+            "entity_b": "Datadog"
+        },
+        {
+            "entity_a": "Sarah Chen",
+            "entity_b": "Dashboard Redesign"
+        },
+        {
+            "entity_a": "Angela Rivera",
+            "entity_b": "Mobile App V2"
+        },
+        {
+            "entity_a": "Angela Rivera",
+            "entity_b": "Developer Portal"
+        }
+    ],
+    "expected_chunks_min": 4,
+    "expected_chunks_max": 12,
+    "expected_filler_chunks": 0
+}

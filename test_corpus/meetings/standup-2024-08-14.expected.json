@@ -1,0 +1,45 @@
+{
+    "entities": [
+        {
+            "name": "Kevin Park",
+            "type": "person"
+        },
+        {
+            "name": "David Kim",
+            "type": "person"
+        },
+        {
+            "name": "Tom Brennan",
+            "type": "person"
+        },
+        {
+            "name": "OAuth",
+            "type": "technology"
+        },
+        {
+            "name": "GitHub Actions",
+            "type": "technology"
+        },
+        {
+            "name": "Docker",
+            "type": "technology"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Kevin Park",
+            "entity_b": "OAuth"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "GitHub Actions"
+        },
+        {
+            "entity_a": "Tom Brennan",
+            "entity_b": "Docker"
+        }
+    ],
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 6,
+    "expected_filler_chunks_min": 1
+}

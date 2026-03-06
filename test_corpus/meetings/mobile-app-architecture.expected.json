@@ -1,0 +1,69 @@
+{
+    "entities": [
+        {
+            "name": "Carlos Mendez",
+            "type": "person"
+        },
+        {
+            "name": "Marcus Johnson",
+            "type": "person"
+        },
+        {
+            "name": "Angela Rivera",
+            "type": "person"
+        },
+        {
+            "name": "React",
+            "type": "technology"
+        },
+        {
+            "name": "Storybook",
+            "type": "technology"
+        },
+        {
+            "name": "React Native",
+            "type": "technology"
+        },
+        {
+            "name": "Developer Portal",
+            "type": "project"
+        },
+        {
+            "name": "API Migration",
+            "type": "project"
+        },
+        {
+            "name": "Mobile App V2",
+            "type": "project"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Carlos Mendez",
+            "entity_b": "React Native"
+        },
+        {
+            "entity_a": "Marcus Johnson",
+            "entity_b": "Storybook"
+        },
+        {
+            "entity_a": "Marcus Johnson",
+            "entity_b": "React"
+        },
+        {
+            "entity_a": "Marcus Johnson",
+            "entity_b": "API Migration"
+        },
+        {
+            "entity_a": "Marcus Johnson",
+            "entity_b": "Mobile App V2"
+        },
+        {
+            "entity_a": "Angela Rivera",
+            "entity_b": "Developer Portal"
+        }
+    ],
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 9,
+    "expected_filler_chunks": 0
+}

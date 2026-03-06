@@ -1,0 +1,69 @@
+{
+    "entities": [
+        {
+            "name": "Kevin Park",
+            "type": "person"
+        },
+        {
+            "name": "Aisha Hassan",
+            "type": "person"
+        },
+        {
+            "name": "Ryan O'Brien",
+            "type": "person"
+        },
+        {
+            "name": "Go",
+            "type": "technology"
+        },
+        {
+            "name": "Vault",
+            "type": "technology"
+        },
+        {
+            "name": "gRPC",
+            "type": "technology"
+        },
+        {
+            "name": "Istio",
+            "type": "technology"
+        },
+        {
+            "name": "Service Mesh Rollout",
+            "type": "project"
+        },
+        {
+            "name": "Payment Gateway Refactor",
+            "type": "project"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Kevin Park",
+            "entity_b": "Vault"
+        },
+        {
+            "entity_a": "Ryan O'Brien",
+            "entity_b": "Istio"
+        },
+        {
+            "entity_a": "Ryan O'Brien",
+            "entity_b": "Go"
+        },
+        {
+            "entity_a": "Ryan O'Brien",
+            "entity_b": "gRPC"
+        },
+        {
+            "entity_a": "Kevin Park",
+            "entity_b": "Payment Gateway Refactor"
+        },
+        {
+            "entity_a": "Ryan O'Brien",
+            "entity_b": "Service Mesh Rollout"
+        }
+    ],
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 9,
+    "expected_filler_chunks": 0
+}

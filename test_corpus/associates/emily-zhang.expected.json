@@ -1,0 +1,101 @@
+{
+    "entities": [
+        {
+            "name": "Emily Zhang",
+            "type": "person"
+        },
+        {
+            "name": "TechCorp",
+            "type": "organization"
+        },
+        {
+            "name": "Data Platform",
+            "type": "organization"
+        },
+        {
+            "name": "PyTorch",
+            "type": "technology"
+        },
+        {
+            "name": "MLflow",
+            "type": "technology"
+        },
+        {
+            "name": "Python",
+            "type": "technology"
+        },
+        {
+            "name": "scikit-learn",
+            "type": "technology"
+        },
+        {
+            "name": "ML Recommendation Engine",
+            "type": "project"
+        },
+        {
+            "name": "Data Lake Migration",
+            "type": "project"
+        },
+        {
+            "name": "David Kim",
+            "type": "person"
+        },
+        {
+            "name": "Priya Patel",
+            "type": "person"
+        },
+        {
+            "name": "James Liu",
+            "type": "person"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Emily Zhang",
+            "entity_b": "TechCorp"
+        },
+        {
+            "entity_a": "Emily Zhang",
+            "entity_b": "Data Platform"
+        },
+        {
+            "entity_a": "Emily Zhang",
+            "entity_b": "PyTorch"
+        },
+        {
+            "entity_a": "Emily Zhang",
+            "entity_b": "MLflow"
+        },
+        {
+            "entity_a": "Emily Zhang",
+            "entity_b": "Python"
+        },
+        {
+            "entity_a": "Emily Zhang",
+            "entity_b": "scikit-learn"
+        },
+        {
+            "entity_a": "Emily Zhang",
+            "entity_b": "ML Recommendation Engine"
+        },
+        {
+            "entity_a": "Emily Zhang",
+            "entity_b": "Data Lake Migration"
+        },
+        {
+            "entity_a": "Emily Zhang",
+            "entity_b": "David Kim"
+        },
+        {
+            "entity_a": "Emily Zhang",
+            "entity_b": "Priya Patel"
+        },
+        {
+            "entity_a": "Emily Zhang",
+            "entity_b": "James Liu"
+        }
+    ],
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 8,
+    "expected_filler_chunks": 0
+}

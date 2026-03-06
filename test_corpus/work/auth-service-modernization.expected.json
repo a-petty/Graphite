@@ -1,0 +1,77 @@
+{
+    "entities": [
+        {
+            "name": "Auth Service Modernization",
+            "type": "project"
+        },
+        {
+            "name": "Kevin Park",
+            "type": "person"
+        },
+        {
+            "name": "Ryan O'Brien",
+            "type": "person"
+        },
+        {
+            "name": "Alex Petrov",
+            "type": "person"
+        },
+        {
+            "name": "OAuth",
+            "type": "technology"
+        },
+        {
+            "name": "Vault",
+            "type": "technology"
+        },
+        {
+            "name": "Go",
+            "type": "technology"
+        },
+        {
+            "name": "gRPC",
+            "type": "technology"
+        },
+        {
+            "name": "JWT",
+            "type": "technology"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Auth Service Modernization",
+            "entity_b": "Kevin Park"
+        },
+        {
+            "entity_a": "Auth Service Modernization",
+            "entity_b": "Ryan O'Brien"
+        },
+        {
+            "entity_a": "Auth Service Modernization",
+            "entity_b": "Alex Petrov"
+        },
+        {
+            "entity_a": "Auth Service Modernization",
+            "entity_b": "OAuth"
+        },
+        {
+            "entity_a": "Auth Service Modernization",
+            "entity_b": "Vault"
+        },
+        {
+            "entity_a": "Auth Service Modernization",
+            "entity_b": "Go"
+        },
+        {
+            "entity_a": "Auth Service Modernization",
+            "entity_b": "gRPC"
+        },
+        {
+            "entity_a": "Auth Service Modernization",
+            "entity_b": "JWT"
+        }
+    ],
+    "expected_chunks_min": 4,
+    "expected_chunks_max": 10,
+    "expected_filler_chunks": 0
+}

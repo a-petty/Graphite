@@ -1,0 +1,53 @@
+{
+    "entities": [
+        {
+            "name": "Marcus Johnson",
+            "type": "person"
+        },
+        {
+            "name": "Maria Santos",
+            "type": "person"
+        },
+        {
+            "name": "Nina Kowalski",
+            "type": "person"
+        },
+        {
+            "name": "Tailwind CSS",
+            "type": "technology"
+        },
+        {
+            "name": "Figma",
+            "type": "technology"
+        },
+        {
+            "name": "React",
+            "type": "technology"
+        },
+        {
+            "name": "Dashboard Redesign",
+            "type": "project"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Marcus Johnson",
+            "entity_b": "React"
+        },
+        {
+            "entity_a": "Maria Santos",
+            "entity_b": "Tailwind CSS"
+        },
+        {
+            "entity_a": "Nina Kowalski",
+            "entity_b": "Figma"
+        },
+        {
+            "entity_a": "Nina Kowalski",
+            "entity_b": "Dashboard Redesign"
+        }
+    ],
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 9,
+    "expected_filler_chunks": 0
+}

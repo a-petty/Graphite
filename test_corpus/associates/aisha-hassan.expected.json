@@ -1,0 +1,29 @@
+{
+    "entities": [
+        {
+            "name": "Aisha Hassan",
+            "type": "person"
+        },
+        {
+            "name": "TechCorp",
+            "type": "organization"
+        },
+        {
+            "name": "Engineering Leadership",
+            "type": "organization"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Aisha Hassan",
+            "entity_b": "TechCorp"
+        },
+        {
+            "entity_a": "Aisha Hassan",
+            "entity_b": "Engineering Leadership"
+        }
+    ],
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 8,
+    "expected_filler_chunks": 0
+}

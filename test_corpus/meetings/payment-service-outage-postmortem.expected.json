@@ -1,0 +1,69 @@
+{
+    "entities": [
+        {
+            "name": "John Doe",
+            "type": "person"
+        },
+        {
+            "name": "Derek Washington",
+            "type": "person"
+        },
+        {
+            "name": "David Kim",
+            "type": "person"
+        },
+        {
+            "name": "PagerDuty",
+            "type": "technology"
+        },
+        {
+            "name": "Python",
+            "type": "technology"
+        },
+        {
+            "name": "Kubernetes",
+            "type": "technology"
+        },
+        {
+            "name": "Prometheus",
+            "type": "technology"
+        },
+        {
+            "name": "GitHub Actions",
+            "type": "technology"
+        },
+        {
+            "name": "Go",
+            "type": "technology"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "John Doe",
+            "entity_b": "Go"
+        },
+        {
+            "entity_a": "John Doe",
+            "entity_b": "Python"
+        },
+        {
+            "entity_a": "Derek Washington",
+            "entity_b": "Prometheus"
+        },
+        {
+            "entity_a": "Derek Washington",
+            "entity_b": "PagerDuty"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "Kubernetes"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "GitHub Actions"
+        }
+    ],
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 8,
+    "expected_filler_chunks": 0
+}

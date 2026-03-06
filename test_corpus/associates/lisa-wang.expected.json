@@ -1,0 +1,85 @@
+{
+    "entities": [
+        {
+            "name": "Lisa Wang",
+            "type": "person"
+        },
+        {
+            "name": "TechCorp",
+            "type": "organization"
+        },
+        {
+            "name": "Platform Services",
+            "type": "organization"
+        },
+        {
+            "name": "Python",
+            "type": "technology"
+        },
+        {
+            "name": "FastAPI",
+            "type": "technology"
+        },
+        {
+            "name": "PostgreSQL",
+            "type": "technology"
+        },
+        {
+            "name": "Payment Gateway Refactor",
+            "type": "project"
+        },
+        {
+            "name": "Kevin Park",
+            "type": "person"
+        },
+        {
+            "name": "John Doe",
+            "type": "person"
+        },
+        {
+            "name": "Tom Brennan",
+            "type": "person"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Lisa Wang",
+            "entity_b": "TechCorp"
+        },
+        {
+            "entity_a": "Lisa Wang",
+            "entity_b": "Platform Services"
+        },
+        {
+            "entity_a": "Lisa Wang",
+            "entity_b": "Python"
+        },
+        {
+            "entity_a": "Lisa Wang",
+            "entity_b": "FastAPI"
+        },
+        {
+            "entity_a": "Lisa Wang",
+            "entity_b": "PostgreSQL"
+        },
+        {
+            "entity_a": "Lisa Wang",
+            "entity_b": "Payment Gateway Refactor"
+        },
+        {
+            "entity_a": "Lisa Wang",
+            "entity_b": "Kevin Park"
+        },
+        {
+            "entity_a": "Lisa Wang",
+            "entity_b": "John Doe"
+        },
+        {
+            "entity_a": "Lisa Wang",
+            "entity_b": "Tom Brennan"
+        }
+    ],
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 8,
+    "expected_filler_chunks": 0
+}

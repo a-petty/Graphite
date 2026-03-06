@@ -1,0 +1,69 @@
+{
+    "entities": [
+        {
+            "name": "Angela Rivera",
+            "type": "person"
+        },
+        {
+            "name": "TechCorp",
+            "type": "organization"
+        },
+        {
+            "name": "Product",
+            "type": "organization"
+        },
+        {
+            "name": "Mobile App V2",
+            "type": "project"
+        },
+        {
+            "name": "Developer Portal",
+            "type": "project"
+        },
+        {
+            "name": "Sophie Martin",
+            "type": "person"
+        },
+        {
+            "name": "Nina Kowalski",
+            "type": "person"
+        },
+        {
+            "name": "Carlos Mendez",
+            "type": "person"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Angela Rivera",
+            "entity_b": "TechCorp"
+        },
+        {
+            "entity_a": "Angela Rivera",
+            "entity_b": "Product"
+        },
+        {
+            "entity_a": "Angela Rivera",
+            "entity_b": "Mobile App V2"
+        },
+        {
+            "entity_a": "Angela Rivera",
+            "entity_b": "Developer Portal"
+        },
+        {
+            "entity_a": "Angela Rivera",
+            "entity_b": "Sophie Martin"
+        },
+        {
+            "entity_a": "Angela Rivera",
+            "entity_b": "Nina Kowalski"
+        },
+        {
+            "entity_a": "Angela Rivera",
+            "entity_b": "Carlos Mendez"
+        }
+    ],
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 8,
+    "expected_filler_chunks": 0
+}

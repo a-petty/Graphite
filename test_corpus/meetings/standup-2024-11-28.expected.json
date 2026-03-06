@@ -1,0 +1,69 @@
+{
+    "entities": [
+        {
+            "name": "Marcus Johnson",
+            "type": "person"
+        },
+        {
+            "name": "James Liu",
+            "type": "person"
+        },
+        {
+            "name": "Ryan O'Brien",
+            "type": "person"
+        },
+        {
+            "name": "Lisa Wang",
+            "type": "person"
+        },
+        {
+            "name": "John Doe",
+            "type": "person"
+        },
+        {
+            "name": "Figma",
+            "type": "technology"
+        },
+        {
+            "name": "dbt",
+            "type": "technology"
+        },
+        {
+            "name": "Istio",
+            "type": "technology"
+        },
+        {
+            "name": "Python",
+            "type": "technology"
+        },
+        {
+            "name": "AWS EKS",
+            "type": "technology"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Marcus Johnson",
+            "entity_b": "Figma"
+        },
+        {
+            "entity_a": "James Liu",
+            "entity_b": "dbt"
+        },
+        {
+            "entity_a": "Ryan O'Brien",
+            "entity_b": "Istio"
+        },
+        {
+            "entity_a": "Lisa Wang",
+            "entity_b": "Python"
+        },
+        {
+            "entity_a": "John Doe",
+            "entity_b": "AWS EKS"
+        }
+    ],
+    "expected_chunks_min": 5,
+    "expected_chunks_max": 10,
+    "expected_filler_chunks_min": 1
+}

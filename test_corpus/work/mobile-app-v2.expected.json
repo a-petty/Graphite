@@ -1,0 +1,77 @@
+{
+    "entities": [
+        {
+            "name": "Mobile App V2",
+            "type": "project"
+        },
+        {
+            "name": "Carlos Mendez",
+            "type": "person"
+        },
+        {
+            "name": "Marcus Johnson",
+            "type": "person"
+        },
+        {
+            "name": "Nina Kowalski",
+            "type": "person"
+        },
+        {
+            "name": "Angela Rivera",
+            "type": "person"
+        },
+        {
+            "name": "React Native",
+            "type": "technology"
+        },
+        {
+            "name": "Firebase",
+            "type": "technology"
+        },
+        {
+            "name": "TypeScript",
+            "type": "technology"
+        },
+        {
+            "name": "Expo",
+            "type": "technology"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Mobile App V2",
+            "entity_b": "Carlos Mendez"
+        },
+        {
+            "entity_a": "Mobile App V2",
+            "entity_b": "Marcus Johnson"
+        },
+        {
+            "entity_a": "Mobile App V2",
+            "entity_b": "Nina Kowalski"
+        },
+        {
+            "entity_a": "Mobile App V2",
+            "entity_b": "Angela Rivera"
+        },
+        {
+            "entity_a": "Mobile App V2",
+            "entity_b": "React Native"
+        },
+        {
+            "entity_a": "Mobile App V2",
+            "entity_b": "Firebase"
+        },
+        {
+            "entity_a": "Mobile App V2",
+            "entity_b": "TypeScript"
+        },
+        {
+            "entity_a": "Mobile App V2",
+            "entity_b": "Expo"
+        }
+    ],
+    "expected_chunks_min": 4,
+    "expected_chunks_max": 10,
+    "expected_filler_chunks": 0
+}

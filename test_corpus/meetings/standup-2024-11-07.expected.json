@@ -1,0 +1,49 @@
+{
+    "entities": [
+        {
+            "name": "Carlos Mendez",
+            "type": "person"
+        },
+        {
+            "name": "Kevin Park",
+            "type": "person"
+        },
+        {
+            "name": "John Doe",
+            "type": "person"
+        },
+        {
+            "name": "Sarah Chen",
+            "type": "person"
+        },
+        {
+            "name": "React Native",
+            "type": "technology"
+        },
+        {
+            "name": "OAuth",
+            "type": "technology"
+        },
+        {
+            "name": "AWS EKS",
+            "type": "technology"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Carlos Mendez",
+            "entity_b": "React Native"
+        },
+        {
+            "entity_a": "Kevin Park",
+            "entity_b": "OAuth"
+        },
+        {
+            "entity_a": "John Doe",
+            "entity_b": "AWS EKS"
+        }
+    ],
+    "expected_chunks_min": 4,
+    "expected_chunks_max": 8,
+    "expected_filler_chunks_min": 1
+}

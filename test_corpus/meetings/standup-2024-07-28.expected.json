@@ -1,0 +1,61 @@
+{
+    "entities": [
+        {
+            "name": "Derek Washington",
+            "type": "person"
+        },
+        {
+            "name": "Lisa Wang",
+            "type": "person"
+        },
+        {
+            "name": "Sarah Chen",
+            "type": "person"
+        },
+        {
+            "name": "James Liu",
+            "type": "person"
+        },
+        {
+            "name": "Maria Santos",
+            "type": "person"
+        },
+        {
+            "name": "PagerDuty",
+            "type": "technology"
+        },
+        {
+            "name": "Python",
+            "type": "technology"
+        },
+        {
+            "name": "Snowflake",
+            "type": "technology"
+        },
+        {
+            "name": "Next.js",
+            "type": "technology"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Derek Washington",
+            "entity_b": "PagerDuty"
+        },
+        {
+            "entity_a": "Lisa Wang",
+            "entity_b": "Python"
+        },
+        {
+            "entity_a": "James Liu",
+            "entity_b": "Snowflake"
+        },
+        {
+            "entity_a": "Maria Santos",
+            "entity_b": "Next.js"
+        }
+    ],
+    "expected_chunks_min": 5,
+    "expected_chunks_max": 10,
+    "expected_filler_chunks_min": 1
+}

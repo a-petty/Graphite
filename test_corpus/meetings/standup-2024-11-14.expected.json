@@ -1,0 +1,45 @@
+{
+    "entities": [
+        {
+            "name": "Ryan O'Brien",
+            "type": "person"
+        },
+        {
+            "name": "Rachel Torres",
+            "type": "person"
+        },
+        {
+            "name": "Carlos Mendez",
+            "type": "person"
+        },
+        {
+            "name": "Istio",
+            "type": "technology"
+        },
+        {
+            "name": "Playwright",
+            "type": "technology"
+        },
+        {
+            "name": "Firebase",
+            "type": "technology"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Ryan O'Brien",
+            "entity_b": "Istio"
+        },
+        {
+            "entity_a": "Rachel Torres",
+            "entity_b": "Playwright"
+        },
+        {
+            "entity_a": "Carlos Mendez",
+            "entity_b": "Firebase"
+        }
+    ],
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 6,
+    "expected_filler_chunks_min": 1
+}

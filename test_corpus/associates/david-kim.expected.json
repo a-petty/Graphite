@@ -1,0 +1,125 @@
+{
+    "entities": [
+        {
+            "name": "David Kim",
+            "type": "person"
+        },
+        {
+            "name": "TechCorp",
+            "type": "organization"
+        },
+        {
+            "name": "Infrastructure",
+            "type": "organization"
+        },
+        {
+            "name": "Kubernetes",
+            "type": "technology"
+        },
+        {
+            "name": "Terraform",
+            "type": "technology"
+        },
+        {
+            "name": "AWS",
+            "type": "technology"
+        },
+        {
+            "name": "Helm",
+            "type": "technology"
+        },
+        {
+            "name": "ArgoCD",
+            "type": "technology"
+        },
+        {
+            "name": "GitHub Actions",
+            "type": "technology"
+        },
+        {
+            "name": "Observability Initiative",
+            "type": "project"
+        },
+        {
+            "name": "Data Lake Migration",
+            "type": "project"
+        },
+        {
+            "name": "Service Mesh Rollout",
+            "type": "project"
+        },
+        {
+            "name": "Ryan O'Brien",
+            "type": "person"
+        },
+        {
+            "name": "James Liu",
+            "type": "person"
+        },
+        {
+            "name": "Derek Washington",
+            "type": "person"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "David Kim",
+            "entity_b": "TechCorp"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "Infrastructure"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "Kubernetes"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "Terraform"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "AWS"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "Helm"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "ArgoCD"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "GitHub Actions"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "Observability Initiative"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "Data Lake Migration"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "Service Mesh Rollout"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "Ryan O'Brien"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "James Liu"
+        },
+        {
+            "entity_a": "David Kim",
+            "entity_b": "Derek Washington"
+        }
+    ],
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 8,
+    "expected_filler_chunks": 0
+}

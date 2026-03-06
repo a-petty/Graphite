@@ -1,0 +1,77 @@
+{
+    "entities": [
+        {
+            "name": "Nina Kowalski",
+            "type": "person"
+        },
+        {
+            "name": "TechCorp",
+            "type": "organization"
+        },
+        {
+            "name": "Design",
+            "type": "organization"
+        },
+        {
+            "name": "Figma",
+            "type": "technology"
+        },
+        {
+            "name": "Dashboard Redesign",
+            "type": "project"
+        },
+        {
+            "name": "Mobile App V2",
+            "type": "project"
+        },
+        {
+            "name": "Carlos Mendez",
+            "type": "person"
+        },
+        {
+            "name": "Priya Patel",
+            "type": "person"
+        },
+        {
+            "name": "Sarah Chen",
+            "type": "person"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Nina Kowalski",
+            "entity_b": "TechCorp"
+        },
+        {
+            "entity_a": "Nina Kowalski",
+            "entity_b": "Design"
+        },
+        {
+            "entity_a": "Nina Kowalski",
+            "entity_b": "Figma"
+        },
+        {
+            "entity_a": "Nina Kowalski",
+            "entity_b": "Dashboard Redesign"
+        },
+        {
+            "entity_a": "Nina Kowalski",
+            "entity_b": "Mobile App V2"
+        },
+        {
+            "entity_a": "Nina Kowalski",
+            "entity_b": "Carlos Mendez"
+        },
+        {
+            "entity_a": "Nina Kowalski",
+            "entity_b": "Priya Patel"
+        },
+        {
+            "entity_a": "Nina Kowalski",
+            "entity_b": "Sarah Chen"
+        }
+    ],
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 8,
+    "expected_filler_chunks": 0
+}

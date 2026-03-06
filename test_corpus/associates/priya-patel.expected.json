@@ -1,0 +1,117 @@
+{
+    "entities": [
+        {
+            "name": "Priya Patel",
+            "type": "person"
+        },
+        {
+            "name": "TechCorp",
+            "type": "organization"
+        },
+        {
+            "name": "Backend Services",
+            "type": "organization"
+        },
+        {
+            "name": "Django",
+            "type": "technology"
+        },
+        {
+            "name": "Redis",
+            "type": "technology"
+        },
+        {
+            "name": "GraphQL",
+            "type": "technology"
+        },
+        {
+            "name": "WebSocket",
+            "type": "technology"
+        },
+        {
+            "name": "Playwright",
+            "type": "technology"
+        },
+        {
+            "name": "Dashboard Redesign",
+            "type": "project"
+        },
+        {
+            "name": "API Migration",
+            "type": "project"
+        },
+        {
+            "name": "ML Recommendation Engine",
+            "type": "project"
+        },
+        {
+            "name": "James Liu",
+            "type": "person"
+        },
+        {
+            "name": "Sarah Chen",
+            "type": "person"
+        },
+        {
+            "name": "Emily Zhang",
+            "type": "person"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Priya Patel",
+            "entity_b": "TechCorp"
+        },
+        {
+            "entity_a": "Priya Patel",
+            "entity_b": "Backend Services"
+        },
+        {
+            "entity_a": "Priya Patel",
+            "entity_b": "Django"
+        },
+        {
+            "entity_a": "Priya Patel",
+            "entity_b": "Redis"
+        },
+        {
+            "entity_a": "Priya Patel",
+            "entity_b": "GraphQL"
+        },
+        {
+            "entity_a": "Priya Patel",
+            "entity_b": "WebSocket"
+        },
+        {
+            "entity_a": "Priya Patel",
+            "entity_b": "Playwright"
+        },
+        {
+            "entity_a": "Priya Patel",
+            "entity_b": "Dashboard Redesign"
+        },
+        {
+            "entity_a": "Priya Patel",
+            "entity_b": "API Migration"
+        },
+        {
+            "entity_a": "Priya Patel",
+            "entity_b": "ML Recommendation Engine"
+        },
+        {
+            "entity_a": "Priya Patel",
+            "entity_b": "James Liu"
+        },
+        {
+            "entity_a": "Priya Patel",
+            "entity_b": "Sarah Chen"
+        },
+        {
+            "entity_a": "Priya Patel",
+            "entity_b": "Emily Zhang"
+        }
+    ],
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 8,
+    "expected_filler_chunks": 0
+}

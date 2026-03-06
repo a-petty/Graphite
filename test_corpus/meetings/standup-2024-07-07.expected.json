@@ -1,0 +1,45 @@
+{
+    "entities": [
+        {
+            "name": "James Liu",
+            "type": "person"
+        },
+        {
+            "name": "Marcus Johnson",
+            "type": "person"
+        },
+        {
+            "name": "Emily Zhang",
+            "type": "person"
+        },
+        {
+            "name": "Snowflake",
+            "type": "technology"
+        },
+        {
+            "name": "Storybook",
+            "type": "technology"
+        },
+        {
+            "name": "Python",
+            "type": "technology"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "James Liu",
+            "entity_b": "Snowflake"
+        },
+        {
+            "entity_a": "Marcus Johnson",
+            "entity_b": "Storybook"
+        },
+        {
+            "entity_a": "Emily Zhang",
+            "entity_b": "Python"
+        }
+    ],
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 6,
+    "expected_filler_chunks_min": 1
+}

@@ -1,0 +1,61 @@
+{
+    "entities": [
+        {
+            "name": "John Doe",
+            "type": "person"
+        },
+        {
+            "name": "Ryan O'Brien",
+            "type": "person"
+        },
+        {
+            "name": "Sarah Chen",
+            "type": "person"
+        },
+        {
+            "name": "Alex Petrov",
+            "type": "person"
+        },
+        {
+            "name": "Rachel Torres",
+            "type": "person"
+        },
+        {
+            "name": "PostgreSQL",
+            "type": "technology"
+        },
+        {
+            "name": "Istio",
+            "type": "technology"
+        },
+        {
+            "name": "Node.js",
+            "type": "technology"
+        },
+        {
+            "name": "Cypress",
+            "type": "technology"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "John Doe",
+            "entity_b": "PostgreSQL"
+        },
+        {
+            "entity_a": "Ryan O'Brien",
+            "entity_b": "Istio"
+        },
+        {
+            "entity_a": "Alex Petrov",
+            "entity_b": "Node.js"
+        },
+        {
+            "entity_a": "Rachel Torres",
+            "entity_b": "Cypress"
+        }
+    ],
+    "expected_chunks_min": 5,
+    "expected_chunks_max": 10,
+    "expected_filler_chunks_min": 1
+}

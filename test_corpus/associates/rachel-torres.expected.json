@@ -1,0 +1,53 @@
+{
+    "entities": [
+        {
+            "name": "Rachel Torres",
+            "type": "person"
+        },
+        {
+            "name": "TechCorp",
+            "type": "organization"
+        },
+        {
+            "name": "Quality Engineering",
+            "type": "organization"
+        },
+        {
+            "name": "Playwright",
+            "type": "technology"
+        },
+        {
+            "name": "Cypress",
+            "type": "technology"
+        },
+        {
+            "name": "Selenium",
+            "type": "technology"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Rachel Torres",
+            "entity_b": "TechCorp"
+        },
+        {
+            "entity_a": "Rachel Torres",
+            "entity_b": "Quality Engineering"
+        },
+        {
+            "entity_a": "Rachel Torres",
+            "entity_b": "Playwright"
+        },
+        {
+            "entity_a": "Rachel Torres",
+            "entity_b": "Cypress"
+        },
+        {
+            "entity_a": "Rachel Torres",
+            "entity_b": "Selenium"
+        }
+    ],
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 8,
+    "expected_filler_chunks": 0
+}

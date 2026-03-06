@@ -1,0 +1,85 @@
+{
+    "entities": [
+        {
+            "name": "Observability Initiative",
+            "type": "project"
+        },
+        {
+            "name": "Derek Washington",
+            "type": "person"
+        },
+        {
+            "name": "John Doe",
+            "type": "person"
+        },
+        {
+            "name": "David Kim",
+            "type": "person"
+        },
+        {
+            "name": "Ryan O'Brien",
+            "type": "person"
+        },
+        {
+            "name": "Jaeger",
+            "type": "technology"
+        },
+        {
+            "name": "OpenTelemetry",
+            "type": "technology"
+        },
+        {
+            "name": "Datadog",
+            "type": "technology"
+        },
+        {
+            "name": "Prometheus",
+            "type": "technology"
+        },
+        {
+            "name": "Grafana",
+            "type": "technology"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Observability Initiative",
+            "entity_b": "Derek Washington"
+        },
+        {
+            "entity_a": "Observability Initiative",
+            "entity_b": "John Doe"
+        },
+        {
+            "entity_a": "Observability Initiative",
+            "entity_b": "David Kim"
+        },
+        {
+            "entity_a": "Observability Initiative",
+            "entity_b": "Ryan O'Brien"
+        },
+        {
+            "entity_a": "Observability Initiative",
+            "entity_b": "Jaeger"
+        },
+        {
+            "entity_a": "Observability Initiative",
+            "entity_b": "OpenTelemetry"
+        },
+        {
+            "entity_a": "Observability Initiative",
+            "entity_b": "Datadog"
+        },
+        {
+            "entity_a": "Observability Initiative",
+            "entity_b": "Prometheus"
+        },
+        {
+            "entity_a": "Observability Initiative",
+            "entity_b": "Grafana"
+        }
+    ],
+    "expected_chunks_min": 4,
+    "expected_chunks_max": 10,
+    "expected_filler_chunks": 0
+}

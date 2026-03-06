@@ -1,0 +1,61 @@
+{
+    "entities": [
+        {
+            "name": "Nina Kowalski",
+            "type": "person"
+        },
+        {
+            "name": "Carlos Mendez",
+            "type": "person"
+        },
+        {
+            "name": "Angela Rivera",
+            "type": "person"
+        },
+        {
+            "name": "Kotlin",
+            "type": "technology"
+        },
+        {
+            "name": "Figma",
+            "type": "technology"
+        },
+        {
+            "name": "React Native",
+            "type": "technology"
+        },
+        {
+            "name": "Firebase",
+            "type": "technology"
+        },
+        {
+            "name": "Dashboard Redesign",
+            "type": "project"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Nina Kowalski",
+            "entity_b": "Figma"
+        },
+        {
+            "entity_a": "Carlos Mendez",
+            "entity_b": "Firebase"
+        },
+        {
+            "entity_a": "Carlos Mendez",
+            "entity_b": "React Native"
+        },
+        {
+            "entity_a": "Carlos Mendez",
+            "entity_b": "Kotlin"
+        },
+        {
+            "entity_a": "Nina Kowalski",
+            "entity_b": "Dashboard Redesign"
+        }
+    ],
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 9,
+    "expected_filler_chunks": 0
+}

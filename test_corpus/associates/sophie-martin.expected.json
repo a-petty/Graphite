@@ -1,0 +1,77 @@
+{
+    "entities": [
+        {
+            "name": "Sophie Martin",
+            "type": "person"
+        },
+        {
+            "name": "TechCorp",
+            "type": "organization"
+        },
+        {
+            "name": "Developer Experience",
+            "type": "organization"
+        },
+        {
+            "name": "Swagger",
+            "type": "technology"
+        },
+        {
+            "name": "API Migration",
+            "type": "project"
+        },
+        {
+            "name": "Developer Portal",
+            "type": "project"
+        },
+        {
+            "name": "Alex Petrov",
+            "type": "person"
+        },
+        {
+            "name": "Maria Santos",
+            "type": "person"
+        },
+        {
+            "name": "Marcus Johnson",
+            "type": "person"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Sophie Martin",
+            "entity_b": "TechCorp"
+        },
+        {
+            "entity_a": "Sophie Martin",
+            "entity_b": "Developer Experience"
+        },
+        {
+            "entity_a": "Sophie Martin",
+            "entity_b": "Swagger"
+        },
+        {
+            "entity_a": "Sophie Martin",
+            "entity_b": "API Migration"
+        },
+        {
+            "entity_a": "Sophie Martin",
+            "entity_b": "Developer Portal"
+        },
+        {
+            "entity_a": "Sophie Martin",
+            "entity_b": "Alex Petrov"
+        },
+        {
+            "entity_a": "Sophie Martin",
+            "entity_b": "Maria Santos"
+        },
+        {
+            "entity_a": "Sophie Martin",
+            "entity_b": "Marcus Johnson"
+        }
+    ],
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 8,
+    "expected_filler_chunks": 0
+}

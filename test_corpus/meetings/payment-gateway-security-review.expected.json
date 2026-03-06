@@ -1,0 +1,97 @@
+{
+    "entities": [
+        {
+            "name": "Kevin Park",
+            "type": "person"
+        },
+        {
+            "name": "John Doe",
+            "type": "person"
+        },
+        {
+            "name": "Tom Brennan",
+            "type": "person"
+        },
+        {
+            "name": "PostgreSQL",
+            "type": "technology"
+        },
+        {
+            "name": "Docker",
+            "type": "technology"
+        },
+        {
+            "name": "AWS EKS",
+            "type": "technology"
+        },
+        {
+            "name": "Redis",
+            "type": "technology"
+        },
+        {
+            "name": "Python",
+            "type": "technology"
+        },
+        {
+            "name": "Go",
+            "type": "technology"
+        },
+        {
+            "name": "Vault",
+            "type": "technology"
+        },
+        {
+            "name": "Payment Gateway Refactor",
+            "type": "project"
+        },
+        {
+            "name": "Observability Initiative",
+            "type": "project"
+        }
+    ],
+    "cooccurrences": [
+        {
+            "entity_a": "Kevin Park",
+            "entity_b": "Vault"
+        },
+        {
+            "entity_a": "John Doe",
+            "entity_b": "AWS EKS"
+        },
+        {
+            "entity_a": "John Doe",
+            "entity_b": "PostgreSQL"
+        },
+        {
+            "entity_a": "John Doe",
+            "entity_b": "Go"
+        },
+        {
+            "entity_a": "Tom Brennan",
+            "entity_b": "Redis"
+        },
+        {
+            "entity_a": "Tom Brennan",
+            "entity_b": "Docker"
+        },
+        {
+            "entity_a": "Tom Brennan",
+            "entity_b": "Python"
+        },
+        {
+            "entity_a": "John Doe",
+            "entity_b": "Payment Gateway Refactor"
+        },
+        {
+            "entity_a": "John Doe",
+            "entity_b": "Observability Initiative"
+        },
+        {
+            "entity_a": "Tom Brennan",
+            "entity_b": "Payment Gateway Refactor"
+        }
+    ],
+    "expected_chunks_min": 3,
+    "expected_chunks_max": 9,
+    "expected_filler_chunks": 0
+}
