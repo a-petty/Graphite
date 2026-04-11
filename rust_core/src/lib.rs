@@ -1,7 +1,6 @@
 #![allow(non_local_definitions)]
 #![allow(unsafe_op_in_unsafe_fn)]
 pub mod parser;
-pub mod test_utils;
 pub mod import_resolver;
 pub mod graph;
 pub mod symbol_table;
@@ -782,14 +781,14 @@ impl PyKnowledgeGraph {
             .map_err(|e| PyRuntimeError::new_err(e))
     }
 
-    /// Load a graph from disk. Returns a new PyKnowledgeGraph.
-    #[staticmethod]
-    fn load(path: &str) -> PyResult<Self> {
+    /// Load a graph from disk into this instance. Replaces current graph data.
+    fn load(&mut self, path: &str) -> PyResult<()> {
         let store = GraphStore::new(Path::new(path));
         let kg = store
             .load(Path::new(path))
             .map_err(|e| PyRuntimeError::new_err(e))?;
-        Ok(Self { kg })
+        self.kg = kg;
+        Ok(())
     }
 
     /// Get graph statistics as JSON.
@@ -869,7 +868,7 @@ impl PyKnowledgeGraph {
 }
 
 
-/// Cortex Semantic Engine
+/// Graphite Semantic Engine
 ///
 /// A knowledge graph engine for LLM memory (transitioning from code analysis).
 #[pymodule]
