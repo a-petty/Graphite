@@ -1,4 +1,4 @@
-"""Tests for CortexAgent._parse_response and related parser methods."""
+"""Tests for GraphiteAgent._parse_response and related parser methods."""
 
 import pytest
 from pathlib import Path
@@ -7,13 +7,13 @@ import tempfile
 
 
 def _make_agent():
-    """Create a CortexAgent with mocked dependencies for parser testing."""
+    """Create a GraphiteAgent with mocked dependencies for parser testing."""
     with tempfile.TemporaryDirectory() as tmp:
-        with patch("cortex.agent.RepoGraph"), \
-             patch("cortex.agent.EmbeddingManager"), \
-             patch("cortex.agent.ContextManager"):
-            from cortex.agent import CortexAgent
-            agent = CortexAgent(project_root=Path(tmp))
+        with patch("graphite.agent.PyKnowledgeGraph"), \
+             patch("graphite.agent.EmbeddingManager"), \
+             patch("graphite.agent.MemoryContextManager"):
+            from graphite.agent import GraphiteAgent
+            agent = GraphiteAgent(project_root=Path(tmp))
             return agent
 
 
@@ -112,12 +112,12 @@ class TestFallbackParsing:
 
     def test_known_tool_in_plain_text(self):
         agent = _make_agent()
-        response = "I think you should read_file('config.py') to understand the config."
+        response = "I think you should entity_profile('Alec') to understand the config."
         thoughts, actions, plain = agent._parse_response(response)
 
         assert len(actions) == 1
-        assert actions[0]['tool'] == 'read_file'
-        assert actions[0]['args'] == ['config.py']
+        assert actions[0]['tool'] == 'entity_profile'
+        assert actions[0]['args'] == ['Alec']
 
     def test_no_tools_in_plain_text(self):
         agent = _make_agent()

@@ -1,0 +1,10 @@
+Classify each of the following text chunks into exactly one category.
+Categories: decision, discussion, action_item, status_update, preference, background, filler
+
+If a chunk contains no meaningful information (greetings, pleasantries,
+scheduling logistics), classify as "filler".
+
+Respond with ONLY the category names, one per line, in the same order as the chunks.
+Do not include chunk numbers, explanations, or any other text.
+
+{chunks}

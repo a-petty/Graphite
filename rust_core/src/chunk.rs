@@ -51,6 +51,8 @@ pub struct Chunk {
     pub text: String,
     pub tags: Vec<String>,
     pub created_at: i64,
+    #[serde(default)]
+    pub projects: Vec<String>,
 }
 
 impl Chunk {
@@ -72,6 +74,7 @@ impl Chunk {
             text,
             tags: Vec::new(),
             created_at: now,
+            projects: Vec::new(),
         }
     }
 }

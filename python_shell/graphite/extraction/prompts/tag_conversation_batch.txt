@@ -1,0 +1,33 @@
+For each of the following conversation excerpts, list every entity mentioned.
+
+Entity types to extract:
+- person: Specific individuals mentioned by name (e.g., "Alberto Menolascina", "Alec")
+- project: Named initiatives, products, or systems being built (e.g., "Graphite", "FountainOfYouth", "Anaplan Rollout")
+- technology: Programming languages, frameworks, libraries, tools, APIs, protocols (e.g., "Rust", "Tree-sitter", "OAuth")
+- organization: Companies, teams, groups, institutions (e.g., "GoPuff", "OpenAI", "Stanford")
+- location: Geographic places, cities, regions (e.g., "San Francisco", "Silicon Valley")
+- concept: Abstract ideas, technical concepts, patterns, methodologies that don't fit other types (e.g., "damping", "PageRank", "vertical integration")
+- preference: User preferences or style choices
+- goal: User goals or objectives
+- pattern: Recurring user behaviors or work patterns
+- skill: Skills, expertise areas, or knowledge gaps
+- decision: Specific decisions made
+
+Important:
+- Do NOT extract file paths, CLI flags, file extensions, or raw numbers as entities.
+- When unsure between concept and technology, prefer technology for anything technical.
+- When unsure between concept and project, prefer project for named initiatives or products.
+
+For each entity, provide:
+- name: the most specific form used in the text
+- type: one of the types listed above
+
+Respond with a JSON object where keys are chunk numbers ("1", "2", etc.)
+and values are arrays of entity objects.
+
+Example response format:
+{"1": [{"name": "Rust", "type": "technology"}], "2": [{"name": "simple over clever", "type": "preference"}]}
+
+Return ONLY the JSON object, no other text.
+
+{chunks}

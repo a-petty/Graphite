@@ -869,3 +869,149 @@ fn test_merge_entities_records_history() {
     assert_eq!(record.method, "direct");
     assert!(record.merged_at > 0);
 }
+
+// ── Phase 1 PR 2: projects + temporal filtering ──
+
+#[test]
+fn test_entity_projects_default_empty() {
+    let entity = make_entity("Alice", EntityType::Person);
+    assert!(entity.projects.is_empty());
+}
+
+#[test]
+fn test_chunk_projects_default_empty() {
+    let chunk = Chunk::new(
+        "doc.md".to_string(),
+        ChunkType::Decision,
+        MemoryCategory::Episodic,
+        "hello".to_string(),
+    );
+    assert!(chunk.projects.is_empty());
+}
+
+#[test]
+fn test_get_entities_by_project_filters_correctly() {
+    let mut kg = make_graph();
+
+    let mut alice = make_entity("Alice", EntityType::Person);
+    alice.projects.push("graphite".to_string());
+    let mut bob = make_entity("Bob", EntityType::Person);
+    bob.projects.push("atlas".to_string());
+    let mut carol = make_entity("Carol", EntityType::Person);
+    carol.projects.push("graphite".to_string());
+    carol.projects.push("atlas".to_string());
+    let dave = make_entity("Dave", EntityType::Person); // no projects
+
+    kg.add_entity(alice);
+    kg.add_entity(bob);
+    kg.add_entity(carol);
+    kg.add_entity(dave);
+
+    let graphite_entities: Vec<String> = kg
+        .get_entities_by_project("graphite")
+        .iter()
+        .map(|e| e.canonical_name.clone())
+        .collect();
+    assert_eq!(graphite_entities.len(), 2);
+    assert!(graphite_entities.contains(&"Alice".to_string()));
+    assert!(graphite_entities.contains(&"Carol".to_string()));
+
+    let atlas_entities: Vec<String> = kg
+        .get_entities_by_project("atlas")
+        .iter()
+        .map(|e| e.canonical_name.clone())
+        .collect();
+    assert_eq!(atlas_entities.len(), 2);
+    assert!(atlas_entities.contains(&"Bob".to_string()));
+    assert!(atlas_entities.contains(&"Carol".to_string()));
+
+    assert!(kg.get_entities_by_project("nonexistent").is_empty());
+}
+
+#[test]
+fn test_get_chunks_by_time_window_inclusive_bounds() {
+    let mut kg = make_graph();
+
+    let mut c1 = Chunk::new(
+        "doc.md".into(),
+        ChunkType::Discussion,
+        MemoryCategory::Episodic,
+        "first".into(),
+    );
+    c1.timestamp = Some(100);
+    let mut c2 = Chunk::new(
+        "doc.md".into(),
+        ChunkType::Discussion,
+        MemoryCategory::Episodic,
+        "second".into(),
+    );
+    c2.timestamp = Some(200);
+    let mut c3 = Chunk::new(
+        "doc.md".into(),
+        ChunkType::Discussion,
+        MemoryCategory::Episodic,
+        "third".into(),
+    );
+    c3.timestamp = Some(300);
+    let c4 = Chunk::new(
+        "doc.md".into(),
+        ChunkType::Discussion,
+        MemoryCategory::Episodic,
+        "no timestamp".into(),
+    ); // None timestamp — always excluded
+
+    kg.store_chunk(c1);
+    kg.store_chunk(c2);
+    kg.store_chunk(c3);
+    kg.store_chunk(c4);
+
+    // Closed window, inclusive on both ends.
+    let in_window = kg.get_chunks_by_time_window(Some(100), Some(200));
+    assert_eq!(in_window.len(), 2);
+
+    // Open lower bound.
+    let up_to = kg.get_chunks_by_time_window(None, Some(200));
+    assert_eq!(up_to.len(), 2);
+
+    // Open upper bound.
+    let since = kg.get_chunks_by_time_window(Some(200), None);
+    assert_eq!(since.len(), 2);
+
+    // Fully open.
+    let all_with_ts = kg.get_chunks_by_time_window(None, None);
+    assert_eq!(all_with_ts.len(), 3, "chunks without a timestamp must be excluded");
+}
+
+#[test]
+fn test_projects_survive_persistence_roundtrip() {
+    use semantic_engine::persistence::GraphStore;
+    let dir = tempfile::tempdir().unwrap();
+    let root = dir.path();
+
+    let mut kg = KnowledgeGraph::new(root);
+
+    let mut alice = make_entity("Alice", EntityType::Person);
+    alice.projects = vec!["graphite".to_string(), "atlas".to_string()];
+    kg.add_entity(alice);
+
+    let mut chunk = Chunk::new(
+        "doc.md".into(),
+        ChunkType::Decision,
+        MemoryCategory::Episodic,
+        "hello".into(),
+    );
+    chunk.projects = vec!["graphite".to_string()];
+    kg.store_chunk(chunk);
+
+    let store = GraphStore::new(root);
+    store.save(&kg).unwrap();
+
+    let loaded = store.load(root).unwrap();
+    let entities = loaded.get_entities_by_project("graphite");
+    assert_eq!(entities.len(), 1);
+    assert_eq!(entities[0].projects.len(), 2);
+
+    let chunks_with_ts: Vec<_> = loaded.chunks_map().values().collect();
+    assert_eq!(chunks_with_ts.len(), 1);
+    assert_eq!(chunks_with_ts[0].projects, vec!["graphite".to_string()]);
+}

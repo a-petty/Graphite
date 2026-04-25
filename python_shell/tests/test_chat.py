@@ -1,28 +1,28 @@
-"""Tests for CortexAgent multi-turn chat functionality."""
+"""Tests for GraphiteAgent multi-turn chat functionality."""
 
 import pytest
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-from cortex.llm import StubClient
+from graphite.llm import StubClient
 
 
 def _make_agent(tmp_path, stub_client=None):
-    """Create a CortexAgent with mocked dependencies for chat testing."""
-    with patch("cortex.agent.RepoGraph") as MockRepoGraph, \
-         patch("cortex.agent.EmbeddingManager"), \
-         patch("cortex.agent.ContextManager") as MockContextManager:
+    """Create a GraphiteAgent with mocked dependencies for chat testing."""
+    with patch("graphite.agent.PyKnowledgeGraph") as MockKG, \
+         patch("graphite.agent.EmbeddingManager"), \
+         patch("graphite.agent.MemoryContextManager"):
 
-        mock_graph = MockRepoGraph.return_value
-        mock_graph.get_top_ranked_files.return_value = []
-        mock_graph.generate_map.return_value = ""
+        mock_kg = MockKG.return_value
+        mock_kg.get_statistics.return_value = '{"entity_count": 0, "edge_count": 0}'
+        mock_kg.compute_pagerank.return_value = '[]'
 
-        mock_cm = MockContextManager.return_value
+        from graphite.agent import GraphiteAgent
+
+        agent = GraphiteAgent(project_root=tmp_path)
+        mock_cm = MagicMock()
         mock_cm.assemble_context.return_value = ""
-
-        from cortex.agent import CortexAgent
-
-        agent = CortexAgent(project_root=tmp_path)
+        agent.context_manager = mock_cm
         if stub_client:
             agent.llm = stub_client
         return agent
@@ -46,18 +46,21 @@ class TestAgenticLoop:
     """Chat with tool calls should loop: tool call -> result -> final answer."""
 
     def test_tool_call_then_final_answer(self, tmp_path):
-        """StubClient returns a read_file action for 'architecture', then a final answer on tool result."""
-        stub = StubClient()
-        agent = _make_agent(tmp_path, stub_client=stub)
+        """StubClient returns a graph_status action for 'architecture', then a final answer on tool result."""
+        class GraphStatusThenAnswer(StubClient):
+            def chat(self, messages):
+                self.call_count += 1
+                if self.call_count == 1:
+                    return "<action>graph_status()</action>"
+                return "The graph has 42 entities and is working well."
 
-        # Create a file the tool can read
-        test_file = agent.tools.project_root / "roadmap.md"
-        test_file.write_text("# Roadmap\nPhase 1: Build core")
+        stub = GraphStatusThenAnswer()
+        agent = _make_agent(tmp_path, stub_client=stub)
 
         agent.chat("Tell me about the architecture")
 
         # StubClient should have been called twice:
-        # 1. Initial query -> returns read_file action
+        # 1. Initial query -> returns graph_status action
         # 2. Tool result follow-up -> returns final answer
         assert stub.call_count == 2
 
@@ -77,14 +80,10 @@ class TestMaxRoundsTermination:
         class AlwaysToolClient(StubClient):
             def chat(self, messages):
                 self.call_count += 1
-                return "<action>read_file('test.py')</action>"
+                return "<action>graph_status()</action>"
 
         stub = AlwaysToolClient()
         agent = _make_agent(tmp_path, stub_client=stub)
-
-        # Create a file the tool can read
-        test_file = agent.tools.project_root / "test.py"
-        test_file.write_text("x = 1")
 
         agent.chat("loop forever", max_tool_rounds=3)
 

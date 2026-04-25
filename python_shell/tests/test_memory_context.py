@@ -21,7 +21,7 @@ from unittest.mock import MagicMock, patch
 import numpy as np
 import pytest
 
-from cortex.config import CortexConfig
+from graphite.config import GraphiteConfig
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -596,18 +596,18 @@ def _make_memory_context_manager(kg=None, config=None, max_tokens=10000):
     if kg is None:
         kg = _build_test_graph()
     if config is None:
-        config = CortexConfig()
+        config = GraphiteConfig()
 
     mock_embed = _make_mock_embedding_manager()
 
-    with patch("cortex.context.tiktoken") as mock_tiktoken:
+    with patch("graphite.context.tiktoken") as mock_tiktoken:
         mock_encoder = MagicMock()
         # Approximate token count: len(text) // 4
         mock_encoder.encode.side_effect = lambda text: list(range(len(text) // 4))
         mock_encoder.decode.side_effect = lambda tokens: "x" * (len(tokens) * 4)
         mock_tiktoken.encoding_for_model.return_value = mock_encoder
 
-        from cortex.context import MemoryContextManager
+        from graphite.context import MemoryContextManager
         mcm = MemoryContextManager(
             knowledge_graph=kg,
             embedding_manager=mock_embed,
@@ -626,22 +626,55 @@ def _make_memory_context_manager(kg=None, config=None, max_tokens=10000):
 class TestEntityEmbeddings:
     def test_build_entity_descriptor_format(self):
         """Descriptor includes name, type, and co-occurrences."""
-        from cortex.embeddings import EmbeddingManager
+        from graphite.embeddings import EmbeddingManager
 
         # Test via the real method signature
         descriptor = EmbeddingManager.build_entity_descriptor(
             None,  # self
             "John Doe", "Person", ["Dashboard Redesign", "React"]
         )
-        assert descriptor == "John Doe (Person): Dashboard Redesign, React"
+        assert descriptor == "John Doe (Person) | Co-occurs with: Dashboard Redesign, React"
 
     def test_build_entity_descriptor_no_cooccurrences(self):
-        """Descriptor without co-occurrences omits the colon."""
-        from cortex.embeddings import EmbeddingManager
+        """Descriptor without co-occurrences omits the co-occurs section."""
+        from graphite.embeddings import EmbeddingManager
         descriptor = EmbeddingManager.build_entity_descriptor(
             None, "React", "Technology", []
         )
         assert descriptor == "React (Technology)"
+
+    def test_build_entity_descriptor_with_category(self):
+        """Descriptor includes memory_category when provided."""
+        from graphite.embeddings import EmbeddingManager
+
+        descriptor = EmbeddingManager.build_entity_descriptor(
+            None, "John Doe", "Person", ["React"],
+            memory_category="Episodic",
+        )
+        assert descriptor == "John Doe (Person, Episodic) | Co-occurs with: React"
+
+    def test_build_entity_descriptor_with_source_documents(self):
+        """Descriptor includes source document names when provided."""
+        from graphite.embeddings import EmbeddingManager
+
+        descriptor = EmbeddingManager.build_entity_descriptor(
+            None, "John Doe", "Person", ["React"],
+            source_documents=["/path/to/meeting-notes.md", "/path/to/project-plan.md"],
+        )
+        assert descriptor == "John Doe (Person) | Co-occurs with: React | Sources: meeting-notes, project-plan"
+
+    def test_build_entity_descriptor_full(self):
+        """Descriptor with all fields populated."""
+        from graphite.embeddings import EmbeddingManager
+
+        descriptor = EmbeddingManager.build_entity_descriptor(
+            None, "John Doe", "Person", ["React", "Dashboard"],
+            memory_category="Episodic",
+            source_documents=["/path/to/meeting.md"],
+        )
+        assert "John Doe (Person, Episodic)" in descriptor
+        assert "Co-occurs with: React, Dashboard" in descriptor
+        assert "Sources: meeting" in descriptor
 
     def test_embed_entities_caches_results(self):
         """embed_entities populates the cache for uncached entities."""
@@ -749,7 +782,7 @@ class TestExpandPhase:
         mcm = _make_memory_context_manager()
         mcm._ensure_entity_embeddings()
 
-        from cortex.context import MemoryContextParams
+        from graphite.context import MemoryContextParams
         params = MemoryContextParams(
             tier1_tokens=1000, tier2_tokens=3000, tier3_tokens=1000,
             anchor_count=3, neighborhood_max_hops=2,
@@ -767,7 +800,7 @@ class TestExpandPhase:
         mcm = _make_memory_context_manager()
         mcm._ensure_entity_embeddings()
 
-        from cortex.context import MemoryContextParams
+        from graphite.context import MemoryContextParams
         params = MemoryContextParams(
             tier1_tokens=1000, tier2_tokens=3000, tier3_tokens=1000,
             anchor_count=1, neighborhood_max_hops=1,
@@ -784,7 +817,7 @@ class TestExpandPhase:
         mcm = _make_memory_context_manager()
         mcm._ensure_entity_embeddings()
 
-        from cortex.context import MemoryContextParams
+        from graphite.context import MemoryContextParams
         params = MemoryContextParams(
             tier1_tokens=1000, tier2_tokens=3000, tier3_tokens=1000,
             anchor_count=1, neighborhood_max_hops=2,
@@ -799,7 +832,7 @@ class TestExpandPhase:
         mcm = _make_memory_context_manager()
         mcm._ensure_entity_embeddings()
 
-        from cortex.context import MemoryContextParams
+        from graphite.context import MemoryContextParams
         params = MemoryContextParams(
             tier1_tokens=1000, tier2_tokens=3000, tier3_tokens=1000,
             anchor_count=1, neighborhood_max_hops=2,
@@ -817,7 +850,7 @@ class TestExpandPhase:
         mcm = _make_memory_context_manager()
         mcm._ensure_entity_embeddings()
 
-        from cortex.context import MemoryContextParams
+        from graphite.context import MemoryContextParams
         params = MemoryContextParams(
             tier1_tokens=1000, tier2_tokens=3000, tier3_tokens=1000,
             anchor_count=1, neighborhood_max_hops=3,
@@ -936,7 +969,7 @@ class TestTier1Map:
         mcm = _make_memory_context_manager()
         mcm._ensure_entity_embeddings()
 
-        from cortex.context import MemoryContextParams
+        from graphite.context import MemoryContextParams
         params = MemoryContextParams(
             tier1_tokens=5000, tier2_tokens=3000, tier3_tokens=1000,
             anchor_count=3, neighborhood_max_hops=2,
@@ -953,7 +986,7 @@ class TestTier1Map:
         mcm = _make_memory_context_manager()
         mcm._ensure_entity_embeddings()
 
-        from cortex.context import MemoryContextParams
+        from graphite.context import MemoryContextParams
         params = MemoryContextParams(
             tier1_tokens=5000, tier2_tokens=3000, tier3_tokens=1000,
             anchor_count=1, neighborhood_max_hops=2,
@@ -973,7 +1006,7 @@ class TestTier1Map:
         mcm = _make_memory_context_manager()
         mcm._ensure_entity_embeddings()
 
-        from cortex.context import MemoryContextParams
+        from graphite.context import MemoryContextParams
         params = MemoryContextParams(
             tier1_tokens=5000, tier2_tokens=3000, tier3_tokens=1000,
             anchor_count=3, neighborhood_max_hops=2,
@@ -998,7 +1031,7 @@ class TestTier2Evidence:
         mcm = _make_memory_context_manager()
         mcm._ensure_entity_embeddings()
 
-        from cortex.context import MemoryContextParams
+        from graphite.context import MemoryContextParams
         params = MemoryContextParams(
             tier1_tokens=1000, tier2_tokens=5000, tier3_tokens=1000,
             anchor_count=3, neighborhood_max_hops=2,
@@ -1016,7 +1049,7 @@ class TestTier2Evidence:
         mcm = _make_memory_context_manager()
         mcm._ensure_entity_embeddings()
 
-        from cortex.context import MemoryContextParams
+        from graphite.context import MemoryContextParams
         params = MemoryContextParams(
             tier1_tokens=1000, tier2_tokens=5000, tier3_tokens=1000,
             anchor_count=3, neighborhood_max_hops=2,
@@ -1032,7 +1065,7 @@ class TestTier2Evidence:
         mcm = _make_memory_context_manager()
         mcm._ensure_entity_embeddings()
 
-        from cortex.context import MemoryContextParams
+        from graphite.context import MemoryContextParams
         params = MemoryContextParams(
             tier1_tokens=1000, tier2_tokens=5000, tier3_tokens=1000,
             anchor_count=3, neighborhood_max_hops=2,
@@ -1059,7 +1092,7 @@ class TestTier3Summaries:
         mcm = _make_memory_context_manager()
         mcm._ensure_entity_embeddings()
 
-        from cortex.context import MemoryContextParams
+        from graphite.context import MemoryContextParams
         params = MemoryContextParams(
             tier1_tokens=1000, tier2_tokens=5000, tier3_tokens=5000,
             anchor_count=3, neighborhood_max_hops=2,
@@ -1080,7 +1113,7 @@ class TestTier3Summaries:
         mcm = _make_memory_context_manager()
         mcm._ensure_entity_embeddings()
 
-        from cortex.context import MemoryContextParams
+        from graphite.context import MemoryContextParams
         params = MemoryContextParams(
             tier1_tokens=1000, tier2_tokens=5000, tier3_tokens=5000,
             anchor_count=3, neighborhood_max_hops=2,
@@ -1100,7 +1133,7 @@ class TestTier3Summaries:
         mcm = _make_memory_context_manager()
         mcm._ensure_entity_embeddings()
 
-        from cortex.context import MemoryContextParams
+        from graphite.context import MemoryContextParams
         params = MemoryContextParams(
             tier1_tokens=1000, tier2_tokens=5000, tier3_tokens=5000,
             anchor_count=3, neighborhood_max_hops=2,
@@ -1135,7 +1168,7 @@ class TestBudgetAllocation:
 
     def test_custom_percentages(self):
         """Custom config overrides tier budgets."""
-        config = CortexConfig(
+        config = GraphiteConfig(
             tier1_budget_pct=0.20,
             tier2_budget_pct=0.50,
         )

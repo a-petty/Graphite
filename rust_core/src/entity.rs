@@ -60,6 +60,8 @@ pub struct EntityNode {
     pub extraction_confidence: Option<f64>,
     #[serde(default)]
     pub merge_history: Vec<MergeRecord>,
+    #[serde(default)]
+    pub projects: Vec<String>,
 }
 
 impl EntityNode {
@@ -79,6 +81,7 @@ impl EntityNode {
             rank: 0.0,
             extraction_confidence: None,
             merge_history: Vec::new(),
+            projects: Vec::new(),
         }
     }
 }

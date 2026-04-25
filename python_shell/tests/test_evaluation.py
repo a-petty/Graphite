@@ -16,10 +16,10 @@ from unittest.mock import MagicMock, patch
 import numpy as np
 import pytest
 
-from cortex.config import CortexConfig
-from cortex.evaluation.queries import TestQuery, TestQueryLoader
-from cortex.evaluation.baseline_rag import SimpleRAGBaseline
-from cortex.evaluation.metrics import (
+from graphite.config import GraphiteConfig
+from graphite.evaluation.queries import TestQuery, TestQueryLoader
+from graphite.evaluation.baseline_rag import SimpleRAGBaseline
+from graphite.evaluation.metrics import (
     MetricResult,
     DegradedLLMClient,
     evaluate_cooccurrence_accuracy,
@@ -31,8 +31,8 @@ from cortex.evaluation.metrics import (
     _chunk_contains_keywords,
     _count_keyword_hits,
 )
-from cortex.evaluation.runner import EvalReport
-from cortex.evaluation.report import ReportFormatter
+from graphite.evaluation.runner import EvalReport
+from graphite.evaluation.report import ReportFormatter
 
 # Import shared test infrastructure
 from tests.test_memory_context import (
@@ -416,7 +416,7 @@ class TestRetrievalPrecision:
 
         assert result.name == "Retrieval Precision @5"
         assert result.queries_evaluated == 2  # only retrieval queries
-        # Cortex should score higher since its context has more keywords
+        # Graphite should score higher since its context has more keywords
         assert result.score > result.baseline_score
 
     def test_empty_context(self):
@@ -504,7 +504,7 @@ class TestContextEfficiency:
     def test_efficiency_calculation(self):
         queries = _make_sample_queries()
 
-        # Cortex: short text with many keywords = high efficiency
+        # Graphite: short text with many keywords = high efficiency
         mock_ctx = MagicMock()
         mock_ctx.assemble_context.return_value = "John React Dashboard"
 
@@ -686,7 +686,7 @@ class TestReportFormatter:
         ReportFormatter.print_console(report, console)
 
         output = buf.getvalue()
-        assert "Cortex Evaluation Report" in output
+        assert "Graphite Evaluation Report" in output
         assert "Retrieval Precision @5" in output
 
 

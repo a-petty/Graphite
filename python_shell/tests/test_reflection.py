@@ -13,7 +13,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from cortex.config import CortexConfig
+from graphite.config import GraphiteConfig
 from tests.test_memory_context import (
     FakeKnowledgeGraph,
     _build_test_graph,
@@ -102,10 +102,10 @@ class MockSynthesisLLM:
 class TestFindMergeCandidates:
     def test_alias_overlap_found(self):
         """Entities with overlapping aliases are detected as candidates."""
-        from cortex.reflection.consolidator import Consolidator
+        from graphite.reflection.consolidator import Consolidator
 
         kg = _build_merge_candidate_graph()
-        config = CortexConfig(merge_alias_overlap_threshold=0.30)
+        config = GraphiteConfig(merge_alias_overlap_threshold=0.30)
         consolidator = Consolidator(kg, config=config)
 
         candidates = consolidator.find_merge_candidates()
@@ -119,7 +119,7 @@ class TestFindMergeCandidates:
 
     def test_different_types_excluded(self):
         """Entities of different types are never merge candidates."""
-        from cortex.reflection.consolidator import Consolidator
+        from graphite.reflection.consolidator import Consolidator
 
         kg = FakeKnowledgeGraph()
         kg.add_test_entity("e-react-person", "React", "Person")
@@ -127,7 +127,7 @@ class TestFindMergeCandidates:
         kg.add_test_entity("e-react-tech", "React", "Technology")
         kg._entities["e-react-tech"]["aliases"] = ["React"]
 
-        config = CortexConfig(merge_alias_overlap_threshold=0.50)
+        config = GraphiteConfig(merge_alias_overlap_threshold=0.50)
         consolidator = Consolidator(kg, config=config)
 
         candidates = consolidator.find_merge_candidates()
@@ -135,10 +135,10 @@ class TestFindMergeCandidates:
 
     def test_clean_graph_empty(self):
         """Graph with no duplicates returns no candidates."""
-        from cortex.reflection.consolidator import Consolidator
+        from graphite.reflection.consolidator import Consolidator
 
         kg = _build_test_graph()  # clean graph
-        config = CortexConfig(merge_alias_overlap_threshold=0.80)
+        config = GraphiteConfig(merge_alias_overlap_threshold=0.80)
         consolidator = Consolidator(kg, config=config)
 
         candidates = consolidator.find_merge_candidates()
@@ -148,7 +148,7 @@ class TestFindMergeCandidates:
 class TestConfirmMerges:
     def test_no_llm_high_confidence(self):
         """Without LLM, high-confidence candidates are auto-approved."""
-        from cortex.reflection.consolidator import Consolidator, MergeCandidate
+        from graphite.reflection.consolidator import Consolidator, MergeCandidate
 
         kg = FakeKnowledgeGraph()
         consolidator = Consolidator(kg, llm_client=None)
@@ -162,7 +162,7 @@ class TestConfirmMerges:
 
     def test_no_llm_low_confidence(self):
         """Without LLM, low-confidence candidates are not approved."""
-        from cortex.reflection.consolidator import Consolidator, MergeCandidate
+        from graphite.reflection.consolidator import Consolidator, MergeCandidate
 
         kg = FakeKnowledgeGraph()
         consolidator = Consolidator(kg, llm_client=None)
@@ -175,7 +175,7 @@ class TestConfirmMerges:
 
     def test_llm_approves(self):
         """LLM that says YES approves the merge."""
-        from cortex.reflection.consolidator import Consolidator, MergeCandidate
+        from graphite.reflection.consolidator import Consolidator, MergeCandidate
 
         kg = FakeKnowledgeGraph()
         llm = MockMergeLLM(approve=True)
@@ -189,7 +189,7 @@ class TestConfirmMerges:
 
     def test_llm_rejects(self):
         """LLM that says NO rejects the merge."""
-        from cortex.reflection.consolidator import Consolidator, MergeCandidate
+        from graphite.reflection.consolidator import Consolidator, MergeCandidate
 
         kg = FakeKnowledgeGraph()
         llm = MockMergeLLM(approve=False)
@@ -205,7 +205,7 @@ class TestConfirmMerges:
 class TestExecuteMerges:
     def test_merges_performed(self):
         """Confirmed merges are executed on the knowledge graph."""
-        from cortex.reflection.consolidator import Consolidator, MergeCandidate
+        from graphite.reflection.consolidator import Consolidator, MergeCandidate
 
         kg = _build_merge_candidate_graph()
         consolidator = Consolidator(kg)
@@ -223,7 +223,7 @@ class TestExecuteMerges:
 
     def test_embedding_cache_invalidated(self):
         """Merge invalidates embedding cache for both entities."""
-        from cortex.reflection.consolidator import Consolidator, MergeCandidate
+        from graphite.reflection.consolidator import Consolidator, MergeCandidate
 
         kg = _build_merge_candidate_graph()
         mock_embed = _make_mock_embedding_manager()
@@ -244,10 +244,10 @@ class TestExecuteMerges:
 class TestCleanupOrphans:
     def test_old_orphan_removed(self):
         """Orphan entities older than max age are removed."""
-        from cortex.reflection.consolidator import Consolidator
+        from graphite.reflection.consolidator import Consolidator
 
         kg = _build_merge_candidate_graph()
-        config = CortexConfig(orphan_max_age_days=7)
+        config = GraphiteConfig(orphan_max_age_days=7)
         consolidator = Consolidator(kg, config=config)
 
         count = consolidator.cleanup_orphans()
@@ -256,13 +256,13 @@ class TestCleanupOrphans:
 
     def test_new_orphan_preserved(self):
         """Recently created orphans are kept."""
-        from cortex.reflection.consolidator import Consolidator
+        from graphite.reflection.consolidator import Consolidator
 
         kg = FakeKnowledgeGraph()
         now = int(time.time())
         kg.add_test_entity("e-new", "New Orphan", "Person",
                            created_at=now, updated_at=now)
-        config = CortexConfig(orphan_max_age_days=7)
+        config = GraphiteConfig(orphan_max_age_days=7)
         consolidator = Consolidator(kg, config=config)
 
         count = consolidator.cleanup_orphans()
@@ -271,10 +271,10 @@ class TestCleanupOrphans:
 
     def test_connected_entity_kept(self):
         """Entities with edges are never orphan-removed."""
-        from cortex.reflection.consolidator import Consolidator
+        from graphite.reflection.consolidator import Consolidator
 
         kg = _build_merge_candidate_graph()
-        config = CortexConfig(orphan_max_age_days=0)  # remove any orphan regardless of age
+        config = GraphiteConfig(orphan_max_age_days=0)  # remove any orphan regardless of age
         consolidator = Consolidator(kg, config=config)
 
         count = consolidator.cleanup_orphans()
@@ -286,7 +286,7 @@ class TestCleanupOrphans:
 class TestApplyDecay:
     def test_access_count_reduced(self):
         """Decay reduces access_count based on age."""
-        from cortex.reflection.consolidator import Consolidator
+        from graphite.reflection.consolidator import Consolidator
 
         kg = FakeKnowledgeGraph()
         old_ts = int(time.time()) - (30 * 86400)  # 30 days ago
@@ -294,7 +294,7 @@ class TestApplyDecay:
                            created_at=old_ts, updated_at=old_ts)
         kg._entities["e-old"]["access_count"] = 100
 
-        config = CortexConfig(decay_half_life_days=30.0, decay_archival_threshold=5)
+        config = GraphiteConfig(decay_half_life_days=30.0, decay_archival_threshold=5)
         consolidator = Consolidator(kg, config=config)
 
         total, flagged = consolidator.apply_decay()
@@ -302,30 +302,39 @@ class TestApplyDecay:
 
 
 class TestConsolidatorOrchestration:
-    def test_run_full_completes(self):
-        """run_full executes all phases and returns a result."""
-        from cortex.reflection.consolidator import Consolidator
+    def test_run_full_does_not_remove_orphans_or_decay(self):
+        """Lifelong-memory semantics: run_full no longer prunes orphans
+        or applies decay. The planted orphan survives a full run."""
+        from graphite.reflection.consolidator import Consolidator
 
         kg = _build_merge_candidate_graph()
-        config = CortexConfig(orphan_max_age_days=7)
+        config = GraphiteConfig(orphan_max_age_days=7)
         consolidator = Consolidator(kg, config=config)
+
+        assert kg.get_entity("e-orphan") is not None
 
         result = consolidator.run_full()
         assert result.duration_seconds >= 0
-        assert result.orphans_removed >= 0
+        assert result.orphans_removed == 0
+        assert result.entities_decayed == 0
+        assert kg.get_entity("e-orphan") is not None, (
+            "run_full must not remove orphans in lifelong-memory mode"
+        )
 
-    def test_run_lightweight_completes(self):
-        """run_lightweight only does orphan cleanup."""
-        from cortex.reflection.consolidator import Consolidator
+    def test_run_lightweight_is_noop(self):
+        """run_lightweight is a compatibility stub after PR 3 — it performs
+        no graph mutations and returns a zeroed result."""
+        from graphite.reflection.consolidator import Consolidator
 
         kg = _build_merge_candidate_graph()
-        config = CortexConfig(orphan_max_age_days=7)
+        config = GraphiteConfig(orphan_max_age_days=7)
         consolidator = Consolidator(kg, config=config)
 
         result = consolidator.run_lightweight()
         assert result.duration_seconds >= 0
-        assert result.orphans_removed >= 1
-        assert result.merges_found == 0  # lightweight doesn't do merges
+        assert result.orphans_removed == 0
+        assert result.merges_found == 0
+        assert result.entities_decayed == 0
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -336,7 +345,7 @@ class TestConsolidatorOrchestration:
 class TestSynthesizer:
     def test_no_llm_returns_none(self):
         """Without LLM, synthesis returns None."""
-        from cortex.reflection.synthesizer import Synthesizer
+        from graphite.reflection.synthesizer import Synthesizer
 
         kg = _build_test_graph()
         synthesizer = Synthesizer(kg, llm_client=None)
@@ -346,7 +355,7 @@ class TestSynthesizer:
 
     def test_mock_llm_creates_background_chunk(self):
         """With LLM, synthesis stores a Background chunk."""
-        from cortex.reflection.synthesizer import Synthesizer
+        from graphite.reflection.synthesizer import Synthesizer
 
         kg = _build_test_graph()
         # Add a third chunk tagged with e-john (synthesis requires >= 3)
@@ -374,7 +383,7 @@ class TestSynthesizer:
 
     def test_entity_with_few_chunks_skipped(self):
         """Entity with < 3 chunks is skipped."""
-        from cortex.reflection.synthesizer import Synthesizer
+        from graphite.reflection.synthesizer import Synthesizer
 
         kg = FakeKnowledgeGraph()
         kg.add_test_entity("e-lone", "Lone", "Person")
@@ -389,7 +398,7 @@ class TestSynthesizer:
 
     def test_enrichment_invalidates_embeddings(self):
         """enrich_entity_profiles invalidates the embedding cache."""
-        from cortex.reflection.synthesizer import Synthesizer
+        from graphite.reflection.synthesizer import Synthesizer
 
         kg = _build_test_graph()
         mock_embed = _make_mock_embedding_manager()
@@ -403,7 +412,7 @@ class TestSynthesizer:
 
     def test_edge_weight_update(self):
         """update_edge_weights calls recalculate."""
-        from cortex.reflection.synthesizer import Synthesizer
+        from graphite.reflection.synthesizer import Synthesizer
 
         kg = _build_test_graph()
         synthesizer = Synthesizer(kg)
@@ -412,7 +421,7 @@ class TestSynthesizer:
 
     def test_full_run_completes(self):
         """Full synthesis run completes without errors."""
-        from cortex.reflection.synthesizer import Synthesizer
+        from graphite.reflection.synthesizer import Synthesizer
 
         kg = _build_test_graph()
         llm = MockSynthesisLLM()

@@ -4,7 +4,7 @@ import sys
 import pytest
 from unittest.mock import MagicMock, patch
 
-from cortex.llm import LLMClient, StubClient
+from graphite.llm import LLMClient, StubClient
 
 
 class TestMLXClientImportGuard:
@@ -14,7 +14,7 @@ class TestMLXClientImportGuard:
         """Attempting to create MLXClient without mlx-lm raises ImportError."""
         # Ensure mlx_lm is not importable
         with patch.dict("sys.modules", {"mlx_lm": None, "mlx_lm.sample_utils": None}):
-            from cortex.llm import MLXClient
+            from graphite.llm import MLXClient
             with pytest.raises(ImportError) as exc_info:
                 MLXClient()
             assert "mlx-lm is not installed" in str(exc_info.value)
@@ -22,10 +22,10 @@ class TestMLXClientImportGuard:
     def test_import_error_mentions_install_command(self):
         """Error message tells the user how to install."""
         with patch.dict("sys.modules", {"mlx_lm": None, "mlx_lm.sample_utils": None}):
-            from cortex.llm import MLXClient
+            from graphite.llm import MLXClient
             with pytest.raises(ImportError) as exc_info:
                 MLXClient()
-            assert "pip install 'cortex[mlx]'" in str(exc_info.value)
+            assert "pip install 'graphite[mlx]'" in str(exc_info.value)
 
 
 class TestMLXClientInit:
@@ -45,7 +45,7 @@ class TestMLXClientInit:
             "mlx_lm": mock_mlx_lm,
             "mlx_lm.sample_utils": mock_sample_utils,
         }):
-            from cortex.llm import MLXClient
+            from graphite.llm import MLXClient
             client = MLXClient(model="mlx-community/test-model")
 
         mock_mlx_lm.load.assert_called_once_with("mlx-community/test-model")
@@ -72,7 +72,7 @@ class TestMLXClientChat:
             "mlx_lm": mock_mlx_lm,
             "mlx_lm.sample_utils": mock_sample_utils,
         }):
-            from cortex.llm import MLXClient
+            from graphite.llm import MLXClient
             client = MLXClient()
 
         self.mock_generate = mock_mlx_lm.generate
@@ -86,9 +86,28 @@ class TestMLXClientChat:
 
         client.chat(messages)
 
+        # ``enable_thinking=False`` is required for Qwen3 to emit clean
+        # JSON without <think>...</think> blocks. Older models ignore it.
         self.mock_tokenizer.apply_chat_template.assert_called_once_with(
-            messages, tokenize=False, add_generation_prompt=True
+            messages,
+            tokenize=False,
+            add_generation_prompt=True,
+            enable_thinking=False,
         )
+
+    def test_thinking_mode_disabled_for_qwen3_compatibility(self):
+        """Regression guard: removing ``enable_thinking=False`` would
+        break the Graphite tagger pipeline on Qwen3 models because
+        <think>...</think> blocks would land inside the JSON output
+        the tagger expects to parse."""
+        client = self._make_client()
+        self.mock_tokenizer.apply_chat_template.return_value = "<formatted>"
+        self.mock_generate.return_value = "[]"
+
+        client.chat([{"role": "user", "content": "tag entities"}])
+
+        kwargs = self.mock_tokenizer.apply_chat_template.call_args.kwargs
+        assert kwargs.get("enable_thinking") is False
 
     def test_generate_called_with_correct_args(self):
         client = self._make_client()
@@ -128,7 +147,7 @@ class TestMLXClientConformsToABC:
             "mlx_lm": mock_mlx_lm,
             "mlx_lm.sample_utils": mock_sample_utils,
         }):
-            from cortex.llm import MLXClient
+            from graphite.llm import MLXClient
             client = MLXClient()
 
         assert isinstance(client, LLMClient)

@@ -17,6 +17,9 @@ test_repo/
 # Build artifacts
 dist/
 
+# Graphite graph data (lives in ~/.graphite, never committed)
+.graphite/
+
 # Rust
 rust_core/target/
 
@@ -24,3 +27,7 @@ rust_core/target/
 git-workflow.md
 CLAUDE.md
 docs/
+
+# macOS / editor cruft
+.DS_Store
+.vscode/

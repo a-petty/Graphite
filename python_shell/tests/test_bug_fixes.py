@@ -2,13 +2,13 @@
 
 Covers:
 - Bug #14: UTC timestamp parsing in structural_parser
-- Bug #8: CortexConfig validation
+- Bug #8: GraphiteConfig validation
 """
 
 import pytest
 
-from cortex.config import CortexConfig
-from cortex.extraction.structural_parser import StructuralParser
+from graphite.config import GraphiteConfig
+from graphite.extraction.structural_parser import StructuralParser
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -43,24 +43,24 @@ class TestTimestampParsingUTC:
 
 
 class TestConfigValidation:
-    """Verify CortexConfig __post_init__ catches invalid values."""
+    """Verify GraphiteConfig __post_init__ catches invalid values."""
 
     def test_config_default_values_pass_validation(self):
-        """Default CortexConfig should pass validation without errors."""
-        config = CortexConfig()
+        """Default GraphiteConfig should pass validation without errors."""
+        config = GraphiteConfig()
         assert config.tier1_budget_pct == 0.10
 
     def test_config_validates_budget_sum(self):
         """Budget percentages summing > 1.0 should raise ValueError."""
         with pytest.raises(ValueError, match="tier1_budget_pct.*tier2_budget_pct.*<= 1.0"):
-            CortexConfig(tier1_budget_pct=0.5, tier2_budget_pct=0.6)
+            GraphiteConfig(tier1_budget_pct=0.5, tier2_budget_pct=0.6)
 
     def test_config_validates_threshold_range(self):
         """Values outside [0.0, 1.0] should raise ValueError."""
         with pytest.raises(ValueError, match="must be in.*0.0.*1.0"):
-            CortexConfig(similarity_weight=1.5)
+            GraphiteConfig(similarity_weight=1.5)
 
     def test_config_validates_positive_integers(self):
         """Non-positive integers should raise ValueError."""
         with pytest.raises(ValueError, match="must be a positive integer"):
-            CortexConfig(max_chunk_tokens=0)
+            GraphiteConfig(max_chunk_tokens=0)

@@ -2,7 +2,7 @@
 
 import pytest
 from pathlib import Path
-from cortex.semantic_engine import RepoGraph, GraphUpdateResult, scan_repository
+from graphite.semantic_engine import RepoGraph, GraphUpdateResult, scan_repository
 
 @pytest.fixture
 def dummy_repo(tmp_path):

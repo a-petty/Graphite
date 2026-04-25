@@ -774,8 +774,31 @@ impl PyKnowledgeGraph {
     }
 
     /// Save the graph to disk at the given path.
+    /// Refuses to save if the graph is empty (0 entities) and a non-empty
+    /// data file already exists, preventing accidental data loss.
     fn save(&self, path: &str) -> PyResult<()> {
         let store = GraphStore::new(Path::new(path));
+
+        // Extra guard: check entity count before delegating to store
+        let entity_count = self.kg.entity_count();
+        if entity_count == 0 {
+            let graph_file = Path::new(path).join(".graphite").join("graph.msgpack");
+            if graph_file.exists() {
+                if let Ok(metadata) = std::fs::metadata(&graph_file) {
+                    if metadata.len() > 10 {
+                        log::warn!(
+                            "Refusing to save empty graph (0 entities) over non-empty file ({} bytes): {}",
+                            metadata.len(),
+                            graph_file.display()
+                        );
+                        return Err(PyRuntimeError::new_err(
+                            "Refusing to save empty graph over non-empty existing file"
+                        ));
+                    }
+                }
+            }
+        }
+
         store
             .save_with_backup(&self.kg)
             .map_err(|e| PyRuntimeError::new_err(e))
@@ -789,6 +812,17 @@ impl PyKnowledgeGraph {
             .map_err(|e| PyRuntimeError::new_err(e))?;
         self.kg = kg;
         Ok(())
+    }
+
+    /// Create a new PyKnowledgeGraph by loading from disk. Static constructor.
+    /// Use this instead of calling load() as a classmethod.
+    #[staticmethod]
+    fn from_path(path: &str) -> PyResult<Self> {
+        let store = GraphStore::new(Path::new(path));
+        let kg = store
+            .load(Path::new(path))
+            .map_err(|e| PyRuntimeError::new_err(e))?;
+        Ok(Self { kg })
     }
 
     /// Get graph statistics as JSON.
@@ -829,6 +863,18 @@ impl PyKnowledgeGraph {
         self.kg.recalculate_edge_weights()
     }
 
+    /// Remove parallel (duplicate) edges between the same entity pair.
+    /// Returns the number of duplicate edges removed.
+    fn deduplicate_edges(&mut self) -> usize {
+        self.kg.deduplicate_edges()
+    }
+
+    /// Remove edges whose weight is below the given threshold.
+    /// Returns the number of edges pruned.
+    fn prune_edges_below_weight(&mut self, threshold: f32) -> usize {
+        self.kg.prune_edges_below_weight(threshold)
+    }
+
     /// Remove a document and cascade-clean its chunks, edges, and orphaned entities.
     /// Returns JSON DocumentRemovalResult.
     fn remove_document(&mut self, document: &str) -> PyResult<String> {
@@ -841,6 +887,27 @@ impl PyKnowledgeGraph {
     fn get_chunks_by_document(&self, document: &str) -> PyResult<String> {
         let chunks = self.kg.get_chunks_by_document(document);
         serde_json::to_string(&chunks)
+            .map_err(|e| PyRuntimeError::new_err(format!("Serialize error: {}", e)))
+    }
+
+    /// Get all chunks whose timestamp falls within `[start, end]` (inclusive).
+    /// Pass `None` on either bound for an open-ended window. Chunks without a
+    /// timestamp are skipped. Returns JSON array.
+    #[pyo3(signature = (start = None, end = None))]
+    fn get_chunks_by_time_window(
+        &self,
+        start: Option<i64>,
+        end: Option<i64>,
+    ) -> PyResult<String> {
+        let chunks = self.kg.get_chunks_by_time_window(start, end);
+        serde_json::to_string(&chunks)
+            .map_err(|e| PyRuntimeError::new_err(format!("Serialize error: {}", e)))
+    }
+
+    /// Get all entities tagged with the given project. Returns JSON array.
+    fn get_entities_by_project(&self, project: &str) -> PyResult<String> {
+        let entities = self.kg.get_entities_by_project(project);
+        serde_json::to_string(&entities)
             .map_err(|e| PyRuntimeError::new_err(format!("Serialize error: {}", e)))
     }
 

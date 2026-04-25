@@ -1,0 +1,20 @@
+Classify each of the following text chunks from conversation transcripts into exactly one category.
+Categories: decision, discussion, preference, debugging, code_review, architecture, learning, action_item, status_update, background, filler
+
+Category definitions:
+- decision: A choice was made about approach, tool, design, or direction
+- discussion: General technical or project discussion
+- preference: User expresses a preference, opinion, or style choice
+- debugging: Troubleshooting a bug, error, or unexpected behavior
+- code_review: Reviewing, critiquing, or refining code
+- architecture: Designing systems, planning structure, discussing patterns
+- learning: User learning something new, asking explanatory questions
+- action_item: A task or follow-up was identified
+- status_update: Progress report on work being done
+- background: Context-setting, history, or reference information
+- filler: No meaningful information (tool call noise, brief acknowledgments)
+
+Respond with ONLY the category names, one per line, in the same order as the chunks.
+Do not include chunk numbers, explanations, or any other text.
+
+{chunks}

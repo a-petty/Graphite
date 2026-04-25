@@ -15,8 +15,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from cortex.config import CortexConfig
-from cortex.ingestion.pipeline import (
+from graphite.config import GraphiteConfig
+from graphite.ingestion.pipeline import (
     DocumentUpdateResult,
     IngestionPipeline,
     IngestionResult,
@@ -63,7 +63,7 @@ def _make_pipeline_with_fake_kg(tmp_path) -> tuple:
     Returns (pipeline, fake_kg, file_path).
     """
     kg = FakeKnowledgeGraph()
-    config = CortexConfig()
+    config = GraphiteConfig()
     config.memory_root = tmp_path
 
     # Create a test document

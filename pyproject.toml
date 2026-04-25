@@ -1,5 +1,5 @@
 [project]
-name = "cortex"
+name = "graphite"
 version = "0.1.0"
 description = "Knowledge graph memory system for LLMs"
 authors = [{ name = "Alec Petty", email = "alexander@petty.is" }]
@@ -16,8 +16,9 @@ dependencies = [
 requires-python = ">=3.10"
 
 [project.scripts]
-cortex = "cortex.cli:main"
-cortex-mcp = "cortex.mcp_server:main"
+graphite = "graphite.cli:main"
+graphite-mcp = "graphite.mcp_server:main"
+graphited = "graphite.daemon:main"
 
 [project.optional-dependencies]
 dev = [
@@ -27,6 +28,12 @@ dev = [
 ]
 mlx = [
     "mlx-lm>=0.20",
+]
+openai = [
+    "openai>=1.0",
+]
+anthropic = [
+    "anthropic>=0.39",
 ]
 mcp = [
     "mcp[cli]>=1.0",
@@ -38,6 +45,6 @@ build-backend = "maturin"
 
 [tool.maturin]
 binding = "pyo3"
-module-name = "cortex.semantic_engine" # Name of the python module that maturin will create from rust_core
+module-name = "graphite.semantic_engine" # Name of the python module that maturin will create from rust_core
 manifest-path = "rust_core/Cargo.toml"
 python-source = "python_shell"

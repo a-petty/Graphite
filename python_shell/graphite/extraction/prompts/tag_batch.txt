@@ -1,0 +1,30 @@
+For each of the following text chunks, list every person, project, technology,
+organization, location, decision, and concept mentioned.
+
+Type definitions:
+- person: specific individuals (e.g., "Alberto Menolascina", "Alec")
+- project: named initiatives, products, or systems being built (e.g., "Graphite", "FountainOfYouth", "Anaplan Rollout")
+- technology: programming languages, frameworks, tools, protocols, or technical methods (e.g., "Rust", "Tree-sitter", "OAuth")
+- organization: companies, teams, institutions (e.g., "GoPuff", "OpenAI", "Stanford")
+- location: geographic places, cities, regions (e.g., "San Francisco", "Silicon Valley")
+- decision: a choice or conclusion that was made (e.g., "switched to Qwen 2.5", "deferred to Phase 2")
+- concept: abstract ideas, principles, or domain-specific terms that don't fit other types (e.g., "damping", "vertical integration", "PageRank")
+
+Important:
+- Do NOT extract file paths, CLI flags, file extensions, or raw numbers as entities.
+- When unsure between concept and technology, prefer technology for anything technical.
+- When unsure between concept and project, prefer project for named initiatives or products.
+
+For each entity, provide:
+- name: the most complete form of the name used in the text
+- type: person, project, technology, organization, location, decision, or concept
+
+Respond with a JSON object where keys are chunk numbers ("1", "2", etc.)
+and values are arrays of entity objects.
+
+Example response format:
+{"1": [{"name": "Alice", "type": "person"}], "2": [{"name": "React", "type": "technology"}]}
+
+Return ONLY the JSON object, no other text.
+
+{chunks}

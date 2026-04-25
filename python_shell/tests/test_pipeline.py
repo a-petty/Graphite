@@ -1,7 +1,7 @@
 """Tests for the Phase 2 three-pass tag-and-index extraction pipeline.
 
 Covers:
-- CortexConfig defaults and overrides
+- GraphiteConfig defaults and overrides
 - Document categorization
 - Structural parser (all document types)
 - Chunk classifier (with mock LLM)
@@ -15,17 +15,17 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from cortex.config import CortexConfig
-from cortex.extraction.classifier import ChunkClassifier, ClassifiedChunk
-from cortex.extraction.structural_parser import RawChunk, StructuralParser
-from cortex.extraction.tagger import (
+from graphite.config import GraphiteConfig
+from graphite.extraction.classifier import ChunkClassifier, ClassifiedChunk
+from graphite.extraction.structural_parser import RawChunk, StructuralParser
+from graphite.extraction.tagger import (
     EntityTagger,
     ExtractedEntity,
     TaggedChunk,
 )
-from cortex.ingestion.categorizer import categorize_document
-from cortex.ingestion.pipeline import IngestionPipeline, IngestionResult
-from cortex.llm import StubClient
+from graphite.ingestion.categorizer import categorize_document
+from graphite.ingestion.pipeline import IngestionPipeline, IngestionResult
+from graphite.llm import StubClient
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -33,9 +33,9 @@ from cortex.llm import StubClient
 # ═══════════════════════════════════════════════════════════════════════════════
 
 
-class TestCortexConfig:
+class TestGraphiteConfig:
     def test_defaults(self):
-        config = CortexConfig()
+        config = GraphiteConfig()
         assert config.llm_provider == "ollama"
         assert config.llm_model == "llama3.3:70b"
         assert config.llm_temperature == 0.1
@@ -51,7 +51,7 @@ class TestCortexConfig:
         assert config.default_chunk_type == "background"
 
     def test_overrides(self):
-        config = CortexConfig(
+        config = GraphiteConfig(
             llm_model="llama3.1:8b",
             max_chunk_tokens=500,
             disambiguation_auto_merge_threshold=0.90,
@@ -63,20 +63,20 @@ class TestCortexConfig:
         assert config.llm_provider == "ollama"
 
     def test_prompts_dir_resolves(self):
-        config = CortexConfig()
+        config = GraphiteConfig()
         assert config.prompts_dir.exists()
         assert (config.prompts_dir / "classify.txt").exists()
         assert (config.prompts_dir / "tag.txt").exists()
 
     def test_get_prompt(self):
-        config = CortexConfig()
+        config = GraphiteConfig()
         classify_prompt = config.get_prompt("classify")
         assert "{chunk_text}" in classify_prompt
         tag_prompt = config.get_prompt("tag")
         assert "{chunk_text}" in tag_prompt
 
     def test_get_prompt_missing(self):
-        config = CortexConfig()
+        config = GraphiteConfig()
         with pytest.raises(FileNotFoundError):
             config.get_prompt("nonexistent")
 
@@ -227,7 +227,7 @@ class TestStructuralParser:
         # Create a chunk that exceeds the token limit
         # Use 200 words with max_chunk_tokens=100 (100/1.3 ≈ 77 words per chunk)
         long_text = " ".join([f"word{i}" for i in range(200)])
-        parser = StructuralParser(CortexConfig(max_chunk_tokens=100))
+        parser = StructuralParser(GraphiteConfig(max_chunk_tokens=100))
         chunks = parser.parse(long_text, "big.md", "Episodic")
         assert len(chunks) > 1
         # Each chunk should be under the limit (with some slack for overlap)
@@ -282,13 +282,28 @@ class TestStructuralParser:
 
 
 class MockClassifierLLM:
-    """Mock LLM that returns predefined classifications."""
+    """Mock LLM that returns predefined classifications.
+
+    Handles both batch and individual calls:
+    - Batch call (prompt contains '---CHUNK'): returns all remaining
+      responses as newline-separated lines.
+    - Individual call: returns responses one at a time.
+    """
 
     def __init__(self, responses):
         self.responses = responses
         self.call_index = 0
 
     def chat(self, messages):
+        prompt = messages[0]["content"] if messages else ""
+
+        # Detect batch call
+        if "---CHUNK" in prompt:
+            remaining = self.responses[self.call_index:]
+            self.call_index = len(self.responses)
+            return "\n".join(remaining)
+
+        # Individual call
         if self.call_index < len(self.responses):
             response = self.responses[self.call_index]
         else:
@@ -649,7 +664,7 @@ class TestPipeline:
 
     def test_ingest_file(self, tmp_path):
         """End-to-end pipeline test with a simple document."""
-        from cortex.semantic_engine import PyKnowledgeGraph
+        from graphite.semantic_engine import PyKnowledgeGraph
 
         # Create test document
         doc = tmp_path / "memory" / "meetings" / "test.md"
@@ -660,7 +675,7 @@ class TestPipeline:
         )
 
         kg = PyKnowledgeGraph(str(tmp_path))
-        config = CortexConfig(memory_root=tmp_path / "memory")
+        config = GraphiteConfig(memory_root=tmp_path / "memory")
         llm = self._make_mock_llm()
 
         pipeline = IngestionPipeline(
@@ -677,7 +692,7 @@ class TestPipeline:
 
     def test_ingest_empty_file(self, tmp_path):
         """Empty files should be handled gracefully."""
-        from cortex.semantic_engine import PyKnowledgeGraph
+        from graphite.semantic_engine import PyKnowledgeGraph
 
         doc = tmp_path / "empty.md"
         doc.write_text("")
@@ -692,7 +707,7 @@ class TestPipeline:
 
     def test_ingest_nonexistent_file(self, tmp_path):
         """Missing files should return failed status."""
-        from cortex.semantic_engine import PyKnowledgeGraph
+        from graphite.semantic_engine import PyKnowledgeGraph
 
         kg = PyKnowledgeGraph(str(tmp_path))
         llm = self._make_mock_llm()
@@ -704,7 +719,7 @@ class TestPipeline:
 
     def test_ingest_directory(self, tmp_path):
         """Directory ingestion should process all .md files."""
-        from cortex.semantic_engine import PyKnowledgeGraph
+        from graphite.semantic_engine import PyKnowledgeGraph
 
         # Create multiple test documents
         meetings = tmp_path / "memory" / "meetings"
@@ -717,7 +732,7 @@ class TestPipeline:
         )
 
         kg = PyKnowledgeGraph(str(tmp_path))
-        config = CortexConfig(memory_root=tmp_path / "memory")
+        config = GraphiteConfig(memory_root=tmp_path / "memory")
 
         # Create a mock LLM that handles both classify and tag calls for both docs
         class MultiDocMockLLM:
@@ -739,7 +754,7 @@ class TestPipeline:
 
     def test_graph_writes(self, tmp_path):
         """Verify entities, chunks, and edges are written to the graph."""
-        from cortex.semantic_engine import PyKnowledgeGraph
+        from graphite.semantic_engine import PyKnowledgeGraph
 
         # Use markdown format (not meeting transcript) so all entity names
         # appear in the chunk text for hallucination validation to pass
@@ -779,7 +794,7 @@ class TestPipeline:
 
     def test_no_llm_client(self, tmp_path):
         """Pipeline without LLM should fail gracefully."""
-        from cortex.semantic_engine import PyKnowledgeGraph
+        from graphite.semantic_engine import PyKnowledgeGraph
 
         doc = tmp_path / "test.md"
         doc.write_text("Some content here.")
@@ -792,7 +807,7 @@ class TestPipeline:
 
     def test_save_graph(self, tmp_path):
         """Verify graph persistence after ingestion."""
-        from cortex.semantic_engine import PyKnowledgeGraph
+        from graphite.semantic_engine import PyKnowledgeGraph
 
         # Use plain text (not meeting transcript) so entity names stay in chunk text
         doc = tmp_path / "test.md"
@@ -814,11 +829,12 @@ class TestPipeline:
         pipeline = IngestionPipeline(kg, SimpleMockLLM())
         pipeline.ingest_file(doc)
 
-        save_path = str(tmp_path / "test_graph.msgpack")
+        # save_path is the directory; GraphStore appends .graphite/graph.msgpack
+        save_path = str(tmp_path / "save_dir")
         pipeline.save_graph(save_path)
 
         # Load and verify
-        loaded_kg = PyKnowledgeGraph.load(save_path)
+        loaded_kg = PyKnowledgeGraph.from_path(save_path)
         stats_json = loaded_kg.get_statistics()
         stats = json.loads(stats_json)
         assert stats["entity_count"] == 2

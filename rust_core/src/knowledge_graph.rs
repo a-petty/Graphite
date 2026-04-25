@@ -375,6 +375,33 @@ impl KnowledgeGraph {
             .collect()
     }
 
+    /// Get all chunks whose timestamp falls within `[start, end]`.
+    /// Either bound may be `None` for an open-ended window. Chunks without
+    /// a timestamp are skipped.
+    pub fn get_chunks_by_time_window(
+        &self,
+        start: Option<i64>,
+        end: Option<i64>,
+    ) -> Vec<&Chunk> {
+        self.chunks
+            .values()
+            .filter(|c| match c.timestamp {
+                Some(ts) => {
+                    start.map_or(true, |s| ts >= s) && end.map_or(true, |e| ts <= e)
+                }
+                None => false,
+            })
+            .collect()
+    }
+
+    /// Get all entities whose `projects` list contains the given project name.
+    pub fn get_entities_by_project(&self, project: &str) -> Vec<&EntityNode> {
+        self.graph
+            .node_weights()
+            .filter(|e| e.projects.iter().any(|p| p == project))
+            .collect()
+    }
+
     /// Remove a document and cascade-clean all its artifacts:
     /// chunks, orphaned edges, and orphaned entities.
     pub fn remove_document(&mut self, document: &str) -> DocumentRemovalResult {
@@ -783,6 +810,92 @@ impl KnowledgeGraph {
 
         self.pagerank_dirty = true;
         updated
+    }
+
+    /// Remove parallel (duplicate) edges between the same entity pair.
+    ///
+    /// After a merge, edges from the removed entity may duplicate existing
+    /// edges on the kept entity. This method consolidates parallel edges:
+    /// keeps the one with the highest weight, accumulates the total weight
+    /// from all duplicates, and removes the rest.
+    ///
+    /// Returns the number of duplicate edges removed.
+    pub fn deduplicate_edges(&mut self) -> usize {
+        // Collect (source_idx, target_idx) → list of edge indices
+        let mut pair_edges: HashMap<(NodeIndex, NodeIndex), Vec<petgraph::graph::EdgeIndex>> =
+            HashMap::new();
+        for edge_idx in self.graph.edge_indices() {
+            if let Some((src, tgt)) = self.graph.edge_endpoints(edge_idx) {
+                pair_edges.entry((src, tgt)).or_default().push(edge_idx);
+            }
+        }
+
+        let mut removed = 0;
+        for (_pair, edges) in pair_edges {
+            if edges.len() <= 1 {
+                continue;
+            }
+            // Find the edge with the highest weight to keep
+            let mut keep_idx = edges[0];
+            let mut max_weight: f32 = -1.0;
+            let mut total_weight: f32 = 0.0;
+            for &eidx in &edges {
+                if let Some(edge) = self.graph.edge_weight(eidx) {
+                    total_weight += edge.weight;
+                    if edge.weight > max_weight {
+                        max_weight = edge.weight;
+                        keep_idx = eidx;
+                    }
+                }
+            }
+
+            // Set kept edge weight to the sum of all parallel edges
+            if let Some(keep_edge) = self.graph.edge_weight_mut(keep_idx) {
+                keep_edge.weight = total_weight;
+            }
+
+            // Remove duplicate edges (reverse order to avoid index invalidation)
+            let mut to_remove: Vec<petgraph::graph::EdgeIndex> =
+                edges.into_iter().filter(|e| *e != keep_idx).collect();
+            to_remove.sort_by(|a, b| b.cmp(a));
+            for eidx in to_remove {
+                self.graph.remove_edge(eidx);
+                removed += 1;
+            }
+        }
+
+        if removed > 0 {
+            self.pagerank_dirty = true;
+        }
+        removed
+    }
+
+    /// Remove all co-occurrence edges whose weight is below the given threshold.
+    ///
+    /// Used after decay to prune edges that have faded to near-zero weight
+    /// (no recent access or re-inforcement). These edges contribute noise to
+    /// search and context assembly.
+    ///
+    /// Returns the number of edges pruned.
+    pub fn prune_edges_below_weight(&mut self, threshold: f32) -> usize {
+        let mut edges_to_remove = Vec::new();
+        for edge_idx in self.graph.edge_indices() {
+            if let Some(edge) = self.graph.edge_weight(edge_idx) {
+                if edge.weight < threshold {
+                    edges_to_remove.push(edge_idx);
+                }
+            }
+        }
+        // Remove in reverse index order to avoid invalidation
+        edges_to_remove.sort_by(|a, b| b.cmp(a));
+        let count = edges_to_remove.len();
+        for edge_idx in edges_to_remove {
+            self.graph.remove_edge(edge_idx);
+        }
+        if count > 0 {
+            self.pagerank_dirty = true;
+        }
+        count
     }
 
     // ── Export ──

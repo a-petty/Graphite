@@ -1,0 +1,6 @@
+this is not valid json at all
+{"type":"file-history-snapshot","messageId":"mal-0001","snapshot":{"messageId":"mal-0001","trackedFileBackups":{},"timestamp":"2026-03-07T12:00:00.000Z"},"isSnapshotUpdate":false}
+{"broken json that is missing closing brace
+{"parentUuid":null,"isSidechain":false,"userType":"external","cwd":"/Users/apetty/Dev/Graphite","sessionId":"malformed-005","version":"2.1.63","gitBranch":"main","slug":"malformed","type":"user","message":{"role":"user","content":"This session has some malformed lines mixed in but should still parse the valid ones."},"uuid":"mal-user-001","timestamp":"2026-03-07T12:00:01.000Z"}
+not json either {"foo": "bar"
+{"parentUuid":"mal-user-001","isSidechain":false,"userType":"external","cwd":"/Users/apetty/Dev/Graphite","sessionId":"malformed-005","version":"2.1.63","gitBranch":"main","slug":"malformed","message":{"model":"claude-opus-4-6","id":"msg_mal001","type":"message","role":"assistant","content":[{"type":"text","text":"I can still respond to valid messages even when the session file has some corruption."}],"stop_reason":"end_turn","usage":{"input_tokens":100,"output_tokens":30}},"type":"assistant","uuid":"mal-asst-001","timestamp":"2026-03-07T12:00:10.000Z"}
