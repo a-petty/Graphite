@@ -230,10 +230,11 @@ def _install_openclaw(
         entries[PLUGIN_ID] = new_plugin
 
         plugin_path = (plugin_source or DEFAULT_PLUGIN_SOURCE).resolve()
-        if not (plugin_path / "openclaw.plugin.json").exists():
+        if not (plugin_path / "HOOK.md").exists():
             plugin_msgs.append(
-                f"  ! plugin source not found at {plugin_path}; entry written but"
-                f" `openclaw plugins install -l` will fail until the path exists."
+                f"  ! plugin source not found at {plugin_path} (HOOK.md missing); "
+                f"entry written but `openclaw plugins install -l` will fail "
+                f"until the path exists."
             )
         if prev_plugin != new_plugin:
             plugin_msgs.append(

@@ -339,9 +339,10 @@ class TestPluginEntryInstall:
 
     def test_default_plugin_source_points_at_repo_dir(self):
         # The default path resolves to <repo>/openclaw_plugin/. The
-        # directory exists in this repo with the manifest + JS entry.
+        # directory must contain HOOK.md (OpenClaw hook-pack manifest)
+        # plus the JS entry point.
         p = mcp_install.DEFAULT_PLUGIN_SOURCE
-        assert (p / "openclaw.plugin.json").exists()
+        assert (p / "HOOK.md").exists()
         assert (p / "index.js").exists()
 
 

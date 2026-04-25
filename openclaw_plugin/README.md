@@ -1,4 +1,8 @@
-# Graphite Memory Capture — OpenClaw plugin
+# Graphite Memory Capture — OpenClaw hook pack
+
+OpenClaw's CLI calls these "hook packs" (the directory must contain
+`HOOK.md` + a `handler`/`index` entry); the docs occasionally also
+refer to them as "plugins". Same thing under both names.
 
 Pushes OpenClaw session activity into the local Graphite knowledge graph
 via the `graphited` daemon.
